@@ -1,0 +1,31 @@
+{
+  "name": "world-execute-terminal-film",
+  "version": "1.0.0",
+  "description": "A deterministic, music-driven terminal film for world.execute(me);",
+  "private": true,
+  "engines": { "node": ">=24 <25" },
+  "bin": { "ascii-film": "dist/src/cli.js" },
+  "scripts": {
+    "play": "node --max-old-space-size=64 --max-semi-space-size=4 --import tsx src/cli.ts play",
+    "check": "tsc --noEmit && node --import tsx src/cli.ts check",
+    "build": "tsc",
+    "test": "node --import tsx --test --test-isolation=none test/*.test.ts",
+    "test:e2e": "python3 test/pty_smoke.py",
+    "render": "node --max-old-space-size=64 --max-semi-space-size=4 --import tsx src/cli.ts render",
+    "benchmark": "node --max-old-space-size=64 --max-semi-space-size=4 --import tsx src/cli.ts benchmark"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "GPL-3.0-only",
+  "type": "module",
+  "dependencies": {
+    "string-width": "8.3.0",
+    "terminal-kit": "3.1.4"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.2",
+    "@types/terminal-kit": "2.5.7",
+    "tsx": "4.23.15",
+    "typescript": "7.0.2"
+  }
+}

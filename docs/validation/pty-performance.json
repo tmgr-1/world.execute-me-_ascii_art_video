@@ -1,0 +1,76 @@
+{
+  "environment": {
+    "platform": "linux",
+    "arch": "x64",
+    "node": "v24.19.0",
+    "size": {
+      "columns": 130,
+      "rows": 35
+    },
+    "mpv": "/home/hyh214/codebase/world.execute_me_2/test/fixtures/fake-mpv.mjs",
+    "audioDevice": "system default, unmeasured",
+    "terminal": "xterm-256color",
+    "font": "not measured"
+  },
+  "metrics": {
+    "frames": 65,
+    "meanFrameMs": 5.019584446153824,
+    "p95FrameMs": 15.214373999999964,
+    "meanEncodeMs": 1.9024634615384552,
+    "rssBytes": 159502336,
+    "dropped": 0,
+    "bytes": 398208,
+    "ipcAgeMs": 14.039930999999797
+  },
+  "critical": [
+    {
+      "id": "send.hello",
+      "atMs": 17780
+    },
+    {
+      "id": "send.points",
+      "atMs": 29770
+    },
+    {
+      "id": "send.circle",
+      "atMs": 33440
+    },
+    {
+      "id": "send.tangent",
+      "atMs": 36960
+    },
+    {
+      "id": "send.infinity",
+      "atMs": 40780
+    },
+    {
+      "id": "send.current",
+      "atMs": 44340
+    },
+    {
+      "id": "send.time",
+      "atMs": 51480
+    },
+    {
+      "id": "send.align",
+      "atMs": 55260
+    },
+    {
+      "id": "intent",
+      "atMs": 162300,
+      "submittedAtMs": 162331.35302853654,
+      "errorMs": 31.353028536541387
+    },
+    {
+      "id": "interrupt",
+      "atMs": 162550,
+      "submittedAtMs": 162611.87258493516,
+      "errorMs": 61.872584935161285
+    }
+  ],
+  "syncFailures": [],
+  "markers": [],
+  "resized": false,
+  "anchorStatus": "unreviewed",
+  "synchronization": "Submission timing only; sound-to-screen latency is not measured."
+}

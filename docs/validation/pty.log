@@ -1,0 +1,7 @@
+
+> world-execute-terminal-film@1.0.0 test:e2e
+> python3 test/pty_smoke.py
+
+PTY fixture passed: ready/start, termination, pause, resize, seek, quit, terminal restore, no duplicate requests.
+PTY player-failure case passed: full-screen panels at 220x60 / 240x64, real ERROR, no story termination, terminal restored.
+PTY loop case passed: repeated exact media seeks, deterministic rebuild, no duplicate requests, terminal restored.

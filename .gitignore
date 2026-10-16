@@ -1,0 +1,44 @@
+# Dependencies, builds, development caches and model weights
+node_modules/
+dist/
+.venv/
+.cache/
+__pycache__/
+*.pyc
+*.tsbuildinfo
+coverage/
+.pytest_cache/
+.ruff_cache/
+*.pt
+*.safetensors
+
+# Local music supplied by the viewer
+*.mp3
+*.wav
+*.flac
+*.m4a
+*.ogg
+*.aac
+*.opus
+*.wma
+*.aiff
+
+# Keep the original root lyric file and the pending v3 design local
+/world.execute (me) ; - Mili.lyc
+/design/story_revision_v3_review.md
+
+# Local credentials, agent state, editor files and operating-system metadata
+.env
+.env.*
+!.env.example
+!.env.*.example
+.aws/
+.codex/
+.agents/
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

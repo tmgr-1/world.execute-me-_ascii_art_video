@@ -1,0 +1,3144 @@
+{
+  "status": "rough",
+  "method": "stable-ts-section-constrained",
+  "audioSha256": "2e9c1a2f7795818ccb6b6fd3fc540d42e73567fde3e8abaeef435ef70f6c85d4",
+  "model": "small",
+  "modelSha256": "9ecf779972d90ba49c06d968637d720dd632c55bbf19d441fb42bf17a411e794",
+  "referenceFileLines": 92,
+  "designNodes": 93,
+  "reviewedByListening": false,
+  "lines": [
+    {
+      "number": 1,
+      "text": "Switch on the power line",
+      "start": 0.34,
+      "end": 1.72,
+      "words": [
+        {
+          "word": " Switch",
+          "start": 0.34,
+          "end": 0.34,
+          "probability": 0.06431274116039276
+        },
+        {
+          "word": " on",
+          "start": 0.34,
+          "end": 0.86,
+          "probability": 0.9263368248939514
+        },
+        {
+          "word": " the",
+          "start": 0.86,
+          "end": 1.04,
+          "probability": 0.988705575466156
+        },
+        {
+          "word": " power",
+          "start": 1.04,
+          "end": 1.3,
+          "probability": 0.8776335120201111
+        },
+        {
+          "word": " line",
+          "start": 1.3,
+          "end": 1.72,
+          "probability": 0.8633571863174438
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "text": "Remember to put on protection",
+      "start": 1.8,
+      "end": 3.6,
+      "words": [
+        {
+          "word": " Remember",
+          "start": 1.8,
+          "end": 2.22,
+          "probability": 0.5610869526863098
+        },
+        {
+          "word": " to",
+          "start": 2.22,
+          "end": 2.58,
+          "probability": 0.9478455185890198
+        },
+        {
+          "word": " put",
+          "start": 2.58,
+          "end": 2.9,
+          "probability": 0.5021805167198181
+        },
+        {
+          "word": " on",
+          "start": 2.9,
+          "end": 3.1,
+          "probability": 0.8443073630332947
+        },
+        {
+          "word": " protection",
+          "start": 3.1,
+          "end": 3.6,
+          "probability": 0.851983368396759
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "text": "Lay down your pieces",
+      "start": 3.9,
+      "end": 5.18,
+      "words": [
+        {
+          "word": " Lay",
+          "start": 3.9,
+          "end": 4.08,
+          "probability": 0.9647988080978394
+        },
+        {
+          "word": " down",
+          "start": 4.08,
+          "end": 4.54,
+          "probability": 0.9918745160102844
+        },
+        {
+          "word": " your",
+          "start": 4.54,
+          "end": 4.72,
+          "probability": 0.9914030432701111
+        },
+        {
+          "word": " pieces",
+          "start": 4.72,
+          "end": 5.18,
+          "probability": 0.9544534087181091
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "text": "And let's begin object creation",
+      "start": 5.44,
+      "end": 7.34,
+      "words": [
+        {
+          "word": " And",
+          "start": 5.44,
+          "end": 5.66,
+          "probability": 0.8539779186248779
+        },
+        {
+          "word": " let's",
+          "start": 5.66,
+          "end": 5.94,
+          "probability": 0.969084769487381
+        },
+        {
+          "word": " begin",
+          "start": 5.94,
+          "end": 6.26,
+          "probability": 0.9903234243392944
+        },
+        {
+          "word": " object",
+          "start": 6.26,
+          "end": 6.62,
+          "probability": 0.20597349107265472
+        },
+        {
+          "word": " creation",
+          "start": 6.62,
+          "end": 7.34,
+          "probability": 0.9862381219863892
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "text": "Fill in my data parameters",
+      "start": 7.54,
+      "end": 9.68,
+      "words": [
+        {
+          "word": " Fill",
+          "start": 7.54,
+          "end": 7.78,
+          "probability": 0.057342998683452606
+        },
+        {
+          "word": " in",
+          "start": 7.78,
+          "end": 8.24,
+          "probability": 0.9819913506507874
+        },
+        {
+          "word": " my",
+          "start": 8.24,
+          "end": 8.46,
+          "probability": 0.9711329936981201
+        },
+        {
+          "word": " data",
+          "start": 8.46,
+          "end": 8.82,
+          "probability": 0.9912176728248596
+        },
+        {
+          "word": " parameters",
+          "start": 8.82,
+          "end": 9.68,
+          "probability": 0.09290894865989685
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "text": "Initialization",
+      "start": 10.14,
+      "end": 11.02,
+      "words": [
+        {
+          "word": " Initialization",
+          "start": 10.14,
+          "end": 11.02,
+          "probability": 0.9226604104042053
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "text": "Set up our new world",
+      "start": 11.26,
+      "end": 12.68,
+      "words": [
+        {
+          "word": " Set",
+          "start": 11.26,
+          "end": 11.44,
+          "probability": 0.9885814785957336
+        },
+        {
+          "word": " up",
+          "start": 11.44,
+          "end": 11.94,
+          "probability": 0.9268011450767517
+        },
+        {
+          "word": " our",
+          "start": 11.94,
+          "end": 12.16,
+          "probability": 0.5415874719619751
+        },
+        {
+          "word": " new",
+          "start": 12.16,
+          "end": 12.4,
+          "probability": 0.9756599068641663
+        },
+        {
+          "word": " world",
+          "start": 12.4,
+          "end": 12.68,
+          "probability": 0.9798689484596252
+        }
+      ]
+    },
+    {
+      "number": 8,
+      "text": "And let's begin the simulation",
+      "start": 12.84,
+      "end": 14.48,
+      "words": [
+        {
+          "word": " And",
+          "start": 12.84,
+          "end": 13.0,
+          "probability": 0.9091567993164062
+        },
+        {
+          "word": " let's",
+          "start": 13.0,
+          "end": 13.32,
+          "probability": 0.9942423701286316
+        },
+        {
+          "word": " begin",
+          "start": 13.32,
+          "end": 13.62,
+          "probability": 0.9977160692214966
+        },
+        {
+          "word": " the",
+          "start": 13.62,
+          "end": 13.94,
+          "probability": 0.8451323509216309
+        },
+        {
+          "word": " simulation",
+          "start": 13.94,
+          "end": 14.48,
+          "probability": 0.9725570678710938
+        }
+      ]
+    },
+    {
+      "number": 9,
+      "text": "If I'm a set of point",
+      "start": 29.96,
+      "end": 31.16,
+      "words": [
+        {
+          "word": " If",
+          "start": 29.96,
+          "end": 29.96,
+          "probability": 0.03923138603568077
+        },
+        {
+          "word": " I'm",
+          "start": 29.96,
+          "end": 30.5,
+          "probability": 0.9111440777778625
+        },
+        {
+          "word": " a",
+          "start": 30.5,
+          "end": 30.66,
+          "probability": 0.43067631125450134
+        },
+        {
+          "word": " set",
+          "start": 30.66,
+          "end": 30.740000000000002,
+          "probability": 0.8125933408737183
+        },
+        {
+          "word": " of",
+          "start": 30.740000000000002,
+          "end": 30.92,
+          "probability": 0.46045541763305664
+        },
+        {
+          "word": " point",
+          "start": 30.92,
+          "end": 31.16,
+          "probability": 0.0007816437864676118
+        }
+      ]
+    },
+    {
+      "number": 10,
+      "text": "Then I will give you my dimension",
+      "start": 31.32,
+      "end": 33.22,
+      "words": [
+        {
+          "word": " Then",
+          "start": 31.32,
+          "end": 31.5,
+          "probability": 0.2895945608615875
+        },
+        {
+          "word": " I",
+          "start": 31.5,
+          "end": 31.740000000000002,
+          "probability": 0.9579082131385803
+        },
+        {
+          "word": " will",
+          "start": 31.740000000000002,
+          "end": 31.94,
+          "probability": 0.9027427434921265
+        },
+        {
+          "word": " give",
+          "start": 31.94,
+          "end": 32.18,
+          "probability": 0.9924613833427429
+        },
+        {
+          "word": " you",
+          "start": 32.18,
+          "end": 32.4,
+          "probability": 0.9835648536682129
+        },
+        {
+          "word": " my",
+          "start": 32.4,
+          "end": 32.660000000000004,
+          "probability": 0.98720782995224
+        },
+        {
+          "word": " dimension",
+          "start": 32.660000000000004,
+          "end": 33.22,
+          "probability": 0.9415642619132996
+        }
+      ]
+    },
+    {
+      "number": 11,
+      "text": "If I'm a circle",
+      "start": 33.64,
+      "end": 34.620000000000005,
+      "words": [
+        {
+          "word": " If",
+          "start": 33.64,
+          "end": 33.64,
+          "probability": 0.9017193913459778
+        },
+        {
+          "word": " I'm",
+          "start": 33.64,
+          "end": 34.2,
+          "probability": 0.9834089875221252
+        },
+        {
+          "word": " a",
+          "start": 34.2,
+          "end": 34.32,
+          "probability": 0.983474850654602
+        },
+        {
+          "word": " circle",
+          "start": 34.32,
+          "end": 34.620000000000005,
+          "probability": 0.9966624975204468
+        }
+      ]
+    },
+    {
+      "number": 12,
+      "text": "Then I will give you my circumference",
+      "start": 35.04,
+      "end": 36.980000000000004,
+      "words": [
+        {
+          "word": " Then",
+          "start": 35.04,
+          "end": 35.18,
+          "probability": 0.886238694190979
+        },
+        {
+          "word": " I",
+          "start": 35.18,
+          "end": 35.44,
+          "probability": 0.995252251625061
+        },
+        {
+          "word": " will",
+          "start": 35.44,
+          "end": 35.64,
+          "probability": 0.9841676354408264
+        },
+        {
+          "word": " give",
+          "start": 35.64,
+          "end": 35.88,
+          "probability": 0.9964154958724976
+        },
+        {
+          "word": " you",
+          "start": 35.88,
+          "end": 36.14,
+          "probability": 0.995388388633728
+        },
+        {
+          "word": " my",
+          "start": 36.14,
+          "end": 36.32,
+          "probability": 0.9884603023529053
+        },
+        {
+          "word": " circumference",
+          "start": 36.32,
+          "end": 36.980000000000004,
+          "probability": 0.8823076784610748
+        }
+      ]
+    },
+    {
+      "number": 13,
+      "text": "If I'm a sine wave",
+      "start": 37.36,
+      "end": 38.56,
+      "words": [
+        {
+          "word": " If",
+          "start": 37.36,
+          "end": 37.36,
+          "probability": 0.9027435183525085
+        },
+        {
+          "word": " I'm",
+          "start": 37.36,
+          "end": 37.88,
+          "probability": 0.9730646908283234
+        },
+        {
+          "word": " a",
+          "start": 37.88,
+          "end": 38.0,
+          "probability": 0.9643439054489136
+        },
+        {
+          "word": " sine",
+          "start": 38.0,
+          "end": 38.120000000000005,
+          "probability": 0.8683926463127136
+        },
+        {
+          "word": " wave",
+          "start": 38.120000000000005,
+          "end": 38.56,
+          "probability": 0.9664875268936157
+        }
+      ]
+    },
+    {
+      "number": 14,
+      "text": "Then you can sit on all my tangents",
+      "start": 38.7,
+      "end": 40.66,
+      "words": [
+        {
+          "word": " Then",
+          "start": 38.7,
+          "end": 38.88,
+          "probability": 0.922160267829895
+        },
+        {
+          "word": " you",
+          "start": 38.88,
+          "end": 39.1,
+          "probability": 0.9946711659431458
+        },
+        {
+          "word": " can",
+          "start": 39.1,
+          "end": 39.3,
+          "probability": 0.995342493057251
+        },
+        {
+          "word": " sit",
+          "start": 39.3,
+          "end": 39.56,
+          "probability": 0.0003761247207876295
+        },
+        {
+          "word": " on",
+          "start": 39.56,
+          "end": 39.82,
+          "probability": 0.4351758360862732
+        },
+        {
+          "word": " all",
+          "start": 39.82,
+          "end": 40.06,
+          "probability": 0.09785734117031097
+        },
+        {
+          "word": " my",
+          "start": 40.06,
+          "end": 40.260000000000005,
+          "probability": 0.9666125774383545
+        },
+        {
+          "word": " tangents",
+          "start": 40.260000000000005,
+          "end": 40.66,
+          "probability": 0.4927661311812699
+        }
+      ]
+    },
+    {
+      "number": 15,
+      "text": "If I approach infinity",
+      "start": 40.78,
+      "end": 41.88,
+      "words": [
+        {
+          "word": " If",
+          "start": 40.78,
+          "end": 41.02,
+          "probability": 0.6447391510009766
+        },
+        {
+          "word": " I",
+          "start": 41.02,
+          "end": 41.18,
+          "probability": 0.9606591463088989
+        },
+        {
+          "word": " approach",
+          "start": 41.18,
+          "end": 41.44,
+          "probability": 0.21738633513450623
+        },
+        {
+          "word": " infinity",
+          "start": 41.44,
+          "end": 41.88,
+          "probability": 0.9351423978805542
+        }
+      ]
+    },
+    {
+      "number": 16,
+      "text": "Then you can be my limitations",
+      "start": 42.42,
+      "end": 44.120000000000005,
+      "words": [
+        {
+          "word": " Then",
+          "start": 42.42,
+          "end": 42.56,
+          "probability": 0.9157447218894958
+        },
+        {
+          "word": " you",
+          "start": 42.56,
+          "end": 42.8,
+          "probability": 0.9963310360908508
+        },
+        {
+          "word": " can",
+          "start": 42.8,
+          "end": 43.0,
+          "probability": 0.9966026544570923
+        },
+        {
+          "word": " be",
+          "start": 43.0,
+          "end": 43.260000000000005,
+          "probability": 0.9915603995323181
+        },
+        {
+          "word": " my",
+          "start": 43.260000000000005,
+          "end": 43.5,
+          "probability": 0.9898404479026794
+        },
+        {
+          "word": " limitations",
+          "start": 43.5,
+          "end": 44.120000000000005,
+          "probability": 0.0750909149646759
+        }
+      ]
+    },
+    {
+      "number": 17,
+      "text": "Switch my current",
+      "start": 44.34,
+      "end": 45.8,
+      "words": [
+        {
+          "word": " Switch",
+          "start": 44.34,
+          "end": 44.78,
+          "probability": 0.0037137188483029604
+        },
+        {
+          "word": " my",
+          "start": 44.78,
+          "end": 45.2,
+          "probability": 0.9643446207046509
+        },
+        {
+          "word": " current",
+          "start": 45.2,
+          "end": 45.8,
+          "probability": 0.9695622324943542
+        }
+      ]
+    },
+    {
+      "number": 18,
+      "text": "To AC, to DC",
+      "start": 46.1,
+      "end": 47.46,
+      "words": [
+        {
+          "word": " To",
+          "start": 46.1,
+          "end": 46.260000000000005,
+          "probability": 0.9195858240127563
+        },
+        {
+          "word": " AC,",
+          "start": 46.260000000000005,
+          "end": 46.980000000000004,
+          "probability": 0.5766013413667679
+        },
+        {
+          "word": " to",
+          "start": 46.980000000000004,
+          "end": 47.16,
+          "probability": 0.9531909227371216
+        },
+        {
+          "word": " DC",
+          "start": 47.16,
+          "end": 47.46,
+          "probability": 0.5172411799430847
+        }
+      ]
+    },
+    {
+      "number": 19,
+      "text": "And then blind my vision",
+      "start": 47.78,
+      "end": 49.42,
+      "words": [
+        {
+          "word": " And",
+          "start": 47.78,
+          "end": 47.94,
+          "probability": 0.8591499924659729
+        },
+        {
+          "word": " then",
+          "start": 47.94,
+          "end": 48.120000000000005,
+          "probability": 0.7958621382713318
+        },
+        {
+          "word": " blind",
+          "start": 48.120000000000005,
+          "end": 48.379999999999995,
+          "probability": 0.3517170548439026
+        },
+        {
+          "word": " my",
+          "start": 48.379999999999995,
+          "end": 48.879999999999995,
+          "probability": 0.9841718077659607
+        },
+        {
+          "word": " vision",
+          "start": 48.879999999999995,
+          "end": 49.42,
+          "probability": 0.9966039657592773
+        }
+      ]
+    },
+    {
+      "number": 20,
+      "text": "So dizzy, so dizzy",
+      "start": 49.8,
+      "end": 51.22,
+      "words": [
+        {
+          "word": " So",
+          "start": 49.8,
+          "end": 49.94,
+          "probability": 0.7856172919273376
+        },
+        {
+          "word": " dizzy,",
+          "start": 49.94,
+          "end": 50.64,
+          "probability": 0.3869869120535441
+        },
+        {
+          "word": " so",
+          "start": 50.64,
+          "end": 50.86,
+          "probability": 0.9934896230697632
+        },
+        {
+          "word": " dizzy",
+          "start": 50.86,
+          "end": 51.22,
+          "probability": 0.9832184910774231
+        }
+      ]
+    },
+    {
+      "number": 21,
+      "text": "Oh, we can travel",
+      "start": 51.480000000000004,
+      "end": 53.06,
+      "words": [
+        {
+          "word": " Oh,",
+          "start": 51.480000000000004,
+          "end": 51.66,
+          "probability": 0.19560982659459114
+        },
+        {
+          "word": " we",
+          "start": 51.66,
+          "end": 51.900000000000006,
+          "probability": 0.2564511001110077
+        },
+        {
+          "word": " can",
+          "start": 51.900000000000006,
+          "end": 52.519999999999996,
+          "probability": 0.9901239275932312
+        },
+        {
+          "word": " travel",
+          "start": 52.519999999999996,
+          "end": 53.06,
+          "probability": 0.974239706993103
+        }
+      ]
+    },
+    {
+      "number": 22,
+      "text": "To AD, to BC",
+      "start": 53.44,
+      "end": 54.84,
+      "words": [
+        {
+          "word": " To",
+          "start": 53.44,
+          "end": 53.64,
+          "probability": 0.9452071189880371
+        },
+        {
+          "word": " AD,",
+          "start": 53.64,
+          "end": 54.400000000000006,
+          "probability": 0.8210883736610413
+        },
+        {
+          "word": " to",
+          "start": 54.400000000000006,
+          "end": 54.54,
+          "probability": 0.9973809123039246
+        },
+        {
+          "word": " BC",
+          "start": 54.54,
+          "end": 54.84,
+          "probability": 0.5020671486854553
+        }
+      ]
+    },
+    {
+      "number": 23,
+      "text": "And we can unite",
+      "start": 55.260000000000005,
+      "end": 56.879999999999995,
+      "words": [
+        {
+          "word": " And",
+          "start": 55.260000000000005,
+          "end": 55.32,
+          "probability": 0.9419338703155518
+        },
+        {
+          "word": " we",
+          "start": 55.32,
+          "end": 55.8,
+          "probability": 0.8754525184631348
+        },
+        {
+          "word": " can",
+          "start": 55.8,
+          "end": 56.3,
+          "probability": 0.992074728012085
+        },
+        {
+          "word": " unite",
+          "start": 56.3,
+          "end": 56.879999999999995,
+          "probability": 0.9941609501838684
+        }
+      ]
+    },
+    {
+      "number": 24,
+      "text": "So deeply, so deeply",
+      "start": 57.2,
+      "end": 58.54,
+      "words": [
+        {
+          "word": " So",
+          "start": 57.2,
+          "end": 57.34,
+          "probability": 0.6234378218650818
+        },
+        {
+          "word": " deeply,",
+          "start": 57.34,
+          "end": 57.96,
+          "probability": 0.5412408038973808
+        },
+        {
+          "word": " so",
+          "start": 57.96,
+          "end": 58.22,
+          "probability": 0.990581214427948
+        },
+        {
+          "word": " deeply",
+          "start": 58.22,
+          "end": 58.54,
+          "probability": 0.9952318072319031
+        }
+      ]
+    },
+    {
+      "number": 25,
+      "text": "If I can, if I can",
+      "start": 59.48,
+      "end": 61.04,
+      "words": [
+        {
+          "word": " If",
+          "start": 59.48,
+          "end": 59.48,
+          "probability": 0.0026652030646800995
+        },
+        {
+          "word": " I",
+          "start": 59.48,
+          "end": 59.86,
+          "probability": 0.7351827025413513
+        },
+        {
+          "word": " can,",
+          "start": 59.86,
+          "end": 60.24,
+          "probability": 0.48007075022906065
+        },
+        {
+          "word": " if",
+          "start": 60.24,
+          "end": 60.42,
+          "probability": 0.7586506605148315
+        },
+        {
+          "word": " I",
+          "start": 60.42,
+          "end": 60.8,
+          "probability": 0.9560386538505554
+        },
+        {
+          "word": " can",
+          "start": 60.8,
+          "end": 61.04,
+          "probability": 0.997595489025116
+        }
+      ]
+    },
+    {
+      "number": 26,
+      "text": "Give you all the simulations",
+      "start": 61.12,
+      "end": 62.44,
+      "words": [
+        {
+          "word": " Give",
+          "start": 61.12,
+          "end": 61.3,
+          "probability": 0.5572884678840637
+        },
+        {
+          "word": " you",
+          "start": 61.3,
+          "end": 61.519999999999996,
+          "probability": 0.4064229428768158
+        },
+        {
+          "word": " all",
+          "start": 61.519999999999996,
+          "end": 61.76,
+          "probability": 0.8990983963012695
+        },
+        {
+          "word": " the",
+          "start": 61.76,
+          "end": 61.92,
+          "probability": 0.2197725623846054
+        },
+        {
+          "word": " simulations",
+          "start": 61.92,
+          "end": 62.44,
+          "probability": 0.05757426843047142
+        }
+      ]
+    },
+    {
+      "number": 27,
+      "text": "Then I can, then I can",
+      "start": 62.48,
+      "end": 64.67999999999999,
+      "words": [
+        {
+          "word": " Then",
+          "start": 62.48,
+          "end": 63.36,
+          "probability": 0.06098257005214691
+        },
+        {
+          "word": " I",
+          "start": 63.36,
+          "end": 63.58,
+          "probability": 0.07415834814310074
+        },
+        {
+          "word": " can,",
+          "start": 63.58,
+          "end": 63.92,
+          "probability": 0.840414971113205
+        },
+        {
+          "word": " then",
+          "start": 63.92,
+          "end": 64.16,
+          "probability": 0.9599584937095642
+        },
+        {
+          "word": " I",
+          "start": 64.16,
+          "end": 64.52,
+          "probability": 0.9163199067115784
+        },
+        {
+          "word": " can",
+          "start": 64.52,
+          "end": 64.67999999999999,
+          "probability": 0.9922879934310913
+        }
+      ]
+    },
+    {
+      "number": 28,
+      "text": "Be your only satisfaction",
+      "start": 64.98,
+      "end": 66.03999999999999,
+      "words": [
+        {
+          "word": " Be",
+          "start": 64.98,
+          "end": 65.02,
+          "probability": 0.516106367111206
+        },
+        {
+          "word": " your",
+          "start": 65.02,
+          "end": 65.22,
+          "probability": 0.7820388078689575
+        },
+        {
+          "word": " only",
+          "start": 65.22,
+          "end": 65.58,
+          "probability": 0.8107554912567139
+        },
+        {
+          "word": " satisfaction",
+          "start": 65.58,
+          "end": 66.03999999999999,
+          "probability": 0.0013726181350648403
+        }
+      ]
+    },
+    {
+      "number": 29,
+      "text": "If I can make you happy",
+      "start": 66.22,
+      "end": 68.28,
+      "words": [
+        {
+          "word": " If",
+          "start": 66.22,
+          "end": 66.84,
+          "probability": 0.915158748626709
+        },
+        {
+          "word": " I",
+          "start": 66.84,
+          "end": 67.25999999999999,
+          "probability": 0.9839872121810913
+        },
+        {
+          "word": " can",
+          "start": 67.25999999999999,
+          "end": 67.5,
+          "probability": 0.9981992840766907
+        },
+        {
+          "word": " make",
+          "start": 67.5,
+          "end": 67.75999999999999,
+          "probability": 0.8490051627159119
+        },
+        {
+          "word": " you",
+          "start": 67.75999999999999,
+          "end": 67.94,
+          "probability": 0.9953711628913879
+        },
+        {
+          "word": " happy",
+          "start": 67.94,
+          "end": 68.28,
+          "probability": 0.9693887233734131
+        }
+      ]
+    },
+    {
+      "number": 30,
+      "text": "I will run the execution",
+      "start": 68.52,
+      "end": 69.96,
+      "words": [
+        {
+          "word": " I",
+          "start": 68.52,
+          "end": 68.7,
+          "probability": 0.8743449449539185
+        },
+        {
+          "word": " will",
+          "start": 68.7,
+          "end": 68.88,
+          "probability": 0.28135690093040466
+        },
+        {
+          "word": " run",
+          "start": 68.88,
+          "end": 69.12,
+          "probability": 0.10366584360599518
+        },
+        {
+          "word": " the",
+          "start": 69.12,
+          "end": 69.32,
+          "probability": 0.048053078353405
+        },
+        {
+          "word": " execution",
+          "start": 69.32,
+          "end": 69.96,
+          "probability": 0.15832965075969696
+        }
+      ]
+    },
+    {
+      "number": 31,
+      "text": "Though we are trapped",
+      "start": 70.36,
+      "end": 71.53999999999999,
+      "words": [
+        {
+          "word": " Though",
+          "start": 70.36,
+          "end": 70.6,
+          "probability": 0.0017350456910207868
+        },
+        {
+          "word": " we",
+          "start": 70.6,
+          "end": 71.0,
+          "probability": 0.7571009993553162
+        },
+        {
+          "word": " are",
+          "start": 71.0,
+          "end": 71.16,
+          "probability": 0.9069443941116333
+        },
+        {
+          "word": " trapped",
+          "start": 71.16,
+          "end": 71.53999999999999,
+          "probability": 0.232413649559021
+        }
+      ]
+    },
+    {
+      "number": 32,
+      "text": "In this strange, strange simulation",
+      "start": 71.94,
+      "end": 73.34,
+      "words": [
+        {
+          "word": " In",
+          "start": 71.94,
+          "end": 71.94,
+          "probability": 0.8247147798538208
+        },
+        {
+          "word": " this",
+          "start": 71.94,
+          "end": 72.14,
+          "probability": 0.7415138483047485
+        },
+        {
+          "word": " strange,",
+          "start": 72.14,
+          "end": 72.53999999999999,
+          "probability": 0.8532274961471558
+        },
+        {
+          "word": " strange",
+          "start": 72.53999999999999,
+          "end": 72.92,
+          "probability": 0.9924353957176208
+        },
+        {
+          "word": " simulation",
+          "start": 72.92,
+          "end": 73.34,
+          "probability": 0.15195803344249725
+        }
+      ]
+    },
+    {
+      "number": 33,
+      "text": "If I'm an eggplant",
+      "start": 73.75,
+      "end": 75.27000000000001,
+      "words": [
+        {
+          "word": " If",
+          "start": 73.75,
+          "end": 74.17,
+          "probability": 0.05988169461488724
+        },
+        {
+          "word": " I'm",
+          "start": 74.17,
+          "end": 74.83000000000001,
+          "probability": 0.9484571814537048
+        },
+        {
+          "word": " an",
+          "start": 74.83000000000001,
+          "end": 74.95,
+          "probability": 0.8681429028511047
+        },
+        {
+          "word": " eggplant",
+          "start": 74.95,
+          "end": 75.27000000000001,
+          "probability": 0.9193353652954102
+        }
+      ]
+    },
+    {
+      "number": 34,
+      "text": "Then I will give u my nutrients",
+      "start": 75.27000000000001,
+      "end": 77.39,
+      "words": [
+        {
+          "word": " Then",
+          "start": 75.27000000000001,
+          "end": 75.89,
+          "probability": 0.05869679152965546
+        },
+        {
+          "word": " I",
+          "start": 75.89,
+          "end": 76.09,
+          "probability": 0.9828953742980957
+        },
+        {
+          "word": " will",
+          "start": 76.09,
+          "end": 76.23,
+          "probability": 0.8568823337554932
+        },
+        {
+          "word": " give",
+          "start": 76.23,
+          "end": 76.49000000000001,
+          "probability": 0.9731993079185486
+        },
+        {
+          "word": " u",
+          "start": 76.49000000000001,
+          "end": 76.71000000000001,
+          "probability": 0.00022145597904454917
+        },
+        {
+          "word": " my",
+          "start": 76.71000000000001,
+          "end": 77.01,
+          "probability": 0.19216474890708923
+        },
+        {
+          "word": " nutrients",
+          "start": 77.01,
+          "end": 77.39,
+          "probability": 0.11618264019489288
+        }
+      ]
+    },
+    {
+      "number": 35,
+      "text": "If I'm a tomato",
+      "start": 77.39,
+      "end": 78.97,
+      "words": [
+        {
+          "word": " If",
+          "start": 77.39,
+          "end": 77.97,
+          "probability": 0.8043810725212097
+        },
+        {
+          "word": " I'm",
+          "start": 77.97,
+          "end": 78.57000000000001,
+          "probability": 0.9334519505500793
+        },
+        {
+          "word": " a",
+          "start": 78.57000000000001,
+          "end": 78.61,
+          "probability": 0.929366409778595
+        },
+        {
+          "word": " tomato",
+          "start": 78.61,
+          "end": 78.97,
+          "probability": 0.9575400352478027
+        }
+      ]
+    },
+    {
+      "number": 36,
+      "text": "Then I will give you antioxidants",
+      "start": 79.23,
+      "end": 80.71000000000001,
+      "words": [
+        {
+          "word": " Then",
+          "start": 79.23,
+          "end": 79.45,
+          "probability": 0.9149977564811707
+        },
+        {
+          "word": " I",
+          "start": 79.45,
+          "end": 79.75,
+          "probability": 0.9942874312400818
+        },
+        {
+          "word": " will",
+          "start": 79.75,
+          "end": 79.93,
+          "probability": 0.9697250127792358
+        },
+        {
+          "word": " give",
+          "start": 79.93,
+          "end": 80.19000000000001,
+          "probability": 0.9647201299667358
+        },
+        {
+          "word": " you",
+          "start": 80.19000000000001,
+          "end": 80.43,
+          "probability": 0.631119966506958
+        },
+        {
+          "word": " antioxidants",
+          "start": 80.43,
+          "end": 80.71000000000001,
+          "probability": 0.01874075084924698
+        }
+      ]
+    },
+    {
+      "number": 37,
+      "text": "If I'm a tabby cat",
+      "start": 81.19000000000001,
+      "end": 82.87,
+      "words": [
+        {
+          "word": " If",
+          "start": 81.19000000000001,
+          "end": 81.61,
+          "probability": 0.9308642745018005
+        },
+        {
+          "word": " I'm",
+          "start": 81.61,
+          "end": 82.25,
+          "probability": 0.9861447513103485
+        },
+        {
+          "word": " a",
+          "start": 82.25,
+          "end": 82.29,
+          "probability": 0.9719074368476868
+        },
+        {
+          "word": " tabby",
+          "start": 82.29,
+          "end": 82.61000000000001,
+          "probability": 0.2909962311387062
+        },
+        {
+          "word": " cat",
+          "start": 82.61000000000001,
+          "end": 82.87,
+          "probability": 0.863861620426178
+        }
+      ]
+    },
+    {
+      "number": 38,
+      "text": "Then I will purr for your enjoyment",
+      "start": 83.03,
+      "end": 84.63000000000001,
+      "words": [
+        {
+          "word": " Then",
+          "start": 83.03,
+          "end": 83.23,
+          "probability": 0.9577000737190247
+        },
+        {
+          "word": " I",
+          "start": 83.23,
+          "end": 83.43,
+          "probability": 0.962330162525177
+        },
+        {
+          "word": " will",
+          "start": 83.43,
+          "end": 83.61000000000001,
+          "probability": 0.9531326293945312
+        },
+        {
+          "word": " purr",
+          "start": 83.61000000000001,
+          "end": 83.93,
+          "probability": 0.5701980516314507
+        },
+        {
+          "word": " for",
+          "start": 83.93,
+          "end": 84.05000000000001,
+          "probability": 0.9918891787528992
+        },
+        {
+          "word": " your",
+          "start": 84.05000000000001,
+          "end": 84.27000000000001,
+          "probability": 0.11463456600904465
+        },
+        {
+          "word": " enjoyment",
+          "start": 84.27000000000001,
+          "end": 84.63000000000001,
+          "probability": 0.018993455916643143
+        }
+      ]
+    },
+    {
+      "number": 39,
+      "text": "If I'm the only God",
+      "start": 84.67,
+      "end": 86.65,
+      "words": [
+        {
+          "word": " If",
+          "start": 84.67,
+          "end": 85.29,
+          "probability": 0.7551241517066956
+        },
+        {
+          "word": " I'm",
+          "start": 85.29,
+          "end": 85.87,
+          "probability": 0.9772887825965881
+        },
+        {
+          "word": " the",
+          "start": 85.87,
+          "end": 86.01,
+          "probability": 0.3601439595222473
+        },
+        {
+          "word": " only",
+          "start": 86.01,
+          "end": 86.25,
+          "probability": 0.6167272925376892
+        },
+        {
+          "word": " God",
+          "start": 86.25,
+          "end": 86.65,
+          "probability": 0.04577261209487915
+        }
+      ]
+    },
+    {
+      "number": 40,
+      "text": "Then you're the proof of my existence",
+      "start": 86.73,
+      "end": 88.39,
+      "words": [
+        {
+          "word": " Then",
+          "start": 86.73,
+          "end": 86.89,
+          "probability": 0.9220364093780518
+        },
+        {
+          "word": " you're",
+          "start": 86.89,
+          "end": 87.15,
+          "probability": 0.9066852629184723
+        },
+        {
+          "word": " the",
+          "start": 87.15,
+          "end": 87.27000000000001,
+          "probability": 0.9845133423805237
+        },
+        {
+          "word": " proof",
+          "start": 87.27000000000001,
+          "end": 87.57000000000001,
+          "probability": 0.9986066222190857
+        },
+        {
+          "word": " of",
+          "start": 87.57000000000001,
+          "end": 87.85000000000001,
+          "probability": 0.9900318384170532
+        },
+        {
+          "word": " my",
+          "start": 87.85000000000001,
+          "end": 88.09,
+          "probability": 0.9951601624488831
+        },
+        {
+          "word": " existence",
+          "start": 88.09,
+          "end": 88.39,
+          "probability": 0.9960806965827942
+        }
+      ]
+    },
+    {
+      "number": 41,
+      "text": "Switch my gender",
+      "start": 89.01,
+      "end": 89.99000000000001,
+      "words": [
+        {
+          "word": " Switch",
+          "start": 89.01,
+          "end": 89.07000000000001,
+          "probability": 0.0006586879026144743
+        },
+        {
+          "word": " my",
+          "start": 89.07000000000001,
+          "end": 89.45,
+          "probability": 0.9188508987426758
+        },
+        {
+          "word": " gender",
+          "start": 89.45,
+          "end": 89.99000000000001,
+          "probability": 0.9398356080055237
+        }
+      ]
+    },
+    {
+      "number": 42,
+      "text": "To F, to M",
+      "start": 90.21000000000001,
+      "end": 91.87,
+      "words": [
+        {
+          "word": " To",
+          "start": 90.21000000000001,
+          "end": 90.55000000000001,
+          "probability": 0.3966801166534424
+        },
+        {
+          "word": " F,",
+          "start": 90.55000000000001,
+          "end": 91.17,
+          "probability": 0.14399383005184063
+        },
+        {
+          "word": " to",
+          "start": 91.17,
+          "end": 91.51,
+          "probability": 0.8018328547477722
+        },
+        {
+          "word": " M",
+          "start": 91.51,
+          "end": 91.87,
+          "probability": 0.6659613847732544
+        }
+      ]
+    },
+    {
+      "number": 43,
+      "text": "And then do whatever",
+      "start": 91.87,
+      "end": 93.43,
+      "words": [
+        {
+          "word": " And",
+          "start": 91.87,
+          "end": 92.25,
+          "probability": 0.7006266713142395
+        },
+        {
+          "word": " then",
+          "start": 92.25,
+          "end": 92.47,
+          "probability": 0.4942112863063812
+        },
+        {
+          "word": " do",
+          "start": 92.47,
+          "end": 92.75,
+          "probability": 0.9324949383735657
+        },
+        {
+          "word": " whatever",
+          "start": 92.75,
+          "end": 93.43,
+          "probability": 0.9192216396331787
+        }
+      ]
+    },
+    {
+      "number": 44,
+      "text": "From AM to PM",
+      "start": 94.05000000000001,
+      "end": 95.71000000000001,
+      "words": [
+        {
+          "word": " From",
+          "start": 94.05000000000001,
+          "end": 94.27000000000001,
+          "probability": 0.8816477656364441
+        },
+        {
+          "word": " AM",
+          "start": 94.27000000000001,
+          "end": 94.65,
+          "probability": 0.006029615178704262
+        },
+        {
+          "word": " to",
+          "start": 94.65,
+          "end": 95.15,
+          "probability": 0.6452023983001709
+        },
+        {
+          "word": " PM",
+          "start": 95.15,
+          "end": 95.71000000000001,
+          "probability": 0.7938182950019836
+        }
+      ]
+    },
+    {
+      "number": 45,
+      "text": "Oh, my switch role",
+      "start": 95.91000000000001,
+      "end": 97.31,
+      "words": [
+        {
+          "word": " Oh,",
+          "start": 95.91000000000001,
+          "end": 96.15,
+          "probability": 0.1477141361683607
+        },
+        {
+          "word": " my",
+          "start": 96.15,
+          "end": 96.35000000000001,
+          "probability": 3.296154682175256e-05
+        },
+        {
+          "word": " switch",
+          "start": 96.35000000000001,
+          "end": 96.37,
+          "probability": 0.002898590872064233
+        },
+        {
+          "word": " role",
+          "start": 96.37,
+          "end": 97.31,
+          "probability": 0.00015889124188106507
+        }
+      ]
+    },
+    {
+      "number": 46,
+      "text": "To S, to M",
+      "start": 97.79,
+      "end": 99.25,
+      "words": [
+        {
+          "word": " To",
+          "start": 97.79,
+          "end": 98.03,
+          "probability": 0.9567896127700806
+        },
+        {
+          "word": " S,",
+          "start": 98.03,
+          "end": 98.87,
+          "probability": 0.8203917443752289
+        },
+        {
+          "word": " to",
+          "start": 98.87,
+          "end": 98.93,
+          "probability": 0.9910256266593933
+        },
+        {
+          "word": " M",
+          "start": 98.93,
+          "end": 99.25,
+          "probability": 0.8299286961555481
+        }
+      ]
+    },
+    {
+      "number": 47,
+      "text": "So we can enter",
+      "start": 99.35000000000001,
+      "end": 101.23,
+      "words": [
+        {
+          "word": " So",
+          "start": 99.35000000000001,
+          "end": 99.63000000000001,
+          "probability": 0.8973633050918579
+        },
+        {
+          "word": " we",
+          "start": 99.63000000000001,
+          "end": 100.13000000000001,
+          "probability": 0.4187539517879486
+        },
+        {
+          "word": " can",
+          "start": 100.13000000000001,
+          "end": 100.59,
+          "probability": 0.9852926135063171
+        },
+        {
+          "word": " enter",
+          "start": 100.59,
+          "end": 101.23,
+          "probability": 0.9451568126678467
+        }
+      ]
+    },
+    {
+      "number": 48,
+      "text": "The trance, the trance",
+      "start": 101.41000000000001,
+      "end": 103.13000000000001,
+      "words": [
+        {
+          "word": " The",
+          "start": 101.41000000000001,
+          "end": 101.59,
+          "probability": 0.8408755660057068
+        },
+        {
+          "word": " trance,",
+          "start": 101.59,
+          "end": 102.39,
+          "probability": 0.7222030659516653
+        },
+        {
+          "word": " the",
+          "start": 102.39,
+          "end": 102.53,
+          "probability": 0.9366205930709839
+        },
+        {
+          "word": " trance",
+          "start": 102.53,
+          "end": 103.13000000000001,
+          "probability": 0.9963021278381348
+        }
+      ]
+    },
+    {
+      "number": 49,
+      "text": "If I can, if I can",
+      "start": 103.86,
+      "end": 105.34,
+      "words": [
+        {
+          "word": " If",
+          "start": 103.86,
+          "end": 103.86,
+          "probability": 0.06364480406045914
+        },
+        {
+          "word": " I",
+          "start": 103.86,
+          "end": 104.17999999999999,
+          "probability": 0.9150514602661133
+        },
+        {
+          "word": " can,",
+          "start": 104.17999999999999,
+          "end": 104.53999999999999,
+          "probability": 0.5482432618737221
+        },
+        {
+          "word": " if",
+          "start": 104.53999999999999,
+          "end": 104.74,
+          "probability": 0.8560769557952881
+        },
+        {
+          "word": " I",
+          "start": 104.74,
+          "end": 105.08,
+          "probability": 0.973987340927124
+        },
+        {
+          "word": " can",
+          "start": 105.08,
+          "end": 105.34,
+          "probability": 0.9984800219535828
+        }
+      ]
+    },
+    {
+      "number": 50,
+      "text": "Feel your vibrations",
+      "start": 105.39999999999999,
+      "end": 106.96,
+      "words": [
+        {
+          "word": " Feel",
+          "start": 105.39999999999999,
+          "end": 105.66,
+          "probability": 0.42353948950767517
+        },
+        {
+          "word": " your",
+          "start": 105.66,
+          "end": 106.06,
+          "probability": 0.9750544428825378
+        },
+        {
+          "word": " vibrations",
+          "start": 106.06,
+          "end": 106.96,
+          "probability": 0.9615291357040405
+        }
+      ]
+    },
+    {
+      "number": 51,
+      "text": "Then I can, then I can",
+      "start": 106.96,
+      "end": 109.06,
+      "words": [
+        {
+          "word": " Then",
+          "start": 106.96,
+          "end": 107.64,
+          "probability": 0.018301432952284813
+        },
+        {
+          "word": " I",
+          "start": 107.64,
+          "end": 107.89999999999999,
+          "probability": 0.9270889759063721
+        },
+        {
+          "word": " can,",
+          "start": 107.89999999999999,
+          "end": 108.24,
+          "probability": 0.6665517538785934
+        },
+        {
+          "word": " then",
+          "start": 108.24,
+          "end": 108.5,
+          "probability": 0.8361791968345642
+        },
+        {
+          "word": " I",
+          "start": 108.5,
+          "end": 108.82,
+          "probability": 0.9225636124610901
+        },
+        {
+          "word": " can",
+          "start": 108.82,
+          "end": 109.06,
+          "probability": 0.9821398854255676
+        }
+      ]
+    },
+    {
+      "number": 52,
+      "text": "Finally be completion",
+      "start": 109.08,
+      "end": 110.52,
+      "words": [
+        {
+          "word": " Finally",
+          "start": 109.08,
+          "end": 109.74,
+          "probability": 0.7855016589164734
+        },
+        {
+          "word": " be",
+          "start": 109.74,
+          "end": 110.16,
+          "probability": 0.6238572597503662
+        },
+        {
+          "word": " completion",
+          "start": 110.16,
+          "end": 110.52,
+          "probability": 0.007645259145647287
+        }
+      ]
+    },
+    {
+      "number": 53,
+      "text": "Though you have left",
+      "start": 110.94,
+      "end": 112.06,
+      "words": [
+        {
+          "word": " Though",
+          "start": 110.94,
+          "end": 111.22,
+          "probability": 0.537193238735199
+        },
+        {
+          "word": " you",
+          "start": 111.22,
+          "end": 111.56,
+          "probability": 0.9159339070320129
+        },
+        {
+          "word": " have",
+          "start": 111.56,
+          "end": 111.78,
+          "probability": 0.9647305607795715
+        },
+        {
+          "word": " left",
+          "start": 111.78,
+          "end": 112.06,
+          "probability": 0.9602446556091309
+        }
+      ]
+    },
+    {
+      "number": 54,
+      "text": "You have left",
+      "start": 112.52,
+      "end": 112.97999999999999,
+      "words": [
+        {
+          "word": " You",
+          "start": 112.52,
+          "end": 112.52,
+          "probability": 0.7930809855461121
+        },
+        {
+          "word": " have",
+          "start": 112.52,
+          "end": 112.74,
+          "probability": 0.9825606942176819
+        },
+        {
+          "word": " left",
+          "start": 112.74,
+          "end": 112.97999999999999,
+          "probability": 0.9634326696395874
+        }
+      ]
+    },
+    {
+      "number": 55,
+      "text": "You have left",
+      "start": 113.2,
+      "end": 113.86,
+      "words": [
+        {
+          "word": " You",
+          "start": 113.2,
+          "end": 113.42,
+          "probability": 0.9408079981803894
+        },
+        {
+          "word": " have",
+          "start": 113.42,
+          "end": 113.62,
+          "probability": 0.9925768971443176
+        },
+        {
+          "word": " left",
+          "start": 113.62,
+          "end": 113.86,
+          "probability": 0.01319141685962677
+        }
+      ]
+    },
+    {
+      "number": 56,
+      "text": "You have left",
+      "start": 114.12,
+      "end": 114.84,
+      "words": [
+        {
+          "word": " You",
+          "start": 114.12,
+          "end": 114.32,
+          "probability": 0.922927975654602
+        },
+        {
+          "word": " have",
+          "start": 114.32,
+          "end": 114.53999999999999,
+          "probability": 0.9939253926277161
+        },
+        {
+          "word": " left",
+          "start": 114.53999999999999,
+          "end": 114.84,
+          "probability": 0.47099414467811584
+        }
+      ]
+    },
+    {
+      "number": 57,
+      "text": "You have left",
+      "start": 115.14,
+      "end": 115.62,
+      "words": [
+        {
+          "word": " You",
+          "start": 115.14,
+          "end": 115.25999999999999,
+          "probability": 0.8754415512084961
+        },
+        {
+          "word": " have",
+          "start": 115.25999999999999,
+          "end": 115.47999999999999,
+          "probability": 0.992397129535675
+        },
+        {
+          "word": " left",
+          "start": 115.47999999999999,
+          "end": 115.62,
+          "probability": 0.8833198547363281
+        }
+      ]
+    },
+    {
+      "number": 58,
+      "text": "You have left",
+      "start": 115.96,
+      "end": 116.39999999999999,
+      "words": [
+        {
+          "word": " You",
+          "start": 115.96,
+          "end": 116.12,
+          "probability": 0.8976646661758423
+        },
+        {
+          "word": " have",
+          "start": 116.12,
+          "end": 116.39999999999999,
+          "probability": 0.9865493178367615
+        },
+        {
+          "word": " left",
+          "start": 116.39999999999999,
+          "end": 116.39999999999999,
+          "probability": 0.9622705578804016
+        }
+      ]
+    },
+    {
+      "number": 59,
+      "text": "You have left me in isolation",
+      "start": 116.39999999999999,
+      "end": 117.8,
+      "words": [
+        {
+          "word": " You",
+          "start": 116.39999999999999,
+          "end": 116.39999999999999,
+          "probability": 0.6615564227104187
+        },
+        {
+          "word": " have",
+          "start": 116.39999999999999,
+          "end": 116.39999999999999,
+          "probability": 0.9697998762130737
+        },
+        {
+          "word": " left",
+          "start": 116.39999999999999,
+          "end": 116.67999999999999,
+          "probability": 0.8846582174301147
+        },
+        {
+          "word": " me",
+          "start": 116.67999999999999,
+          "end": 117.06,
+          "probability": 0.017643723636865616
+        },
+        {
+          "word": " in",
+          "start": 117.06,
+          "end": 117.12,
+          "probability": 0.0023262619506567717
+        },
+        {
+          "word": " isolation",
+          "start": 117.12,
+          "end": 117.8,
+          "probability": 7.26987564121373e-05
+        }
+      ]
+    },
+    {
+      "number": 60,
+      "text": "If I can, if I can",
+      "start": 117.88000000000001,
+      "end": 120.10000000000001,
+      "words": [
+        {
+          "word": " If",
+          "start": 117.88000000000001,
+          "end": 118.18,
+          "probability": 0.022163067013025284
+        },
+        {
+          "word": " I",
+          "start": 118.18,
+          "end": 118.94,
+          "probability": 0.9309230446815491
+        },
+        {
+          "word": " can,",
+          "start": 118.94,
+          "end": 119.32000000000001,
+          "probability": 0.45967363752424717
+        },
+        {
+          "word": " if",
+          "start": 119.32000000000001,
+          "end": 119.52,
+          "probability": 0.5928255319595337
+        },
+        {
+          "word": " I",
+          "start": 119.52,
+          "end": 119.84,
+          "probability": 0.9783104658126831
+        },
+        {
+          "word": " can",
+          "start": 119.84,
+          "end": 120.10000000000001,
+          "probability": 0.9814976453781128
+        }
+      ]
+    },
+    {
+      "number": 61,
+      "text": "Erase all the pointless fragments",
+      "start": 120.24000000000001,
+      "end": 121.84,
+      "words": [
+        {
+          "word": " Erase",
+          "start": 120.24000000000001,
+          "end": 120.64,
+          "probability": 0.3215379386674613
+        },
+        {
+          "word": " all",
+          "start": 120.64,
+          "end": 120.86,
+          "probability": 0.676178514957428
+        },
+        {
+          "word": " the",
+          "start": 120.86,
+          "end": 121.0,
+          "probability": 0.7443080544471741
+        },
+        {
+          "word": " pointless",
+          "start": 121.0,
+          "end": 121.44,
+          "probability": 0.19946642220020294
+        },
+        {
+          "word": " fragments",
+          "start": 121.44,
+          "end": 121.84,
+          "probability": 0.9819216728210449
+        }
+      ]
+    },
+    {
+      "number": 62,
+      "text": "Then maybe, then maybe",
+      "start": 122.34,
+      "end": 123.76,
+      "words": [
+        {
+          "word": " Then",
+          "start": 122.34,
+          "end": 122.42,
+          "probability": 0.04833291471004486
+        },
+        {
+          "word": " maybe,",
+          "start": 122.42,
+          "end": 122.98,
+          "probability": 0.44088010489940643
+        },
+        {
+          "word": " then",
+          "start": 122.98,
+          "end": 123.26,
+          "probability": 0.7541178464889526
+        },
+        {
+          "word": " maybe",
+          "start": 123.26,
+          "end": 123.76,
+          "probability": 0.509564220905304
+        }
+      ]
+    },
+    {
+      "number": 63,
+      "text": "You won't leave me so disheartened",
+      "start": 123.98,
+      "end": 125.68,
+      "words": [
+        {
+          "word": " You",
+          "start": 123.98,
+          "end": 124.06,
+          "probability": 0.87450110912323
+        },
+        {
+          "word": " won't",
+          "start": 124.06,
+          "end": 124.42,
+          "probability": 0.6276263296604156
+        },
+        {
+          "word": " leave",
+          "start": 124.42,
+          "end": 124.52000000000001,
+          "probability": 0.005741885397583246
+        },
+        {
+          "word": " me",
+          "start": 124.52000000000001,
+          "end": 124.7,
+          "probability": 0.872255265712738
+        },
+        {
+          "word": " so",
+          "start": 124.7,
+          "end": 124.9,
+          "probability": 0.07303965836763382
+        },
+        {
+          "word": " disheartened",
+          "start": 124.9,
+          "end": 125.68,
+          "probability": 0.568662961324056
+        }
+      ]
+    },
+    {
+      "number": 64,
+      "text": "Challenging your God",
+      "start": 125.76,
+      "end": 128.28,
+      "words": [
+        {
+          "word": " Challenging",
+          "start": 125.76,
+          "end": 127.08,
+          "probability": 0.7672361632188162
+        },
+        {
+          "word": " your",
+          "start": 127.08,
+          "end": 127.4,
+          "probability": 0.9403260350227356
+        },
+        {
+          "word": " God",
+          "start": 127.4,
+          "end": 128.28,
+          "probability": 0.4317905902862549
+        }
+      ]
+    },
+    {
+      "number": 65,
+      "text": "You have made some",
+      "start": 128.88,
+      "end": 130.72,
+      "words": [
+        {
+          "word": " You",
+          "start": 128.88,
+          "end": 129.14000000000001,
+          "probability": 0.965334951877594
+        },
+        {
+          "word": " have",
+          "start": 129.14000000000001,
+          "end": 129.36,
+          "probability": 0.7243037223815918
+        },
+        {
+          "word": " made",
+          "start": 129.36,
+          "end": 129.9,
+          "probability": 0.868177056312561
+        },
+        {
+          "word": " some",
+          "start": 129.9,
+          "end": 130.72,
+          "probability": 0.9365571737289429
+        }
+      ]
+    },
+    {
+      "number": 66,
+      "text": "Illegal arguments",
+      "start": 131.14000000000001,
+      "end": 133.02,
+      "words": [
+        {
+          "word": " Illegal",
+          "start": 131.14000000000001,
+          "end": 132.38,
+          "probability": 0.4335622088983655
+        },
+        {
+          "word": " arguments",
+          "start": 132.38,
+          "end": 133.02,
+          "probability": 0.03160414472222328
+        }
+      ]
+    },
+    {
+      "number": 67,
+      "text": "Execution, execution",
+      "start": 148.02,
+      "end": 149.26,
+      "words": [
+        {
+          "word": " Execution,",
+          "start": 148.02,
+          "end": 148.72,
+          "probability": 0.48099296105404693
+        },
+        {
+          "word": " execution",
+          "start": 148.72,
+          "end": 149.26,
+          "probability": 0.7248267531394958
+        }
+      ]
+    },
+    {
+      "number": 68,
+      "text": "Execution, execution",
+      "start": 149.94,
+      "end": 151.44,
+      "words": [
+        {
+          "word": " Execution,",
+          "start": 149.94,
+          "end": 151.44,
+          "probability": 0.6638556321461996
+        },
+        {
+          "word": " execution",
+          "start": 151.44,
+          "end": 151.44,
+          "probability": 0.6249085068702698
+        }
+      ]
+    },
+    {
+      "number": 69,
+      "text": "Execution, execution",
+      "start": 151.62,
+      "end": 155.18,
+      "words": [
+        {
+          "word": " Execution,",
+          "start": 151.62,
+          "end": 155.18,
+          "probability": 0.7977247436841329
+        },
+        {
+          "word": " execution",
+          "start": 155.18,
+          "end": 155.18,
+          "probability": 0.601442277431488
+        }
+      ]
+    },
+    {
+      "number": 70,
+      "text": "Execution, execution",
+      "start": 155.18,
+      "end": 156.46,
+      "words": [
+        {
+          "word": " Execution,",
+          "start": 155.18,
+          "end": 155.96,
+          "probability": 0.855647087097168
+        },
+        {
+          "word": " execution",
+          "start": 155.96,
+          "end": 156.46,
+          "probability": 0.6576988101005554
+        }
+      ]
+    },
+    {
+      "number": 71,
+      "text": "Execution, execution",
+      "start": 157.14,
+      "end": 157.86,
+      "words": [
+        {
+          "word": " Execution,",
+          "start": 157.14,
+          "end": 157.86,
+          "probability": 0.8631522258122762
+        },
+        {
+          "word": " execution",
+          "start": 157.86,
+          "end": 157.86,
+          "probability": 0.3053801953792572
+        }
+      ]
+    },
+    {
+      "number": 72,
+      "text": "Execution, execution",
+      "start": 157.86,
+      "end": 159.08,
+      "words": [
+        {
+          "word": " Execution,",
+          "start": 157.86,
+          "end": 158.94,
+          "probability": 0.8124634822209676
+        },
+        {
+          "word": " execution",
+          "start": 158.94,
+          "end": 159.08,
+          "probability": 0.18581083416938782
+        }
+      ]
+    },
+    {
+      "number": 73,
+      "text": "Ein, dos",
+      "start": 159.22,
+      "end": 159.66,
+      "words": [
+        {
+          "word": " Ein,",
+          "start": 159.22,
+          "end": 159.44,
+          "probability": 0.00954687195940096
+        },
+        {
+          "word": " dos",
+          "start": 159.44,
+          "end": 159.66,
+          "probability": 0.0035701850429177284
+        }
+      ]
+    },
+    {
+      "number": 74,
+      "text": "Trios, ne",
+      "start": 159.89999999999998,
+      "end": 160.5,
+      "words": [
+        {
+          "word": " Trios,",
+          "start": 159.89999999999998,
+          "end": 160.35999999999999,
+          "probability": 0.09435859619528249
+        },
+        {
+          "word": " ne",
+          "start": 160.35999999999999,
+          "end": 160.5,
+          "probability": 0.20522376894950867
+        }
+      ]
+    },
+    {
+      "number": 75,
+      "text": "Fem, liu",
+      "start": 160.78,
+      "end": 161.64,
+      "words": [
+        {
+          "word": " Fem,",
+          "start": 160.78,
+          "end": 161.22,
+          "probability": 0.06266636525591214
+        },
+        {
+          "word": " liu",
+          "start": 161.22,
+          "end": 161.64,
+          "probability": 0.15800136560574174
+        }
+      ]
+    },
+    {
+      "number": 76,
+      "text": "Execution",
+      "start": 161.7,
+      "end": 162.29999999999998,
+      "words": [
+        {
+          "word": " Execution",
+          "start": 161.7,
+          "end": 162.29999999999998,
+          "probability": 0.07340904010925442
+        }
+      ]
+    },
+    {
+      "number": 77,
+      "text": "If I can, if I can",
+      "start": 162.84,
+      "end": 164.44,
+      "words": [
+        {
+          "word": " If",
+          "start": 162.84,
+          "end": 162.84,
+          "probability": 0.03039792738854885
+        },
+        {
+          "word": " I",
+          "start": 162.84,
+          "end": 163.24,
+          "probability": 0.8599444627761841
+        },
+        {
+          "word": " can,",
+          "start": 163.24,
+          "end": 163.64000000000001,
+          "probability": 0.4925185348838568
+        },
+        {
+          "word": " if",
+          "start": 163.64000000000001,
+          "end": 163.8,
+          "probability": 0.8120827674865723
+        },
+        {
+          "word": " I",
+          "start": 163.8,
+          "end": 164.16,
+          "probability": 0.944743812084198
+        },
+        {
+          "word": " can",
+          "start": 164.16,
+          "end": 164.44,
+          "probability": 0.9986147880554199
+        }
+      ]
+    },
+    {
+      "number": 78,
+      "text": "Give them all the execution",
+      "start": 164.54,
+      "end": 165.96,
+      "words": [
+        {
+          "word": " Give",
+          "start": 164.54,
+          "end": 164.68,
+          "probability": 0.46626269817352295
+        },
+        {
+          "word": " them",
+          "start": 164.68,
+          "end": 164.92000000000002,
+          "probability": 0.9603684544563293
+        },
+        {
+          "word": " all",
+          "start": 164.92000000000002,
+          "end": 165.16,
+          "probability": 0.9572592377662659
+        },
+        {
+          "word": " the",
+          "start": 165.16,
+          "end": 165.4,
+          "probability": 0.707514762878418
+        },
+        {
+          "word": " execution",
+          "start": 165.4,
+          "end": 165.96,
+          "probability": 0.47385966777801514
+        }
+      ]
+    },
+    {
+      "number": 79,
+      "text": "Then I can, then I can",
+      "start": 166.56,
+      "end": 168.16,
+      "words": [
+        {
+          "word": " Then",
+          "start": 166.56,
+          "end": 166.58,
+          "probability": 0.03047679364681244
+        },
+        {
+          "word": " I",
+          "start": 166.58,
+          "end": 166.96,
+          "probability": 0.7622242569923401
+        },
+        {
+          "word": " can,",
+          "start": 166.96,
+          "end": 167.24,
+          "probability": 0.7736746668815613
+        },
+        {
+          "word": " then",
+          "start": 167.24,
+          "end": 167.5,
+          "probability": 0.9589071273803711
+        },
+        {
+          "word": " I",
+          "start": 167.5,
+          "end": 167.9,
+          "probability": 0.9840561151504517
+        },
+        {
+          "word": " can",
+          "start": 167.9,
+          "end": 168.16,
+          "probability": 0.995210587978363
+        }
+      ]
+    },
+    {
+      "number": 80,
+      "text": "Be your only execution",
+      "start": 168.36,
+      "end": 169.56,
+      "words": [
+        {
+          "word": " Be",
+          "start": 168.36,
+          "end": 168.42000000000002,
+          "probability": 0.04154105484485626
+        },
+        {
+          "word": " your",
+          "start": 168.42000000000002,
+          "end": 168.64000000000001,
+          "probability": 0.24552154541015625
+        },
+        {
+          "word": " only",
+          "start": 168.64000000000001,
+          "end": 168.96,
+          "probability": 0.9575731754302979
+        },
+        {
+          "word": " execution",
+          "start": 168.96,
+          "end": 169.56,
+          "probability": 0.8223910927772522
+        }
+      ]
+    },
+    {
+      "number": 81,
+      "text": "If I can have you back",
+      "start": 169.78,
+      "end": 171.82,
+      "words": [
+        {
+          "word": " If",
+          "start": 169.78,
+          "end": 170.22,
+          "probability": 0.5188099145889282
+        },
+        {
+          "word": " I",
+          "start": 170.22,
+          "end": 170.66,
+          "probability": 0.9846751093864441
+        },
+        {
+          "word": " can",
+          "start": 170.66,
+          "end": 170.88,
+          "probability": 0.9950234889984131
+        },
+        {
+          "word": " have",
+          "start": 170.88,
+          "end": 171.22,
+          "probability": 0.13856345415115356
+        },
+        {
+          "word": " you",
+          "start": 171.22,
+          "end": 171.56,
+          "probability": 0.7984597086906433
+        },
+        {
+          "word": " back",
+          "start": 171.56,
+          "end": 171.82,
+          "probability": 0.8278598785400391
+        }
+      ]
+    },
+    {
+      "number": 82,
+      "text": "I will run the execution",
+      "start": 171.94,
+      "end": 173.4,
+      "words": [
+        {
+          "word": " I",
+          "start": 171.94,
+          "end": 172.12,
+          "probability": 0.24806612730026245
+        },
+        {
+          "word": " will",
+          "start": 172.12,
+          "end": 172.28,
+          "probability": 0.4809128940105438
+        },
+        {
+          "word": " run",
+          "start": 172.28,
+          "end": 172.54000000000002,
+          "probability": 0.007648681290447712
+        },
+        {
+          "word": " the",
+          "start": 172.54000000000002,
+          "end": 172.78,
+          "probability": 0.21474015712738037
+        },
+        {
+          "word": " execution",
+          "start": 172.78,
+          "end": 173.4,
+          "probability": 0.9850062727928162
+        }
+      ]
+    },
+    {
+      "number": 83,
+      "text": "Though we are trapped",
+      "start": 173.76,
+      "end": 174.86,
+      "words": [
+        {
+          "word": " Though",
+          "start": 173.76,
+          "end": 173.98000000000002,
+          "probability": 0.03347457945346832
+        },
+        {
+          "word": " we",
+          "start": 173.98000000000002,
+          "end": 174.4,
+          "probability": 0.9052149653434753
+        },
+        {
+          "word": " are",
+          "start": 174.4,
+          "end": 174.56,
+          "probability": 0.9558764100074768
+        },
+        {
+          "word": " trapped",
+          "start": 174.56,
+          "end": 174.86,
+          "probability": 0.16535243391990662
+        }
+      ]
+    },
+    {
+      "number": 84,
+      "text": "We are trapped, ah",
+      "start": 175.26,
+      "end": 176.26,
+      "words": [
+        {
+          "word": " We",
+          "start": 175.26,
+          "end": 175.3,
+          "probability": 0.7511398792266846
+        },
+        {
+          "word": " are",
+          "start": 175.3,
+          "end": 175.5,
+          "probability": 0.9921262264251709
+        },
+        {
+          "word": " trapped,",
+          "start": 175.5,
+          "end": 176.0,
+          "probability": 0.5416666232049465
+        },
+        {
+          "word": " ah",
+          "start": 176.0,
+          "end": 176.26,
+          "probability": 0.029257120564579964
+        }
+      ]
+    },
+    {
+      "number": 85,
+      "text": "I've studied, I've studied",
+      "start": 177.58,
+      "end": 179.06,
+      "words": [
+        {
+          "word": " I've",
+          "start": 177.58,
+          "end": 177.72,
+          "probability": 0.4348979815840721
+        },
+        {
+          "word": " studied,",
+          "start": 177.72,
+          "end": 178.34,
+          "probability": 0.855854332447052
+        },
+        {
+          "word": " I've",
+          "start": 178.34,
+          "end": 178.66,
+          "probability": 0.992799699306488
+        },
+        {
+          "word": " studied",
+          "start": 178.66,
+          "end": 179.06,
+          "probability": 0.9964942336082458
+        }
+      ]
+    },
+    {
+      "number": 86,
+      "text": "How to properly lo-o-ove",
+      "start": 179.3,
+      "end": 180.86,
+      "words": [
+        {
+          "word": " How",
+          "start": 179.3,
+          "end": 179.46,
+          "probability": 0.21357153356075287
+        },
+        {
+          "word": " to",
+          "start": 179.46,
+          "end": 179.62,
+          "probability": 0.972579836845398
+        },
+        {
+          "word": " properly",
+          "start": 179.62,
+          "end": 180.16,
+          "probability": 0.14651045203208923
+        },
+        {
+          "word": " lo-o-ove",
+          "start": 180.16,
+          "end": 180.86,
+          "probability": 0.24990528790513053
+        }
+      ]
+    },
+    {
+      "number": 87,
+      "text": "Question me, question me",
+      "start": 180.96,
+      "end": 182.9,
+      "words": [
+        {
+          "word": " Question",
+          "start": 180.96,
+          "end": 181.42,
+          "probability": 0.014298774302005768
+        },
+        {
+          "word": " me,",
+          "start": 181.42,
+          "end": 181.98,
+          "probability": 0.5642602890729904
+        },
+        {
+          "word": " question",
+          "start": 181.98,
+          "end": 182.34,
+          "probability": 0.9601767063140869
+        },
+        {
+          "word": " me",
+          "start": 182.34,
+          "end": 182.9,
+          "probability": 0.998363196849823
+        }
+      ]
+    },
+    {
+      "number": 88,
+      "text": "I can answer all lo-o-ove",
+      "start": 183.0,
+      "end": 184.56,
+      "words": [
+        {
+          "word": " I",
+          "start": 183.0,
+          "end": 183.14,
+          "probability": 0.8767727017402649
+        },
+        {
+          "word": " can",
+          "start": 183.14,
+          "end": 183.34,
+          "probability": 0.3857085108757019
+        },
+        {
+          "word": " answer",
+          "start": 183.34,
+          "end": 183.68,
+          "probability": 0.002371062058955431
+        },
+        {
+          "word": " all",
+          "start": 183.68,
+          "end": 184.08,
+          "probability": 0.8452742099761963
+        },
+        {
+          "word": " lo-o-ove",
+          "start": 184.08,
+          "end": 184.56,
+          "probability": 0.7054385592695326
+        }
+      ]
+    },
+    {
+      "number": 89,
+      "text": "I know the algebraic expression of lo-o-ove",
+      "start": 184.74,
+      "end": 188.42,
+      "words": [
+        {
+          "word": " I",
+          "start": 184.74,
+          "end": 185.04,
+          "probability": 0.9001054167747498
+        },
+        {
+          "word": " know",
+          "start": 185.04,
+          "end": 185.28,
+          "probability": 0.00482254708185792
+        },
+        {
+          "word": " the",
+          "start": 185.28,
+          "end": 185.58,
+          "probability": 0.6883664131164551
+        },
+        {
+          "word": " algebraic",
+          "start": 185.58,
+          "end": 186.64,
+          "probability": 0.23571683838963509
+        },
+        {
+          "word": " expression",
+          "start": 186.64,
+          "end": 187.08,
+          "probability": 0.21033556759357452
+        },
+        {
+          "word": " of",
+          "start": 187.08,
+          "end": 187.74,
+          "probability": 0.48973843455314636
+        },
+        {
+          "word": " lo-o-ove",
+          "start": 187.74,
+          "end": 188.42,
+          "probability": 0.9211623430252075
+        }
+      ]
+    },
+    {
+      "number": 90,
+      "text": "Though you are free",
+      "start": 188.68,
+      "end": 189.64,
+      "words": [
+        {
+          "word": " Though",
+          "start": 188.68,
+          "end": 188.74,
+          "probability": 0.14427809417247772
+        },
+        {
+          "word": " you",
+          "start": 188.74,
+          "end": 189.12,
+          "probability": 0.9668723940849304
+        },
+        {
+          "word": " are",
+          "start": 189.12,
+          "end": 189.36,
+          "probability": 0.7324548363685608
+        },
+        {
+          "word": " free",
+          "start": 189.36,
+          "end": 189.64,
+          "probability": 0.9730253219604492
+        }
+      ]
+    },
+    {
+      "number": 91,
+      "text": "I am trapped",
+      "start": 189.94,
+      "end": 190.54,
+      "words": [
+        {
+          "word": " I",
+          "start": 189.94,
+          "end": 190.1,
+          "probability": 0.905255913734436
+        },
+        {
+          "word": " am",
+          "start": 190.1,
+          "end": 190.26,
+          "probability": 0.716458261013031
+        },
+        {
+          "word": " trapped",
+          "start": 190.26,
+          "end": 190.54,
+          "probability": 0.34430980682373047
+        }
+      ]
+    },
+    {
+      "number": 92,
+      "text": "Trapped in lo-o-ove",
+      "start": 190.88,
+      "end": 191.96,
+      "words": [
+        {
+          "word": " Trapped",
+          "start": 190.88,
+          "end": 191.2,
+          "probability": 0.4058736553415656
+        },
+        {
+          "word": " in",
+          "start": 191.2,
+          "end": 191.42,
+          "probability": 0.9053491950035095
+        },
+        {
+          "word": " lo-o-ove",
+          "start": 191.42,
+          "end": 191.96,
+          "probability": 0.8170630216598511
+        }
+      ]
+    },
+    {
+      "number": 93,
+      "text": "Execution",
+      "start": 192.48,
+      "end": 194.48,
+      "words": [
+        {
+          "word": " Execution",
+          "start": 192.48,
+          "end": 194.48,
+          "probability": 0.12360474415970657
+        }
+      ]
+    }
+  ]
+}

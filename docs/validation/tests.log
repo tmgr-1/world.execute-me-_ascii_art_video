@@ -1,0 +1,43 @@
+
+> world-execute-terminal-film@1.0.0 test
+> node --import tsx --test --test-isolation=none test/*.test.ts
+
+✔ rehearsal loop ranges use media milliseconds and reject empty, reversed or tiny intervals (1.108332ms)
+✔ all content contracts pass; unreviewed machine anchors fail release validation (428.075018ms)
+✔ keyword and count syllable anchors cannot drift outside their lyric spans (1.208623ms)
+✔ typed values, UTF-8 references, byte order, alignment, and invalid-write rollback share one store (0.40906ms)
+✔ draft does not create a request or task; one send links history, transcript, task and rx (2.118731ms)
+✔ disconnect freezes external facts; predictions never become rx, ack or verification (27.710791ms)
+✔ erasure changes bytes and validity while protected session writes are rejected (27.474603ms)
+✔ a request allocates its typed boundary from semantic parameters without handwritten addresses (5.459766ms)
+✔ six stages arm without committing; the word end precedes intent and the write barrier (66.270513ms)
+✔ the patch is a draft before the check event and cannot acquire PASS from a later render (30.22722ms)
+✔ fixed ticks and checkpoints reproduce exact state across frame rates, dropped frames and reverse seeks (236.095051ms)
+✔ providers preserve circumference, tangent contact, current stages and era direction (0.196176ms)
+✔ AC/DC and AD/BC states land on their keyword anchors (7.979402ms)
+✔ media clock pause, speed and epochs are independent of render cadence (0.117034ms)
+✔ wide graphemes erase and clip as complete glyphs (0.105207ms)
+✔ 130x35 cn: all scene and count boundaries preserve valid glyphs (122.061361ms)
+✔ 130x35 cn: frozen modal keeps every outside cell and all styles for 3000ms (175.075027ms)
+✔ 130x35 en: all scene and count boundaries preserve valid glyphs (115.080877ms)
+✔ 130x35 en: frozen modal keeps every outside cell and all styles for 3000ms (170.556664ms)
+✔ 160x45 cn: all scene and count boundaries preserve valid glyphs (129.631888ms)
+✔ 160x45 cn: frozen modal keeps every outside cell and all styles for 3000ms (184.194285ms)
+✔ 160x45 en: all scene and count boundaries preserve valid glyphs (135.551173ms)
+✔ 160x45 en: frozen modal keeps every outside cell and all styles for 3000ms (183.564433ms)
+✔ the six words have independent assets and retain all six language sources (38.584173ms)
+✔ the root and disposal target remain readable for over three seconds before counting (35.723796ms)
+✔ damage and canonical flashback frames reproduce after forward and reverse seeks (197.452617ms)
+✔ JSON protocol fixture: load paused, exact seek, speed, frozen pause, EOF and own-child cleanup (427.123459ms)
+✔ invalid files and missing players fail and clean up rather than becoming story termination (46.182105ms)
+✔ single output adapter uses terminal-kit, emits whole glyphs and restores terminal modes (18.068624ms)
+✔ terminal output includes the side panels and bottom edge beyond the reference viewport after resizing (22.802243ms)
+✔ backpressure bounds pending work and only encodes the latest dropped-frame replacement (12.162525ms)
+ℹ tests 31
+ℹ suites 0
+ℹ pass 31
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3534.719333

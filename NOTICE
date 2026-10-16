@@ -1,0 +1,24 @@
+world.execute(me); — terminal character film
+Copyright (C) 2026 world.execute-me-_ascii_art_video contributors
+SPDX-License-Identifier: GPL-3.0-only
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of version 3 of the GNU General Public License as
+published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+The project source code and original documentation use GPL-3.0-only.
+The song and its lyrics are by Mili and are not relicensed by this notice.
+The repository does not provide the music recording.
+
+Third-party packages retain their respective licenses.
+Word-art assets have separate source and license information in
+films/world-execute/assets/README.md and glyphs.json, including
+CC0-1.0 original glyphs and glyphs rendered from Noto CJK (SIL OFL 1.1).

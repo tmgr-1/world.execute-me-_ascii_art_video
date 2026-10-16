@@ -1,0 +1,6 @@
+
+> world-execute-terminal-film@1.0.0 check
+> tsc --noEmit && node --import tsx src/cli.ts check
+
+内容结构通过；发布检查仍需精校锚点。
+E_ANCHOR_ROUGH:209

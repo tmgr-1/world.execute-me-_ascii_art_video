@@ -1,0 +1,30 @@
+[project]
+name = "world-execute-authoring"
+version = "0.1.0"
+description = "Optional offline lyric timing tools for the terminal film"
+requires-python = ">=3.12,<3.13"
+dependencies = []
+
+[project.optional-dependencies]
+alignment = [
+    "torch>=2.0,<3",
+    "torchaudio>=2.0,<3",
+    "openai-whisper==20250625",
+    "stable-ts==2.19.1",
+]
+glyphs = ["pillow==12.3.0"]
+
+[tool.uv]
+package = false
+# The supplied offline wheel cache targets this development machine.
+# This does not restrict the Node.js film player's supported platforms.
+environments = ["sys_platform == 'linux' and platform_machine == 'x86_64' and platform_python_implementation == 'CPython'"]
+
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
+torchaudio = { index = "pytorch-cpu" }
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true

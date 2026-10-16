@@ -1,0 +1,620 @@
+{
+  "audioSha256": "2e9c1a2f7795818ccb6b6fd3fc540d42e73567fde3e8abaeef435ef70f6c85d4",
+  "reviewedByListening": false,
+  "method": "bounded-context-consensus",
+  "changes": [
+    {
+      "id": "lyric.09.start",
+      "beforeMs": 29960,
+      "afterMs": 29770,
+      "deltaMs": -190,
+      "reason": "recover-collapsed-first-word",
+      "candidates": {
+        "baseline": 29960
+      }
+    },
+    {
+      "id": "lyric.09.end",
+      "beforeMs": 31160,
+      "afterMs": 31170,
+      "deltaMs": 10,
+      "reason": "context-consensus",
+      "candidates": {
+        "baseline": 31160,
+        "short-context": 31170,
+        "transcription": 31220
+      }
+    },
+    {
+      "id": "lyric.10.start",
+      "beforeMs": 31320,
+      "afterMs": 31310,
+      "deltaMs": -10,
+      "reason": "context-consensus",
+      "candidates": {
+        "baseline": 31320,
+        "transcription": 31300
+      }
+    },
+    {
+      "id": "lyric.10.dimension",
+      "beforeMs": 32660,
+      "afterMs": 32680,
+      "deltaMs": 20,
+      "reason": "context-consensus",
+      "candidates": {
+        "baseline": 32660,
+        "short-context": 32730,
+        "transcription": 32680
+      }
+    },
+    {
+      "id": "lyric.11.start",
+      "beforeMs": 33640,
+      "afterMs": 33440,
+      "deltaMs": -200,
+      "reason": "recover-collapsed-first-word",
+      "candidates": {
+        "baseline": 33640,
+        "transcription": 33200
+      }
+    },
+    {
+      "id": "lyric.11.end",
+      "beforeMs": 34620,
+      "afterMs": 34640,
+      "deltaMs": 20,
+      "reason": "context-consensus",
+      "candidates": {
+        "baseline": 34620,
+        "short-context": 34640,
+        "transcription": 34680
+      }
+    },
+    {
+      "id": "lyric.13.start",
+      "beforeMs": 37360,
+      "afterMs": 36960,
+      "deltaMs": -400,
+      "reason": "recover-collapsed-first-word",
+      "candidates": {
+        "baseline": 37360,
+        "transcription": 36960
+      }
+    },
+    {
+      "id": "lyric.14.start",
+      "beforeMs": 38700,
+      "afterMs": 38680,
+      "deltaMs": -20,
+      "reason": "context-consensus",
+      "candidates": {
+        "baseline": 38700,
+        "transcription": 38660
+      }
+    },
+    {
+      "id": "lyric.14.tangents",
+      "beforeMs": 40260,
+      "afterMs": 40280,
+      "deltaMs": 20,
+      "reason": "context-consensus",
+      "candidates": {
+        "baseline": 40260,
+        "short-context": 40300
+      }
+    },
+    {
+      "id": "lyric.14.end",
+      "beforeMs": 40660,
+      "afterMs": 40680,
+      "deltaMs": 20,
+      "reason": "context-consensus",
+      "candidates": {
+        "baseline": 40660,
+        "short-context": 40700
+      }
+    },
+    {
+      "id": "lyric.17.end",
+      "beforeMs": 45800,
+      "afterMs": 45830,
+      "deltaMs": 30,
+      "reason": "context-consensus",
+      "candidates": {
+        "baseline": 45800,
+        "short-context": 45732,
+        "transcription": 45860
+      }
+    },
+    {
+      "id": "lyric.18.ac",
+      "beforeMs": 46260,
+      "afterMs": 46270,
+      "deltaMs": 10,
+      "reason": "context-consensus",
+      "candidates": {
+        "baseline": 46260,
+        "short-context": 46280
+      }
+    },
+    {
+      "id": "lyric.18.dc",
+      "beforeMs": 47160,
+      "afterMs": 47140,
+      "deltaMs": -20,
+      "reason": "context-consensus",
+      "candidates": {
+        "baseline": 47160,
+        "short-context": 47100,
+        "transcription": 47140
+      }
+    },
+    {
+      "id": "lyric.18.end",
+      "beforeMs": 47460,
+      "afterMs": 47500,
+      "deltaMs": 40,
+      "reason": "context-consensus",
+      "candidates": {
+        "baseline": 47460,
+        "short-context": 47500,
+        "transcription": 47500
+      }
+    },
+    {
+      "id": "lyric.22.start",
+      "beforeMs": 53440,
+      "afterMs": 53460,
+      "deltaMs": 20,
+      "reason": "context-consensus",
+      "candidates": {
+        "baseline": 53440,
+        "short-context": 53180,
+        "transcription": 53480
+      }
+    },
+    {
+      "id": "lyric.22.ad",
+      "beforeMs": 53640,
+      "afterMs": 53630,
+      "deltaMs": -10,
+      "reason": "context-consensus",
+      "candidates": {
+        "baseline": 53640,
+        "transcription": 53620
+      }
+    },
+    {
+      "id": "lyric.23.end",
+      "beforeMs": 56880,
+      "afterMs": 56890,
+      "deltaMs": 10,
+      "reason": "context-consensus",
+      "candidates": {
+        "baseline": 56880,
+        "short-context": 56760,
+        "transcription": 56900
+      }
+    },
+    {
+      "id": "lyric.24.end",
+      "beforeMs": 58540,
+      "afterMs": 58550,
+      "deltaMs": 10,
+      "reason": "context-consensus",
+      "candidates": {
+        "baseline": 58540,
+        "short-context": 58560
+      }
+    },
+    {
+      "id": "lyric.67.start",
+      "beforeMs": 148020,
+      "afterMs": 148000,
+      "deltaMs": -20,
+      "reason": "context-consensus",
+      "candidates": {
+        "baseline": 148020,
+        "short-context": 147979
+      }
+    },
+    {
+      "id": "count.1",
+      "beforeMs": 159220,
+      "afterMs": 159190,
+      "deltaMs": -30,
+      "reason": "context-consensus",
+      "candidates": {
+        "baseline": 159220,
+        "short-context": 159160
+      }
+    },
+    {
+      "id": "count.2",
+      "beforeMs": 159440,
+      "afterMs": 159430,
+      "deltaMs": -10,
+      "reason": "context-consensus",
+      "candidates": {
+        "baseline": 159440,
+        "short-context": 159420
+      }
+    },
+    {
+      "id": "count.3",
+      "beforeMs": 159900,
+      "afterMs": 159880,
+      "deltaMs": -20,
+      "reason": "context-consensus",
+      "candidates": {
+        "baseline": 159900,
+        "short-context": 159860
+      }
+    },
+    {
+      "id": "lyric.74.start",
+      "beforeMs": 159900,
+      "afterMs": 159880,
+      "deltaMs": -20,
+      "reason": "context-consensus",
+      "candidates": {
+        "baseline": 159900,
+        "short-context": 159860
+      }
+    },
+    {
+      "id": "count.4",
+      "beforeMs": 160360,
+      "afterMs": 160390,
+      "deltaMs": 30,
+      "reason": "context-consensus",
+      "candidates": {
+        "baseline": 160360,
+        "short-context": 160420
+      }
+    },
+    {
+      "id": "lyric.74.end",
+      "beforeMs": 160500,
+      "afterMs": 160540,
+      "deltaMs": 40,
+      "reason": "context-consensus",
+      "candidates": {
+        "baseline": 160500,
+        "short-context": 160580
+      }
+    },
+    {
+      "id": "count.5",
+      "beforeMs": 160780,
+      "afterMs": 160790,
+      "deltaMs": 10,
+      "reason": "context-consensus",
+      "candidates": {
+        "baseline": 160780,
+        "short-context": 160800
+      }
+    },
+    {
+      "id": "count.6",
+      "beforeMs": 161220,
+      "afterMs": 161190,
+      "deltaMs": -30,
+      "reason": "context-consensus",
+      "candidates": {
+        "baseline": 161220,
+        "short-context": 161160
+      }
+    },
+    {
+      "id": "lyric.85.start",
+      "beforeMs": 177580,
+      "afterMs": 177360,
+      "deltaMs": -220,
+      "reason": "context-consensus",
+      "candidates": {
+        "baseline": 177580,
+        "short-context": 177370,
+        "transcription": 177360
+      }
+    },
+    {
+      "id": "lyric.85.end",
+      "beforeMs": 179060,
+      "afterMs": 179050,
+      "deltaMs": -10,
+      "reason": "context-consensus",
+      "candidates": {
+        "baseline": 179060,
+        "short-context": 179230,
+        "transcription": 179040
+      }
+    },
+    {
+      "id": "lyric.73.start",
+      "beforeMs": 159220,
+      "afterMs": 159190,
+      "deltaMs": -30,
+      "reason": "share-count-syllable-onset"
+    },
+    {
+      "id": "lyric.75.start",
+      "beforeMs": 160780,
+      "afterMs": 160790,
+      "deltaMs": 10,
+      "reason": "share-count-syllable-onset"
+    },
+    {
+      "id": "lyric.12.end",
+      "beforeMs": 36980,
+      "afterMs": 36960,
+      "deltaMs": -20,
+      "reason": "resolve-one-attention-frame-overlap"
+    }
+  ],
+  "deferred": [
+    {
+      "id": "lyric.12.start",
+      "atMs": 35040,
+      "candidates": {
+        "baseline": 35040,
+        "transcription": 34940
+      },
+      "reason": "disagreement-or-degenerate-word"
+    },
+    {
+      "id": "lyric.15.start",
+      "atMs": 40780,
+      "candidates": {
+        "baseline": 40780
+      },
+      "reason": "insufficient-evidence"
+    },
+    {
+      "id": "lyric.16.start",
+      "atMs": 42420,
+      "candidates": {
+        "baseline": 42420,
+        "transcription": 42320
+      },
+      "reason": "disagreement-or-degenerate-word"
+    },
+    {
+      "id": "lyric.16.limitations",
+      "atMs": 43500,
+      "candidates": {
+        "baseline": 43500
+      },
+      "reason": "insufficient-evidence"
+    },
+    {
+      "id": "lyric.16.end",
+      "atMs": 44120,
+      "candidates": {
+        "baseline": 44120
+      },
+      "reason": "insufficient-evidence"
+    },
+    {
+      "id": "lyric.17.start",
+      "atMs": 44340,
+      "candidates": {
+        "baseline": 44340
+      },
+      "reason": "insufficient-evidence"
+    },
+    {
+      "id": "lyric.18.start",
+      "atMs": 46100,
+      "candidates": {
+        "baseline": 46100,
+        "short-context": 45900
+      },
+      "reason": "disagreement-or-degenerate-word"
+    },
+    {
+      "id": "lyric.21.start",
+      "atMs": 51480,
+      "candidates": {
+        "baseline": 51480
+      },
+      "reason": "insufficient-evidence"
+    },
+    {
+      "id": "lyric.22.end",
+      "atMs": 54840,
+      "candidates": {
+        "baseline": 54840,
+        "short-context": 54937
+      },
+      "reason": "disagreement-or-degenerate-word"
+    },
+    {
+      "id": "lyric.23.start",
+      "atMs": 55260,
+      "candidates": {
+        "baseline": 55260,
+        "transcription": 54840
+      },
+      "reason": "disagreement-or-degenerate-word"
+    },
+    {
+      "id": "lyric.24.start",
+      "atMs": 57200,
+      "candidates": {
+        "baseline": 57200
+      },
+      "reason": "insufficient-evidence"
+    },
+    {
+      "id": "lyric.24.deeply",
+      "atMs": 57340,
+      "candidates": {
+        "baseline": 57340,
+        "short-context": 57220
+      },
+      "reason": "disagreement-or-degenerate-word"
+    },
+    {
+      "id": "lyric.67.end",
+      "atMs": 149260,
+      "candidates": {
+        "baseline": 149260,
+        "short-context": 149050
+      },
+      "reason": "disagreement-or-degenerate-word"
+    },
+    {
+      "id": "lyric.68.start",
+      "atMs": 149940,
+      "candidates": {
+        "baseline": 149940
+      },
+      "reason": "disagreement-or-degenerate-word"
+    },
+    {
+      "id": "lyric.68.end",
+      "atMs": 151440,
+      "candidates": {
+        "baseline": 151440
+      },
+      "reason": "insufficient-evidence"
+    },
+    {
+      "id": "lyric.69.start",
+      "atMs": 151620,
+      "candidates": {
+        "baseline": 151620
+      },
+      "reason": "disagreement-or-degenerate-word"
+    },
+    {
+      "id": "lyric.69.end",
+      "atMs": 155180,
+      "candidates": {
+        "baseline": 155180
+      },
+      "reason": "insufficient-evidence"
+    },
+    {
+      "id": "lyric.70.start",
+      "atMs": 155180,
+      "candidates": {
+        "baseline": 155180
+      },
+      "reason": "disagreement-or-degenerate-word"
+    },
+    {
+      "id": "lyric.70.end",
+      "atMs": 156460,
+      "candidates": {
+        "baseline": 156460
+      },
+      "reason": "insufficient-evidence"
+    },
+    {
+      "id": "lyric.71.start",
+      "atMs": 157140,
+      "candidates": {
+        "baseline": 157140,
+        "short-context": 156330
+      },
+      "reason": "disagreement-or-degenerate-word"
+    },
+    {
+      "id": "lyric.71.end",
+      "atMs": 157860,
+      "candidates": {
+        "baseline": 157860
+      },
+      "reason": "insufficient-evidence"
+    },
+    {
+      "id": "lyric.72.start",
+      "atMs": 157860,
+      "candidates": {
+        "baseline": 157860,
+        "short-context": 158050
+      },
+      "reason": "disagreement-or-degenerate-word"
+    },
+    {
+      "id": "lyric.72.end",
+      "atMs": 159080,
+      "candidates": {
+        "baseline": 159080
+      },
+      "reason": "disagreement-or-degenerate-word"
+    },
+    {
+      "id": "lyric.73.start",
+      "atMs": 159220,
+      "candidates": {
+        "baseline": 159220
+      },
+      "reason": "insufficient-evidence"
+    },
+    {
+      "id": "lyric.73.end",
+      "atMs": 159660,
+      "candidates": {
+        "baseline": 159660
+      },
+      "reason": "insufficient-evidence"
+    },
+    {
+      "id": "lyric.75.start",
+      "atMs": 160780,
+      "candidates": {
+        "baseline": 160780
+      },
+      "reason": "insufficient-evidence"
+    },
+    {
+      "id": "lyric.75.end",
+      "atMs": 161640,
+      "candidates": {
+        "baseline": 161640
+      },
+      "reason": "insufficient-evidence"
+    },
+    {
+      "id": "lyric.76.start",
+      "atMs": 161700,
+      "candidates": {
+        "baseline": 161700
+      },
+      "reason": "insufficient-evidence"
+    },
+    {
+      "id": "lyric.76.end",
+      "atMs": 162300,
+      "candidates": {
+        "baseline": 162300
+      },
+      "reason": "insufficient-evidence"
+    },
+    {
+      "id": "lyric.93.start",
+      "atMs": 192480,
+      "candidates": {
+        "baseline": 192480
+      },
+      "reason": "disagreement-or-degenerate-word"
+    },
+    {
+      "id": "lyric.93.end",
+      "atMs": 194480,
+      "candidates": {
+        "baseline": 194480
+      },
+      "reason": "disagreement-or-degenerate-word"
+    }
+  ],
+  "notes": [
+    "All times remain machine estimates. No human listening approval is inferred.",
+    "A 20 ms refinement grid does not establish 20 ms accuracy.",
+    "Large disagreements, crop-edge hits, collapsed words and unreliable repetitions are deferred."
+  ]
+}

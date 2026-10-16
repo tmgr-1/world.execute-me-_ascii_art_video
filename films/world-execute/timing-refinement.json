@@ -1,0 +1,2938 @@
+{
+  "status": "rough",
+  "reviewedByListening": false,
+  "method": "short-context-dynamic-heads-probability-refinement-20ms",
+  "audioSha256": "2e9c1a2f7795818ccb6b6fd3fc540d42e73567fde3e8abaeef435ef70f6c85d4",
+  "model": "small",
+  "modelSha256": "9ecf779972d90ba49c06d968637d720dd632c55bbf19d441fb42bf17a411e794",
+  "groups": [
+    {
+      "from": 76,
+      "to": 76,
+      "window": [
+        161.54,
+        162.85
+      ],
+      "aligned": [
+        {
+          "start": 161.54,
+          "end": 162.24,
+          "text": " Execution",
+          "seek": null,
+          "tokens": [
+            17662,
+            1448
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " Execution",
+              "start": 161.54,
+              "end": 162.24,
+              "probability": 0.03822329081594944,
+              "tokens": [
+                17662,
+                1448
+              ]
+            }
+          ],
+          "number": 76
+        }
+      ],
+      "refined": [
+        {
+          "start": 161.54,
+          "end": 162.24,
+          "text": " Execution",
+          "seek": null,
+          "tokens": [
+            17662,
+            1448
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " Execution",
+              "start": 161.54,
+              "end": 162.24,
+              "probability": 0.03822329081594944,
+              "tokens": [
+                17662,
+                1448
+              ]
+            }
+          ],
+          "number": 76
+        }
+      ]
+    },
+    {
+      "from": 73,
+      "to": 75,
+      "window": [
+        158.98000000000002,
+        161.79999999999998
+      ],
+      "aligned": [
+        {
+          "start": 159.16,
+          "end": 159.68,
+          "text": " Ein, dos",
+          "seek": null,
+          "tokens": [
+            6391,
+            11,
+            4491
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " Ein,",
+              "start": 159.16,
+              "end": 159.42,
+              "probability": 0.013295234585257276,
+              "tokens": [
+                6391,
+                11
+              ]
+            },
+            {
+              "word": " dos",
+              "start": 159.42,
+              "end": 159.68,
+              "probability": 0.0009097090805880725,
+              "tokens": [
+                4491
+              ]
+            }
+          ],
+          "number": 73
+        },
+        {
+          "start": 159.86,
+          "end": 160.58,
+          "text": " trois, ne",
+          "seek": null,
+          "tokens": [
+            19758,
+            11,
+            408
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " trois,",
+              "start": 159.86,
+              "end": 160.42,
+              "probability": 0.3840131757169729,
+              "tokens": [
+                19758,
+                11
+              ]
+            },
+            {
+              "word": " ne",
+              "start": 160.42,
+              "end": 160.58,
+              "probability": 0.5927982330322266,
+              "tokens": [
+                408
+              ]
+            }
+          ],
+          "number": 74
+        },
+        {
+          "start": 160.8,
+          "end": 161.56,
+          "text": " Fem, liu",
+          "seek": null,
+          "tokens": [
+            479,
+            443,
+            11,
+            375,
+            84
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " Fem,",
+              "start": 160.8,
+              "end": 161.16,
+              "probability": 0.05162105771402518,
+              "tokens": [
+                479,
+                443,
+                11
+              ]
+            },
+            {
+              "word": " liu",
+              "start": 161.16,
+              "end": 161.56,
+              "probability": 0.13429810288653243,
+              "tokens": [
+                375,
+                84
+              ]
+            }
+          ],
+          "number": 75
+        }
+      ],
+      "refined": [
+        {
+          "start": 159.16,
+          "end": 159.68,
+          "text": " Ein, dos",
+          "seek": null,
+          "tokens": [
+            6391,
+            11,
+            4491
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " Ein,",
+              "start": 159.16,
+              "end": 159.42,
+              "probability": 0.013295234585257276,
+              "tokens": [
+                6391,
+                11
+              ]
+            },
+            {
+              "word": " dos",
+              "start": 159.42,
+              "end": 159.68,
+              "probability": 0.0009097090805880725,
+              "tokens": [
+                4491
+              ]
+            }
+          ],
+          "number": 73
+        },
+        {
+          "start": 159.86,
+          "end": 160.444,
+          "text": " trois, ne",
+          "seek": null,
+          "tokens": [
+            19758,
+            11,
+            408
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " trois,",
+              "start": 159.86,
+              "end": 160.175,
+              "probability": 0.3840131757169729,
+              "tokens": [
+                19758,
+                11
+              ]
+            },
+            {
+              "word": " ne",
+              "start": 160.42,
+              "end": 160.444,
+              "probability": 0.5927982330322266,
+              "tokens": [
+                408
+              ]
+            }
+          ],
+          "number": 74
+        },
+        {
+          "start": 160.8,
+          "end": 161.56,
+          "text": " Fem, liu",
+          "seek": null,
+          "tokens": [
+            479,
+            443,
+            11,
+            375,
+            84
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " Fem,",
+              "start": 160.8,
+              "end": 161.16,
+              "probability": 0.05162105771402518,
+              "tokens": [
+                479,
+                443,
+                11
+              ]
+            },
+            {
+              "word": " liu",
+              "start": 161.16,
+              "end": 161.56,
+              "probability": 0.13429810288653243,
+              "tokens": [
+                375,
+                84
+              ]
+            }
+          ],
+          "number": 75
+        }
+      ]
+    },
+    {
+      "from": 67,
+      "to": 72,
+      "window": [
+        147.47,
+        159.32
+      ],
+      "aligned": [
+        {
+          "start": 147.99,
+          "end": 149.05,
+          "text": " Execution, execution",
+          "seek": null,
+          "tokens": [
+            17662,
+            1448,
+            11,
+            15058
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " Execution,",
+              "start": 147.99,
+              "end": 148.59,
+              "probability": 0.4158344959529738,
+              "tokens": [
+                17662,
+                1448,
+                11
+              ]
+            },
+            {
+              "word": " execution",
+              "start": 148.59,
+              "end": 149.05,
+              "probability": 0.60263991355896,
+              "tokens": [
+                15058
+              ]
+            }
+          ],
+          "number": 67
+        },
+        {
+          "start": 149.77,
+          "end": 151.65,
+          "text": " Execution, execution",
+          "seek": null,
+          "tokens": [
+            17662,
+            1448,
+            11,
+            15058
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " Execution,",
+              "start": 149.77,
+              "end": 151.39,
+              "probability": 0.6445279916127523,
+              "tokens": [
+                17662,
+                1448,
+                11
+              ]
+            },
+            {
+              "word": " execution",
+              "start": 151.39,
+              "end": 151.65,
+              "probability": 0.2185535728931427,
+              "tokens": [
+                15058
+              ]
+            }
+          ],
+          "number": 68
+        },
+        {
+          "start": 151.65,
+          "end": 153.37,
+          "text": " Execution, execution",
+          "seek": null,
+          "tokens": [
+            17662,
+            1448,
+            11,
+            15058
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " Execution,",
+              "start": 151.65,
+              "end": 153.25,
+              "probability": 0.6920319944620132,
+              "tokens": [
+                17662,
+                1448,
+                11
+              ]
+            },
+            {
+              "word": " execution",
+              "start": 153.25,
+              "end": 153.37,
+              "probability": 0.08699959516525269,
+              "tokens": [
+                15058
+              ]
+            }
+          ],
+          "number": 69
+        },
+        {
+          "start": 153.37,
+          "end": 156.33,
+          "text": " Execution, execution",
+          "seek": null,
+          "tokens": [
+            17662,
+            1448,
+            11,
+            15058
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " Execution,",
+              "start": 153.37,
+              "end": 155.75,
+              "probability": 0.7306558887163798,
+              "tokens": [
+                17662,
+                1448,
+                11
+              ]
+            },
+            {
+              "word": " execution",
+              "start": 155.75,
+              "end": 156.33,
+              "probability": 0.18245522677898407,
+              "tokens": [
+                15058
+              ]
+            }
+          ],
+          "number": 70
+        },
+        {
+          "start": 156.33,
+          "end": 156.99,
+          "text": " Execution, execution",
+          "seek": null,
+          "tokens": [
+            17662,
+            1448,
+            11,
+            15058
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " Execution,",
+              "start": 156.33,
+              "end": 156.63,
+              "probability": 0.7992158432801565,
+              "tokens": [
+                17662,
+                1448,
+                11
+              ]
+            },
+            {
+              "word": " execution",
+              "start": 156.63,
+              "end": 156.99,
+              "probability": 0.11040963977575302,
+              "tokens": [
+                15058
+              ]
+            }
+          ],
+          "number": 71
+        },
+        {
+          "start": 158.05,
+          "end": 159.03,
+          "text": " Execution, execution",
+          "seek": null,
+          "tokens": [
+            17662,
+            1448,
+            11,
+            15058
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " Execution,",
+              "start": 158.05,
+              "end": 159.03,
+              "probability": 0.7632281680901846,
+              "tokens": [
+                17662,
+                1448,
+                11
+              ]
+            },
+            {
+              "word": " execution",
+              "start": 159.03,
+              "end": 159.03,
+              "probability": 0.047359880059957504,
+              "tokens": [
+                15058
+              ]
+            }
+          ],
+          "number": 72
+        }
+      ],
+      "refined": [
+        {
+          "start": 147.979,
+          "end": 149.056,
+          "text": " Execution, execution",
+          "seek": null,
+          "tokens": [
+            17662,
+            1448,
+            11,
+            15058
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " Execution,",
+              "start": 147.979,
+              "end": 148.598,
+              "probability": 0.4158344959529738,
+              "tokens": [
+                17662,
+                1448,
+                11
+              ]
+            },
+            {
+              "word": " execution",
+              "start": 149.021,
+              "end": 149.056,
+              "probability": 0.60263991355896,
+              "tokens": [
+                15058
+              ]
+            }
+          ],
+          "number": 67
+        },
+        {
+          "start": 149.549,
+          "end": 151.65,
+          "text": " Execution, execution",
+          "seek": null,
+          "tokens": [
+            17662,
+            1448,
+            11,
+            15058
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " Execution,",
+              "start": 149.549,
+              "end": 149.578,
+              "probability": 0.6445279916127523,
+              "tokens": [
+                17662,
+                1448,
+                11
+              ]
+            },
+            {
+              "word": " execution",
+              "start": 151.39,
+              "end": 151.65,
+              "probability": 0.2185535728931427,
+              "tokens": [
+                15058
+              ]
+            }
+          ],
+          "number": 68
+        },
+        {
+          "start": 152.675,
+          "end": 153.37,
+          "text": " Execution, execution",
+          "seek": null,
+          "tokens": [
+            17662,
+            1448,
+            11,
+            15058
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " Execution,",
+              "start": 152.675,
+              "end": 152.711,
+              "probability": 0.6920319944620132,
+              "tokens": [
+                17662,
+                1448,
+                11
+              ]
+            },
+            {
+              "word": " execution",
+              "start": 153.25,
+              "end": 153.37,
+              "probability": 0.08699959516525269,
+              "tokens": [
+                15058
+              ]
+            }
+          ],
+          "number": 69
+        },
+        {
+          "start": 154.523,
+          "end": 156.33,
+          "text": " Execution, execution",
+          "seek": null,
+          "tokens": [
+            17662,
+            1448,
+            11,
+            15058
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " Execution,",
+              "start": 154.523,
+              "end": 154.868,
+              "probability": 0.7306558887163798,
+              "tokens": [
+                17662,
+                1448,
+                11
+              ]
+            },
+            {
+              "word": " execution",
+              "start": 155.75,
+              "end": 156.33,
+              "probability": 0.18245522677898407,
+              "tokens": [
+                15058
+              ]
+            }
+          ],
+          "number": 70
+        },
+        {
+          "start": 156.33,
+          "end": 156.99,
+          "text": " Execution, execution",
+          "seek": null,
+          "tokens": [
+            17662,
+            1448,
+            11,
+            15058
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " Execution,",
+              "start": 156.33,
+              "end": 156.368,
+              "probability": 0.7992158432801565,
+              "tokens": [
+                17662,
+                1448,
+                11
+              ]
+            },
+            {
+              "word": " execution",
+              "start": 156.63,
+              "end": 156.99,
+              "probability": 0.11040963977575302,
+              "tokens": [
+                15058
+              ]
+            }
+          ],
+          "number": 71
+        },
+        {
+          "start": 158.492,
+          "end": 159.03,
+          "text": " Execution, execution",
+          "seek": null,
+          "tokens": [
+            17662,
+            1448,
+            11,
+            15058
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " Execution,",
+              "start": 158.492,
+              "end": 158.526,
+              "probability": 0.7632281680901846,
+              "tokens": [
+                17662,
+                1448,
+                11
+              ]
+            },
+            {
+              "word": " execution",
+              "start": 159.03,
+              "end": 159.03,
+              "probability": 0.047359880059957504,
+              "tokens": [
+                15058
+              ]
+            }
+          ],
+          "number": 72
+        }
+      ]
+    },
+    {
+      "from": 9,
+      "to": 10,
+      "window": [
+        29.41,
+        33.74
+      ],
+      "aligned": [
+        {
+          "start": 29.77,
+          "end": 31.17,
+          "text": " If I'm a set of points",
+          "seek": null,
+          "tokens": [
+            759,
+            286,
+            478,
+            257,
+            992,
+            295,
+            2793
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " If",
+              "start": 29.77,
+              "end": 30.05,
+              "probability": 0.008208676241338253,
+              "tokens": [
+                759
+              ]
+            },
+            {
+              "word": " I'm",
+              "start": 30.05,
+              "end": 30.53,
+              "probability": 0.5271245986223221,
+              "tokens": [
+                286,
+                478
+              ]
+            },
+            {
+              "word": " a",
+              "start": 30.53,
+              "end": 30.61,
+              "probability": 0.12511329352855682,
+              "tokens": [
+                257
+              ]
+            },
+            {
+              "word": " set",
+              "start": 30.61,
+              "end": 30.75,
+              "probability": 0.8624243140220642,
+              "tokens": [
+                992
+              ]
+            },
+            {
+              "word": " of",
+              "start": 30.75,
+              "end": 30.91,
+              "probability": 0.7592925429344177,
+              "tokens": [
+                295
+              ]
+            },
+            {
+              "word": " points",
+              "start": 30.91,
+              "end": 31.17,
+              "probability": 0.9129060506820679,
+              "tokens": [
+                2793
+              ]
+            }
+          ],
+          "number": 9
+        },
+        {
+          "start": 31.27,
+          "end": 33.27,
+          "text": " Then I will give you my dimension",
+          "seek": null,
+          "tokens": [
+            1396,
+            286,
+            486,
+            976,
+            291,
+            452,
+            10139
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " Then",
+              "start": 31.27,
+              "end": 31.53,
+              "probability": 0.24210046231746674,
+              "tokens": [
+                1396
+              ]
+            },
+            {
+              "word": " I",
+              "start": 31.53,
+              "end": 31.77,
+              "probability": 0.9719927906990051,
+              "tokens": [
+                286
+              ]
+            },
+            {
+              "word": " will",
+              "start": 31.77,
+              "end": 31.89,
+              "probability": 0.9279158711433411,
+              "tokens": [
+                486
+              ]
+            },
+            {
+              "word": " give",
+              "start": 31.89,
+              "end": 32.19,
+              "probability": 0.9909504652023315,
+              "tokens": [
+                976
+              ]
+            },
+            {
+              "word": " you",
+              "start": 32.19,
+              "end": 32.43,
+              "probability": 0.9904171228408813,
+              "tokens": [
+                291
+              ]
+            },
+            {
+              "word": " my",
+              "start": 32.43,
+              "end": 32.73,
+              "probability": 0.978306770324707,
+              "tokens": [
+                452
+              ]
+            },
+            {
+              "word": " dimension",
+              "start": 32.73,
+              "end": 33.27,
+              "probability": 0.4979802668094635,
+              "tokens": [
+                10139
+              ]
+            }
+          ],
+          "number": 10
+        }
+      ],
+      "refined": [
+        {
+          "start": 29.77,
+          "end": 31.17,
+          "text": " If I'm a set of points",
+          "seek": null,
+          "tokens": [
+            759,
+            286,
+            478,
+            257,
+            992,
+            295,
+            2793
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " If",
+              "start": 29.77,
+              "end": 30.05,
+              "probability": 0.008208676241338253,
+              "tokens": [
+                759
+              ]
+            },
+            {
+              "word": " I'm",
+              "start": 30.05,
+              "end": 30.44,
+              "probability": 0.5271245986223221,
+              "tokens": [
+                286,
+                478
+              ]
+            },
+            {
+              "word": " a",
+              "start": 30.53,
+              "end": 30.61,
+              "probability": 0.12511329352855682,
+              "tokens": [
+                257
+              ]
+            },
+            {
+              "word": " set",
+              "start": 30.61,
+              "end": 30.75,
+              "probability": 0.8624243140220642,
+              "tokens": [
+                992
+              ]
+            },
+            {
+              "word": " of",
+              "start": 30.75,
+              "end": 30.77,
+              "probability": 0.7592925429344177,
+              "tokens": [
+                295
+              ]
+            },
+            {
+              "word": " points",
+              "start": 30.91,
+              "end": 31.17,
+              "probability": 0.9129060506820679,
+              "tokens": [
+                2793
+              ]
+            }
+          ],
+          "number": 9
+        },
+        {
+          "start": 31.27,
+          "end": 33.27,
+          "text": " Then I will give you my dimension",
+          "seek": null,
+          "tokens": [
+            1396,
+            286,
+            486,
+            976,
+            291,
+            452,
+            10139
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " Then",
+              "start": 31.27,
+              "end": 31.53,
+              "probability": 0.24210046231746674,
+              "tokens": [
+                1396
+              ]
+            },
+            {
+              "word": " I",
+              "start": 31.62,
+              "end": 31.732,
+              "probability": 0.9719927906990051,
+              "tokens": [
+                286
+              ]
+            },
+            {
+              "word": " will",
+              "start": 31.77,
+              "end": 31.799,
+              "probability": 0.9279158711433411,
+              "tokens": [
+                486
+              ]
+            },
+            {
+              "word": " give",
+              "start": 32.002,
+              "end": 32.245,
+              "probability": 0.9909504652023315,
+              "tokens": [
+                976
+              ]
+            },
+            {
+              "word": " you",
+              "start": 32.28,
+              "end": 32.313,
+              "probability": 0.9904171228408813,
+              "tokens": [
+                291
+              ]
+            },
+            {
+              "word": " my",
+              "start": 32.542,
+              "end": 32.66,
+              "probability": 0.978306770324707,
+              "tokens": [
+                452
+              ]
+            },
+            {
+              "word": " dimension",
+              "start": 32.73,
+              "end": 33.27,
+              "probability": 0.4979802668094635,
+              "tokens": [
+                10139
+              ]
+            }
+          ],
+          "number": 10
+        }
+      ]
+    },
+    {
+      "from": 11,
+      "to": 12,
+      "window": [
+        33.12,
+        37.46
+      ],
+      "aligned": [
+        {
+          "start": 33.44,
+          "end": 34.64,
+          "text": " If I'm a circle",
+          "seek": null,
+          "tokens": [
+            759,
+            286,
+            478,
+            257,
+            6329
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " If",
+              "start": 33.44,
+              "end": 33.72,
+              "probability": 0.06510933488607407,
+              "tokens": [
+                759
+              ]
+            },
+            {
+              "word": " I'm",
+              "start": 33.72,
+              "end": 34.18,
+              "probability": 0.9469311237335205,
+              "tokens": [
+                286,
+                478
+              ]
+            },
+            {
+              "word": " a",
+              "start": 34.18,
+              "end": 34.32,
+              "probability": 0.47185999155044556,
+              "tokens": [
+                257
+              ]
+            },
+            {
+              "word": " circle",
+              "start": 34.32,
+              "end": 34.64,
+              "probability": 0.8906550407409668,
+              "tokens": [
+                6329
+              ]
+            }
+          ],
+          "number": 11
+        },
+        {
+          "start": 34.9,
+          "end": 36.98,
+          "text": " Then I will give you my circumference",
+          "seek": null,
+          "tokens": [
+            1396,
+            286,
+            486,
+            976,
+            291,
+            452,
+            7125,
+            5158
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " Then",
+              "start": 34.9,
+              "end": 35.18,
+              "probability": 0.296681672334671,
+              "tokens": [
+                1396
+              ]
+            },
+            {
+              "word": " I",
+              "start": 35.18,
+              "end": 35.46,
+              "probability": 0.9760312438011169,
+              "tokens": [
+                286
+              ]
+            },
+            {
+              "word": " will",
+              "start": 35.46,
+              "end": 35.64,
+              "probability": 0.9295012950897217,
+              "tokens": [
+                486
+              ]
+            },
+            {
+              "word": " give",
+              "start": 35.64,
+              "end": 35.9,
+              "probability": 0.9913650751113892,
+              "tokens": [
+                976
+              ]
+            },
+            {
+              "word": " you",
+              "start": 35.9,
+              "end": 36.14,
+              "probability": 0.980059802532196,
+              "tokens": [
+                291
+              ]
+            },
+            {
+              "word": " my",
+              "start": 36.14,
+              "end": 36.36,
+              "probability": 0.9726406335830688,
+              "tokens": [
+                452
+              ]
+            },
+            {
+              "word": " circumference",
+              "start": 36.36,
+              "end": 36.98,
+              "probability": 0.7765359580516815,
+              "tokens": [
+                7125,
+                5158
+              ]
+            }
+          ],
+          "number": 12
+        }
+      ],
+      "refined": [
+        {
+          "start": 33.44,
+          "end": 34.863,
+          "text": " If I'm a circle",
+          "seek": null,
+          "tokens": [
+            759,
+            286,
+            478,
+            257,
+            6329
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " If",
+              "start": 33.44,
+              "end": 33.72,
+              "probability": 0.06510933488607407,
+              "tokens": [
+                759
+              ]
+            },
+            {
+              "word": " I'm",
+              "start": 33.72,
+              "end": 34.094,
+              "probability": 0.9469311237335205,
+              "tokens": [
+                286,
+                478
+              ]
+            },
+            {
+              "word": " a",
+              "start": 34.18,
+              "end": 34.355,
+              "probability": 0.47185999155044556,
+              "tokens": [
+                257
+              ]
+            },
+            {
+              "word": " circle",
+              "start": 34.46,
+              "end": 34.863,
+              "probability": 0.8906550407409668,
+              "tokens": [
+                6329
+              ]
+            }
+          ],
+          "number": 11
+        },
+        {
+          "start": 34.9,
+          "end": 36.985,
+          "text": " Then I will give you my circumference",
+          "seek": null,
+          "tokens": [
+            1396,
+            286,
+            486,
+            976,
+            291,
+            452,
+            7125,
+            5158
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " Then",
+              "start": 34.9,
+              "end": 35.18,
+              "probability": 0.296681672334671,
+              "tokens": [
+                1396
+              ]
+            },
+            {
+              "word": " I",
+              "start": 35.285,
+              "end": 35.394,
+              "probability": 0.9760312438011169,
+              "tokens": [
+                286
+              ]
+            },
+            {
+              "word": " will",
+              "start": 35.46,
+              "end": 35.572,
+              "probability": 0.9295012950897217,
+              "tokens": [
+                486
+              ]
+            },
+            {
+              "word": " give",
+              "start": 35.64,
+              "end": 35.706,
+              "probability": 0.9913650751113892,
+              "tokens": [
+                976
+              ]
+            },
+            {
+              "word": " you",
+              "start": 35.99,
+              "end": 36.027,
+              "probability": 0.980059802532196,
+              "tokens": [
+                291
+              ]
+            },
+            {
+              "word": " my",
+              "start": 36.14,
+              "end": 36.277,
+              "probability": 0.9726406335830688,
+              "tokens": [
+                452
+              ]
+            },
+            {
+              "word": " circumference",
+              "start": 36.36,
+              "end": 36.985,
+              "probability": 0.7765359580516815,
+              "tokens": [
+                7125,
+                5158
+              ]
+            }
+          ],
+          "number": 12
+        }
+      ]
+    },
+    {
+      "from": 13,
+      "to": 14,
+      "window": [
+        36.88,
+        40.88
+      ],
+      "aligned": [
+        {
+          "start": 36.96,
+          "end": 38.56,
+          "text": " If I'm a sine wave",
+          "seek": null,
+          "tokens": [
+            759,
+            286,
+            478,
+            257,
+            18609,
+            5772
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " If",
+              "start": 36.96,
+              "end": 37.38,
+              "probability": 0.002416386967524886,
+              "tokens": [
+                759
+              ]
+            },
+            {
+              "word": " I'm",
+              "start": 37.38,
+              "end": 37.86,
+              "probability": 0.7904715836048126,
+              "tokens": [
+                286,
+                478
+              ]
+            },
+            {
+              "word": " a",
+              "start": 37.86,
+              "end": 38.02,
+              "probability": 0.8282917737960815,
+              "tokens": [
+                257
+              ]
+            },
+            {
+              "word": " sine",
+              "start": 38.02,
+              "end": 38.26,
+              "probability": 0.28731200098991394,
+              "tokens": [
+                18609
+              ]
+            },
+            {
+              "word": " wave",
+              "start": 38.26,
+              "end": 38.56,
+              "probability": 0.9543055295944214,
+              "tokens": [
+                5772
+              ]
+            }
+          ],
+          "number": 13
+        },
+        {
+          "start": 38.66,
+          "end": 40.7,
+          "text": " Then you can sit on all my tangents",
+          "seek": null,
+          "tokens": [
+            1396,
+            291,
+            393,
+            1394,
+            322,
+            439,
+            452,
+            10266,
+            791
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " Then",
+              "start": 38.66,
+              "end": 38.88,
+              "probability": 0.24302349984645844,
+              "tokens": [
+                1396
+              ]
+            },
+            {
+              "word": " you",
+              "start": 38.88,
+              "end": 38.98,
+              "probability": 0.9888259172439575,
+              "tokens": [
+                291
+              ]
+            },
+            {
+              "word": " can",
+              "start": 38.98,
+              "end": 39.16,
+              "probability": 0.9951456189155579,
+              "tokens": [
+                393
+              ]
+            },
+            {
+              "word": " sit",
+              "start": 39.16,
+              "end": 39.5,
+              "probability": 0.007727233227342367,
+              "tokens": [
+                1394
+              ]
+            },
+            {
+              "word": " on",
+              "start": 39.5,
+              "end": 39.8,
+              "probability": 0.8534842133522034,
+              "tokens": [
+                322
+              ]
+            },
+            {
+              "word": " all",
+              "start": 39.8,
+              "end": 40.06,
+              "probability": 0.754757821559906,
+              "tokens": [
+                439
+              ]
+            },
+            {
+              "word": " my",
+              "start": 40.06,
+              "end": 40.3,
+              "probability": 0.9487956762313843,
+              "tokens": [
+                452
+              ]
+            },
+            {
+              "word": " tangents",
+              "start": 40.3,
+              "end": 40.7,
+              "probability": 0.4755570477727815,
+              "tokens": [
+                10266,
+                791
+              ]
+            }
+          ],
+          "number": 14
+        }
+      ],
+      "refined": [
+        {
+          "start": 36.96,
+          "end": 38.56,
+          "text": " If I'm a sine wave",
+          "seek": null,
+          "tokens": [
+            759,
+            286,
+            478,
+            257,
+            18609,
+            5772
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " If",
+              "start": 36.96,
+              "end": 37.38,
+              "probability": 0.002416386967524886,
+              "tokens": [
+                759
+              ]
+            },
+            {
+              "word": " I'm",
+              "start": 37.71,
+              "end": 37.823,
+              "probability": 0.7904715836048126,
+              "tokens": [
+                286,
+                478
+              ]
+            },
+            {
+              "word": " a",
+              "start": 37.86,
+              "end": 38.02,
+              "probability": 0.8282917737960815,
+              "tokens": [
+                257
+              ]
+            },
+            {
+              "word": " sine",
+              "start": 38.02,
+              "end": 38.26,
+              "probability": 0.28731200098991394,
+              "tokens": [
+                18609
+              ]
+            },
+            {
+              "word": " wave",
+              "start": 38.523,
+              "end": 38.56,
+              "probability": 0.9543055295944214,
+              "tokens": [
+                5772
+              ]
+            }
+          ],
+          "number": 13
+        },
+        {
+          "start": 38.66,
+          "end": 40.7,
+          "text": " Then you can sit on all my tangents",
+          "seek": null,
+          "tokens": [
+            1396,
+            291,
+            393,
+            1394,
+            322,
+            439,
+            452,
+            10266,
+            791
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " Then",
+              "start": 38.66,
+              "end": 38.88,
+              "probability": 0.24302349984645844,
+              "tokens": [
+                1396
+              ]
+            },
+            {
+              "word": " you",
+              "start": 38.905,
+              "end": 38.98,
+              "probability": 0.9888259172439575,
+              "tokens": [
+                291
+              ]
+            },
+            {
+              "word": " can",
+              "start": 38.98,
+              "end": 39.16,
+              "probability": 0.9951456189155579,
+              "tokens": [
+                393
+              ]
+            },
+            {
+              "word": " sit",
+              "start": 39.16,
+              "end": 39.5,
+              "probability": 0.007727233227342367,
+              "tokens": [
+                1394
+              ]
+            },
+            {
+              "word": " on",
+              "start": 39.612,
+              "end": 39.683,
+              "probability": 0.8534842133522034,
+              "tokens": [
+                322
+              ]
+            },
+            {
+              "word": " all",
+              "start": 39.8,
+              "end": 40.06,
+              "probability": 0.754757821559906,
+              "tokens": [
+                439
+              ]
+            },
+            {
+              "word": " my",
+              "start": 40.09,
+              "end": 40.221,
+              "probability": 0.9487956762313843,
+              "tokens": [
+                452
+              ]
+            },
+            {
+              "word": " tangents",
+              "start": 40.3,
+              "end": 40.7,
+              "probability": 0.4755570477727815,
+              "tokens": [
+                10266,
+                791
+              ]
+            }
+          ],
+          "number": 14
+        }
+      ]
+    },
+    {
+      "from": 15,
+      "to": 16,
+      "window": [
+        40.559999999999995,
+        44.440000000000005
+      ],
+      "aligned": [
+        {
+          "start": 40.8,
+          "end": 41.88,
+          "text": " If I approach infinity",
+          "seek": null,
+          "tokens": [
+            759,
+            286,
+            3109,
+            13202
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " If",
+              "start": 40.8,
+              "end": 41.02,
+              "probability": 0.0070752366445958614,
+              "tokens": [
+                759
+              ]
+            },
+            {
+              "word": " I",
+              "start": 41.02,
+              "end": 41.2,
+              "probability": 0.9045620560646057,
+              "tokens": [
+                286
+              ]
+            },
+            {
+              "word": " approach",
+              "start": 41.2,
+              "end": 41.46,
+              "probability": 0.028859656304121017,
+              "tokens": [
+                3109
+              ]
+            },
+            {
+              "word": " infinity",
+              "start": 41.46,
+              "end": 41.88,
+              "probability": 0.9450012445449829,
+              "tokens": [
+                13202
+              ]
+            }
+          ],
+          "number": 15
+        },
+        {
+          "start": 42.3,
+          "end": 43.96,
+          "text": " Then you can be my limitations",
+          "seek": null,
+          "tokens": [
+            1396,
+            291,
+            393,
+            312,
+            452,
+            15705
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " Then",
+              "start": 42.3,
+              "end": 42.58,
+              "probability": 0.23891229927539825,
+              "tokens": [
+                1396
+              ]
+            },
+            {
+              "word": " you",
+              "start": 42.58,
+              "end": 42.78,
+              "probability": 0.9821312427520752,
+              "tokens": [
+                291
+              ]
+            },
+            {
+              "word": " can",
+              "start": 42.78,
+              "end": 42.98,
+              "probability": 0.997171938419342,
+              "tokens": [
+                393
+              ]
+            },
+            {
+              "word": " be",
+              "start": 42.98,
+              "end": 43.26,
+              "probability": 0.9872545599937439,
+              "tokens": [
+                312
+              ]
+            },
+            {
+              "word": " my",
+              "start": 43.26,
+              "end": 43.52,
+              "probability": 0.8745365738868713,
+              "tokens": [
+                452
+              ]
+            },
+            {
+              "word": " limitations",
+              "start": 43.52,
+              "end": 43.96,
+              "probability": 0.010874280706048012,
+              "tokens": [
+                15705
+              ]
+            }
+          ],
+          "number": 16
+        }
+      ],
+      "refined": [
+        {
+          "start": 40.8,
+          "end": 41.962,
+          "text": " If I approach infinity",
+          "seek": null,
+          "tokens": [
+            759,
+            286,
+            3109,
+            13202
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " If",
+              "start": 40.8,
+              "end": 41.02,
+              "probability": 0.0070752366445958614,
+              "tokens": [
+                759
+              ]
+            },
+            {
+              "word": " I",
+              "start": 41.087,
+              "end": 41.2,
+              "probability": 0.9045620560646057,
+              "tokens": [
+                286
+              ]
+            },
+            {
+              "word": " approach",
+              "start": 41.2,
+              "end": 41.46,
+              "probability": 0.028859656304121017,
+              "tokens": [
+                3109
+              ]
+            },
+            {
+              "word": " infinity",
+              "start": 41.591,
+              "end": 41.962,
+              "probability": 0.9450012445449829,
+              "tokens": [
+                13202
+              ]
+            }
+          ],
+          "number": 15
+        },
+        {
+          "start": 42.3,
+          "end": 43.96,
+          "text": " Then you can be my limitations",
+          "seek": null,
+          "tokens": [
+            1396,
+            291,
+            393,
+            312,
+            452,
+            15705
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " Then",
+              "start": 42.3,
+              "end": 42.58,
+              "probability": 0.23891229927539825,
+              "tokens": [
+                1396
+              ]
+            },
+            {
+              "word": " you",
+              "start": 42.63,
+              "end": 42.658,
+              "probability": 0.9821312427520752,
+              "tokens": [
+                291
+              ]
+            },
+            {
+              "word": " can",
+              "start": 42.855,
+              "end": 42.941,
+              "probability": 0.997171938419342,
+              "tokens": [
+                393
+              ]
+            },
+            {
+              "word": " be",
+              "start": 43.085,
+              "end": 43.187,
+              "probability": 0.9872545599937439,
+              "tokens": [
+                312
+              ]
+            },
+            {
+              "word": " my",
+              "start": 43.357,
+              "end": 43.459,
+              "probability": 0.8745365738868713,
+              "tokens": [
+                452
+              ]
+            },
+            {
+              "word": " limitations",
+              "start": 43.52,
+              "end": 43.96,
+              "probability": 0.010874280706048012,
+              "tokens": [
+                15705
+              ]
+            }
+          ],
+          "number": 16
+        }
+      ]
+    },
+    {
+      "from": 17,
+      "to": 18,
+      "window": [
+        44.02,
+        47.88
+      ],
+      "aligned": [
+        {
+          "start": 44.48,
+          "end": 45.72,
+          "text": " Switch my current",
+          "seek": null,
+          "tokens": [
+            13893,
+            452,
+            2190
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " Switch",
+              "start": 44.48,
+              "end": 44.88,
+              "probability": 0.00012099330342607573,
+              "tokens": [
+                13893
+              ]
+            },
+            {
+              "word": " my",
+              "start": 44.88,
+              "end": 45.24,
+              "probability": 0.8152579665184021,
+              "tokens": [
+                452
+              ]
+            },
+            {
+              "word": " current",
+              "start": 45.24,
+              "end": 45.72,
+              "probability": 0.9706186056137085,
+              "tokens": [
+                2190
+              ]
+            }
+          ],
+          "number": 17
+        },
+        {
+          "start": 45.9,
+          "end": 47.5,
+          "text": " To AC, to DC",
+          "seek": null,
+          "tokens": [
+            1407,
+            8157,
+            11,
+            281,
+            9114
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " To",
+              "start": 45.9,
+              "end": 46.28,
+              "probability": 0.41927576065063477,
+              "tokens": [
+                1407
+              ]
+            },
+            {
+              "word": " AC,",
+              "start": 46.28,
+              "end": 46.82,
+              "probability": 0.5967380255460739,
+              "tokens": [
+                8157,
+                11
+              ]
+            },
+            {
+              "word": " to",
+              "start": 46.82,
+              "end": 47.1,
+              "probability": 0.9011326432228088,
+              "tokens": [
+                281
+              ]
+            },
+            {
+              "word": " DC",
+              "start": 47.1,
+              "end": 47.5,
+              "probability": 0.8797289729118347,
+              "tokens": [
+                9114
+              ]
+            }
+          ],
+          "number": 18
+        }
+      ],
+      "refined": [
+        {
+          "start": 44.48,
+          "end": 45.732,
+          "text": " Switch my current",
+          "seek": null,
+          "tokens": [
+            13893,
+            452,
+            2190
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " Switch",
+              "start": 44.48,
+              "end": 44.88,
+              "probability": 0.00012099330342607573,
+              "tokens": [
+                13893
+              ]
+            },
+            {
+              "word": " my",
+              "start": 44.88,
+              "end": 45.294,
+              "probability": 0.8152579665184021,
+              "tokens": [
+                452
+              ]
+            },
+            {
+              "word": " current",
+              "start": 45.39,
+              "end": 45.732,
+              "probability": 0.9706186056137085,
+              "tokens": [
+                2190
+              ]
+            }
+          ],
+          "number": 17
+        },
+        {
+          "start": 45.755,
+          "end": 47.242,
+          "text": " To AC, to DC",
+          "seek": null,
+          "tokens": [
+            1407,
+            8157,
+            11,
+            281,
+            9114
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " To",
+              "start": 45.755,
+              "end": 46.437,
+              "probability": 0.41927576065063477,
+              "tokens": [
+                1407
+              ]
+            },
+            {
+              "word": " AC,",
+              "start": 46.482,
+              "end": 46.897,
+              "probability": 0.5967380255460739,
+              "tokens": [
+                8157,
+                11
+              ]
+            },
+            {
+              "word": " to",
+              "start": 46.925,
+              "end": 47.1,
+              "probability": 0.9011326432228088,
+              "tokens": [
+                281
+              ]
+            },
+            {
+              "word": " DC",
+              "start": 47.1,
+              "end": 47.242,
+              "probability": 0.8797289729118347,
+              "tokens": [
+                9114
+              ]
+            }
+          ],
+          "number": 18
+        }
+      ]
+    },
+    {
+      "from": 21,
+      "to": 22,
+      "window": [
+        51.12,
+        55.36000000000001
+      ],
+      "aligned": [
+        {
+          "start": 51.46,
+          "end": 53.04,
+          "text": " Oh, we can travel",
+          "seek": null,
+          "tokens": [
+            876,
+            11,
+            321,
+            393,
+            3147
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " Oh,",
+              "start": 51.46,
+              "end": 51.68,
+              "probability": 0.23303238459629938,
+              "tokens": [
+                876,
+                11
+              ]
+            },
+            {
+              "word": " we",
+              "start": 51.68,
+              "end": 52.14,
+              "probability": 0.5585079789161682,
+              "tokens": [
+                321
+              ]
+            },
+            {
+              "word": " can",
+              "start": 52.14,
+              "end": 52.6,
+              "probability": 0.9844712018966675,
+              "tokens": [
+                393
+              ]
+            },
+            {
+              "word": " travel",
+              "start": 52.6,
+              "end": 53.04,
+              "probability": 0.9108862280845642,
+              "tokens": [
+                3147
+              ]
+            }
+          ],
+          "number": 21
+        },
+        {
+          "start": 53.18,
+          "end": 54.88,
+          "text": " To AD, to BC",
+          "seek": null,
+          "tokens": [
+            1407,
+            9135,
+            11,
+            281,
+            14359
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " To",
+              "start": 53.18,
+              "end": 53.6,
+              "probability": 0.31894657015800476,
+              "tokens": [
+                1407
+              ]
+            },
+            {
+              "word": " AD,",
+              "start": 53.6,
+              "end": 54.08,
+              "probability": 0.1134956544265151,
+              "tokens": [
+                9135,
+                11
+              ]
+            },
+            {
+              "word": " to",
+              "start": 54.08,
+              "end": 54.54,
+              "probability": 0.9636124968528748,
+              "tokens": [
+                281
+              ]
+            },
+            {
+              "word": " BC",
+              "start": 54.54,
+              "end": 54.88,
+              "probability": 0.9620562195777893,
+              "tokens": [
+                14359
+              ]
+            }
+          ],
+          "number": 22
+        }
+      ],
+      "refined": [
+        {
+          "start": 51.46,
+          "end": 53.04,
+          "text": " Oh, we can travel",
+          "seek": null,
+          "tokens": [
+            876,
+            11,
+            321,
+            393,
+            3147
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " Oh,",
+              "start": 51.46,
+              "end": 51.68,
+              "probability": 0.23303238459629938,
+              "tokens": [
+                876,
+                11
+              ]
+            },
+            {
+              "word": " we",
+              "start": 51.68,
+              "end": 52.14,
+              "probability": 0.5585079789161682,
+              "tokens": [
+                321
+              ]
+            },
+            {
+              "word": " can",
+              "start": 52.341,
+              "end": 52.503,
+              "probability": 0.9844712018966675,
+              "tokens": [
+                393
+              ]
+            },
+            {
+              "word": " travel",
+              "start": 52.6,
+              "end": 53.04,
+              "probability": 0.9108862280845642,
+              "tokens": [
+                3147
+              ]
+            }
+          ],
+          "number": 21
+        },
+        {
+          "start": 53.075,
+          "end": 54.937,
+          "text": " To AD, to BC",
+          "seek": null,
+          "tokens": [
+            1407,
+            9135,
+            11,
+            281,
+            14359
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " To",
+              "start": 53.075,
+              "end": 53.6,
+              "probability": 0.31894657015800476,
+              "tokens": [
+                1407
+              ]
+            },
+            {
+              "word": " AD,",
+              "start": 53.6,
+              "end": 54.08,
+              "probability": 0.1134956544265151,
+              "tokens": [
+                9135,
+                11
+              ]
+            },
+            {
+              "word": " to",
+              "start": 54.281,
+              "end": 54.51,
+              "probability": 0.9636124968528748,
+              "tokens": [
+                281
+              ]
+            },
+            {
+              "word": " BC",
+              "start": 54.689,
+              "end": 54.937,
+              "probability": 0.9620562195777893,
+              "tokens": [
+                14359
+              ]
+            }
+          ],
+          "number": 22
+        }
+      ]
+    },
+    {
+      "from": 23,
+      "to": 24,
+      "window": [
+        54.74,
+        59.089999999999996
+      ],
+      "aligned": [
+        {
+          "start": 55.04,
+          "end": 56.76,
+          "text": " And we can unite",
+          "seek": null,
+          "tokens": [
+            400,
+            321,
+            393,
+            29320
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " And",
+              "start": 55.04,
+              "end": 55.34,
+              "probability": 0.009189043194055557,
+              "tokens": [
+                400
+              ]
+            },
+            {
+              "word": " we",
+              "start": 55.34,
+              "end": 55.82,
+              "probability": 0.6564576625823975,
+              "tokens": [
+                321
+              ]
+            },
+            {
+              "word": " can",
+              "start": 55.82,
+              "end": 56.32,
+              "probability": 0.9590776562690735,
+              "tokens": [
+                393
+              ]
+            },
+            {
+              "word": " unite",
+              "start": 56.32,
+              "end": 56.76,
+              "probability": 0.9940164089202881,
+              "tokens": [
+                29320
+              ]
+            }
+          ],
+          "number": 23
+        },
+        {
+          "start": 56.94,
+          "end": 58.56,
+          "text": " So deeply, so deeply",
+          "seek": null,
+          "tokens": [
+            407,
+            8760,
+            11,
+            370,
+            8760
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " So",
+              "start": 56.94,
+              "end": 57.22,
+              "probability": 0.015218059532344341,
+              "tokens": [
+                407
+              ]
+            },
+            {
+              "word": " deeply,",
+              "start": 57.22,
+              "end": 58.08,
+              "probability": 0.48918066173791885,
+              "tokens": [
+                8760,
+                11
+              ]
+            },
+            {
+              "word": " so",
+              "start": 58.08,
+              "end": 58.24,
+              "probability": 0.48472413420677185,
+              "tokens": [
+                370
+              ]
+            },
+            {
+              "word": " deeply",
+              "start": 58.24,
+              "end": 58.56,
+              "probability": 0.9974777102470398,
+              "tokens": [
+                8760
+              ]
+            }
+          ],
+          "number": 24
+        }
+      ],
+      "refined": [
+        {
+          "start": 55.04,
+          "end": 56.85,
+          "text": " And we can unite",
+          "seek": null,
+          "tokens": [
+            400,
+            321,
+            393,
+            29320
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " And",
+              "start": 55.04,
+              "end": 55.34,
+              "probability": 0.009189043194055557,
+              "tokens": [
+                400
+              ]
+            },
+            {
+              "word": " we",
+              "start": 55.34,
+              "end": 55.987,
+              "probability": 0.6564576625823975,
+              "tokens": [
+                321
+              ]
+            },
+            {
+              "word": " can",
+              "start": 56.008,
+              "end": 56.092,
+              "probability": 0.9590776562690735,
+              "tokens": [
+                393
+              ]
+            },
+            {
+              "word": " unite",
+              "start": 56.458,
+              "end": 56.85,
+              "probability": 0.9940164089202881,
+              "tokens": [
+                29320
+              ]
+            }
+          ],
+          "number": 23
+        },
+        {
+          "start": 56.94,
+          "end": 58.407,
+          "text": " So deeply, so deeply",
+          "seek": null,
+          "tokens": [
+            407,
+            8760,
+            11,
+            370,
+            8760
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " So",
+              "start": 56.94,
+              "end": 57.22,
+              "probability": 0.015218059532344341,
+              "tokens": [
+                407
+              ]
+            },
+            {
+              "word": " deeply,",
+              "start": 57.22,
+              "end": 57.892,
+              "probability": 0.48918066173791885,
+              "tokens": [
+                8760,
+                11
+              ]
+            },
+            {
+              "word": " so",
+              "start": 58.08,
+              "end": 58.342,
+              "probability": 0.48472413420677185,
+              "tokens": [
+                370
+              ]
+            },
+            {
+              "word": " deeply",
+              "start": 58.38,
+              "end": 58.407,
+              "probability": 0.9974777102470398,
+              "tokens": [
+                8760
+              ]
+            }
+          ],
+          "number": 24
+        }
+      ]
+    },
+    {
+      "from": 85,
+      "to": 85,
+      "window": [
+        177.03,
+        179.4
+      ],
+      "aligned": [
+        {
+          "start": 177.37,
+          "end": 179.23,
+          "text": " I've studied, I've studied",
+          "seek": null,
+          "tokens": [
+            286,
+            600,
+            9454,
+            11,
+            286,
+            600,
+            9454
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " I've",
+              "start": 177.37,
+              "end": 177.73,
+              "probability": 0.5211157575249672,
+              "tokens": [
+                286,
+                600
+              ]
+            },
+            {
+              "word": " studied,",
+              "start": 177.73,
+              "end": 178.33,
+              "probability": 0.8325783908367157,
+              "tokens": [
+                9454,
+                11
+              ]
+            },
+            {
+              "word": " I've",
+              "start": 178.51,
+              "end": 178.97,
+              "probability": 0.9113902151584625,
+              "tokens": [
+                286,
+                600
+              ]
+            },
+            {
+              "word": " studied",
+              "start": 178.97,
+              "end": 179.23,
+              "probability": 0.9909492135047913,
+              "tokens": [
+                9454
+              ]
+            }
+          ],
+          "number": 85
+        }
+      ],
+      "refined": [
+        {
+          "start": 177.196,
+          "end": 179.089,
+          "text": " I've studied, I've studied",
+          "seek": null,
+          "tokens": [
+            286,
+            600,
+            9454,
+            11,
+            286,
+            600,
+            9454
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " I've",
+              "start": 177.196,
+              "end": 177.73,
+              "probability": 0.5211157575249672,
+              "tokens": [
+                286,
+                600
+              ]
+            },
+            {
+              "word": " studied,",
+              "start": 177.73,
+              "end": 178.33,
+              "probability": 0.8325783908367157,
+              "tokens": [
+                9454,
+                11
+              ]
+            },
+            {
+              "word": " I've",
+              "start": 178.55,
+              "end": 178.712,
+              "probability": 0.9113902151584625,
+              "tokens": [
+                286,
+                600
+              ]
+            },
+            {
+              "word": " studied",
+              "start": 179.068,
+              "end": 179.089,
+              "probability": 0.9909492135047913,
+              "tokens": [
+                9454
+              ]
+            }
+          ],
+          "number": 85
+        }
+      ]
+    },
+    {
+      "from": 93,
+      "to": 93,
+      "window": [
+        191.92999999999998,
+        195.03
+      ],
+      "aligned": [
+        {
+          "start": 191.93,
+          "end": 195.01,
+          "text": " Execution",
+          "seek": null,
+          "tokens": [
+            17662,
+            1448
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " Execution",
+              "start": 191.93,
+              "end": 195.01,
+              "probability": 0.23772340915672885,
+              "tokens": [
+                17662,
+                1448
+              ]
+            }
+          ],
+          "number": 93
+        }
+      ],
+      "refined": [
+        {
+          "start": 191.93,
+          "end": 195.01,
+          "text": " Execution",
+          "seek": null,
+          "tokens": [
+            17662,
+            1448
+          ],
+          "temperature": null,
+          "avg_logprob": null,
+          "compression_ratio": null,
+          "no_speech_prob": null,
+          "words": [
+            {
+              "word": " Execution",
+              "start": 191.93,
+              "end": 195.01,
+              "probability": 0.23772340915672885,
+              "tokens": [
+                17662,
+                1448
+              ]
+            }
+          ],
+          "number": 93
+        }
+      ]
+    }
+  ]
+}

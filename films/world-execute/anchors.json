@@ -1,0 +1,1061 @@
+{
+  "version": 1,
+  "audioSha256": "2e9c1a2f7795818ccb6b6fd3fc540d42e73567fde3e8abaeef435ef70f6c85d4",
+  "durationMs": 211944,
+  "originAudioMs": 0,
+  "method": "stable-ts-section-plus-bounded-context-consensus",
+  "reviewed": false,
+  "notes": [
+    "Machine estimates; listening review required before release.",
+    "The supplied .lyc has 92 lines; the design script has 93, adding one repeated You have left.",
+    "Phrase windows constrain alignment across instrumentals.",
+    "Short-context and transcription evidence reviewed computationally; listening review remains incomplete."
+  ],
+  "anchors": [
+    {
+      "id": "lyric.01.start",
+      "atMs": 340,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.01.end",
+      "atMs": 1720,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.02.start",
+      "atMs": 1800,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.02.end",
+      "atMs": 3600,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.03.start",
+      "atMs": 3900,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.03.end",
+      "atMs": 5180,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.04.start",
+      "atMs": 5440,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.04.end",
+      "atMs": 7340,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.05.start",
+      "atMs": 7540,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.05.end",
+      "atMs": 9680,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.06.start",
+      "atMs": 10140,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.06.end",
+      "atMs": 11020,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.07.start",
+      "atMs": 11260,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.07.end",
+      "atMs": 12680,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.08.start",
+      "atMs": 12840,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.08.end",
+      "atMs": 14480,
+      "status": "rough"
+    },
+    {
+      "id": "intro.connect",
+      "atMs": 15230,
+      "status": "rough"
+    },
+    {
+      "id": "intro.greeting.type",
+      "atMs": 16180,
+      "status": "rough"
+    },
+    {
+      "id": "intro.greeting.complete",
+      "atMs": 17330,
+      "status": "rough"
+    },
+    {
+      "id": "intro.greeting.send",
+      "atMs": 17780,
+      "status": "rough"
+    },
+    {
+      "id": "intro.greeting.reply",
+      "atMs": 18480,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.09.start",
+      "atMs": 29770,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.09.end",
+      "atMs": 31170,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.10.start",
+      "atMs": 31310,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.10.dimension",
+      "atMs": 32680,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.10.end",
+      "atMs": 33220,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.11.start",
+      "atMs": 33440,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.11.end",
+      "atMs": 34640,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.12.start",
+      "atMs": 35040,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.12.circumference",
+      "atMs": 36320,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.12.end",
+      "atMs": 36960,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.13.start",
+      "atMs": 36960,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.13.end",
+      "atMs": 38560,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.14.start",
+      "atMs": 38680,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.14.tangents",
+      "atMs": 40280,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.14.end",
+      "atMs": 40680,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.15.start",
+      "atMs": 40780,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.15.end",
+      "atMs": 41880,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.16.start",
+      "atMs": 42420,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.16.limitations",
+      "atMs": 43500,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.16.end",
+      "atMs": 44120,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.17.start",
+      "atMs": 44340,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.17.end",
+      "atMs": 45830,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.18.start",
+      "atMs": 46100,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.18.ac",
+      "atMs": 46270,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.18.dc",
+      "atMs": 47140,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.18.end",
+      "atMs": 47500,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.19.start",
+      "atMs": 47780,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.19.end",
+      "atMs": 49420,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.20.start",
+      "atMs": 49800,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.20.end",
+      "atMs": 51220,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.21.start",
+      "atMs": 51480,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.21.end",
+      "atMs": 53060,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.22.start",
+      "atMs": 53460,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.22.ad",
+      "atMs": 53630,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.22.bc",
+      "atMs": 54540,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.22.end",
+      "atMs": 54840,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.23.start",
+      "atMs": 55260,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.23.end",
+      "atMs": 56890,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.24.start",
+      "atMs": 57200,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.24.deeply",
+      "atMs": 57340,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.24.end",
+      "atMs": 58550,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.25.start",
+      "atMs": 59480,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.25.end",
+      "atMs": 61040,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.26.start",
+      "atMs": 61120,
+      "status": "rough"
+    },
+    {
+      "id": "session.close",
+      "atMs": 61470,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.26.end",
+      "atMs": 62440,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.27.start",
+      "atMs": 62480,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.27.end",
+      "atMs": 64680,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.28.start",
+      "atMs": 64980,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.28.end",
+      "atMs": 66040,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.29.start",
+      "atMs": 66220,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.29.end",
+      "atMs": 68280,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.30.start",
+      "atMs": 68520,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.30.end",
+      "atMs": 69960,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.31.start",
+      "atMs": 70360,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.31.end",
+      "atMs": 71540,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.32.start",
+      "atMs": 71940,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.32.end",
+      "atMs": 73340,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.33.start",
+      "atMs": 73750,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.33.end",
+      "atMs": 75270,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.34.start",
+      "atMs": 75270,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.34.end",
+      "atMs": 77390,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.35.start",
+      "atMs": 77390,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.35.end",
+      "atMs": 78970,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.36.start",
+      "atMs": 79230,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.36.end",
+      "atMs": 80710,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.37.start",
+      "atMs": 81190,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.37.end",
+      "atMs": 82870,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.38.start",
+      "atMs": 83030,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.38.end",
+      "atMs": 84630,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.39.start",
+      "atMs": 84670,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.39.end",
+      "atMs": 86650,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.40.start",
+      "atMs": 86730,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.40.end",
+      "atMs": 88390,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.41.start",
+      "atMs": 89010,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.41.end",
+      "atMs": 89990,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.42.start",
+      "atMs": 90210,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.42.end",
+      "atMs": 91870,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.43.start",
+      "atMs": 91870,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.43.end",
+      "atMs": 93430,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.44.start",
+      "atMs": 94050,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.44.end",
+      "atMs": 95710,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.45.start",
+      "atMs": 95910,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.45.end",
+      "atMs": 97310,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.46.start",
+      "atMs": 97790,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.46.end",
+      "atMs": 99250,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.47.start",
+      "atMs": 99350,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.47.end",
+      "atMs": 101230,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.48.start",
+      "atMs": 101410,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.48.end",
+      "atMs": 103130,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.49.start",
+      "atMs": 103860,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.49.end",
+      "atMs": 105340,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.50.start",
+      "atMs": 105400,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.50.end",
+      "atMs": 106960,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.51.start",
+      "atMs": 106960,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.51.end",
+      "atMs": 109060,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.52.start",
+      "atMs": 109080,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.52.end",
+      "atMs": 110520,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.53.start",
+      "atMs": 110940,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.53.end",
+      "atMs": 112060,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.54.start",
+      "atMs": 112520,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.54.end",
+      "atMs": 112980,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.55.start",
+      "atMs": 113200,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.55.end",
+      "atMs": 113860,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.56.start",
+      "atMs": 114120,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.56.end",
+      "atMs": 114840,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.57.start",
+      "atMs": 115140,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.57.end",
+      "atMs": 115620,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.58.start",
+      "atMs": 115960,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.58.end",
+      "atMs": 116400,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.59.start",
+      "atMs": 116400,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.59.end",
+      "atMs": 117800,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.60.start",
+      "atMs": 117880,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.60.end",
+      "atMs": 120100,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.61.erase",
+      "atMs": 120240,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.61.start",
+      "atMs": 120240,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.61.fragments",
+      "atMs": 121440,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.61.end",
+      "atMs": 121840,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.62.start",
+      "atMs": 122340,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.62.end",
+      "atMs": 123760,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.63.start",
+      "atMs": 123980,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.63.end",
+      "atMs": 125680,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.64.start",
+      "atMs": 125760,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.64.end",
+      "atMs": 128280,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.65.start",
+      "atMs": 128880,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.65.end",
+      "atMs": 130720,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.66.start",
+      "atMs": 131140,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.66.end",
+      "atMs": 133020,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.67.start",
+      "atMs": 148000,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.67.end",
+      "atMs": 149260,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.68.start",
+      "atMs": 149940,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.68.end",
+      "atMs": 151440,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.69.start",
+      "atMs": 151620,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.69.end",
+      "atMs": 155180,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.70.start",
+      "atMs": 155180,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.70.end",
+      "atMs": 156460,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.71.start",
+      "atMs": 157140,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.71.end",
+      "atMs": 157860,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.72.start",
+      "atMs": 157860,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.72.end",
+      "atMs": 159080,
+      "status": "rough"
+    },
+    {
+      "id": "count.1",
+      "atMs": 159190,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.73.start",
+      "atMs": 159190,
+      "status": "rough"
+    },
+    {
+      "id": "count.2",
+      "atMs": 159430,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.73.end",
+      "atMs": 159660,
+      "status": "rough"
+    },
+    {
+      "id": "count.3",
+      "atMs": 159880,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.74.start",
+      "atMs": 159880,
+      "status": "rough"
+    },
+    {
+      "id": "count.4",
+      "atMs": 160390,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.74.end",
+      "atMs": 160540,
+      "status": "rough"
+    },
+    {
+      "id": "count.5",
+      "atMs": 160790,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.75.start",
+      "atMs": 160790,
+      "status": "rough"
+    },
+    {
+      "id": "count.6",
+      "atMs": 161190,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.75.end",
+      "atMs": 161640,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.76.start",
+      "atMs": 161700,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.76.end",
+      "atMs": 162300,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.77.start",
+      "atMs": 162840,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.77.end",
+      "atMs": 164440,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.78.start",
+      "atMs": 164540,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.78.end",
+      "atMs": 165960,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.79.start",
+      "atMs": 166560,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.79.end",
+      "atMs": 168160,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.80.start",
+      "atMs": 168360,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.80.end",
+      "atMs": 169560,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.81.start",
+      "atMs": 169780,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.81.end",
+      "atMs": 171820,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.82.start",
+      "atMs": 171940,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.82.end",
+      "atMs": 173400,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.83.start",
+      "atMs": 173760,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.83.end",
+      "atMs": 174860,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.84.start",
+      "atMs": 175260,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.84.end",
+      "atMs": 176260,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.85.start",
+      "atMs": 177360,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.85.end",
+      "atMs": 179050,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.86.start",
+      "atMs": 179300,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.86.end",
+      "atMs": 180860,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.87.start",
+      "atMs": 180960,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.87.end",
+      "atMs": 182900,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.88.start",
+      "atMs": 183000,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.88.end",
+      "atMs": 184560,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.89.start",
+      "atMs": 184740,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.89.end",
+      "atMs": 188420,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.90.start",
+      "atMs": 188680,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.90.end",
+      "atMs": 189640,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.91.start",
+      "atMs": 189940,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.91.end",
+      "atMs": 190540,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.92.start",
+      "atMs": 190880,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.92.end",
+      "atMs": 191960,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.93.start",
+      "atMs": 192480,
+      "status": "rough"
+    },
+    {
+      "id": "lyric.93.end",
+      "atMs": 194480,
+      "status": "rough"
+    }
+  ]
+}
