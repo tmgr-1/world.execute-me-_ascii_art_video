@@ -14,10 +14,10 @@ import { tr } from '../src/locale.js';
 const film = makeFilm(), size = { columns: 160, rows: 45 };
 const damaged = (c: Canvas): number[] => c.cells.flatMap((cell, i) => cell.semantic === 'corruption' ? [i] : []);
 
-test('the five corruption stages follow approved story anchors and preserve the global 16% ceiling', () => {
+test('the five corruption stages follow approved story anchors and preserve the global 12% ceiling', () => {
   assert.deepEqual(film.corruption, [
     { atMs: 120240, density: .01 }, { atMs: 123980, density: .02 },
-    { atMs: 131140, density: .04 }, { atMs: 148000, density: .08 }, { atMs: 155180, density: .16 },
+    { atMs: 131140, density: .04 }, { atMs: 148000, density: .08 }, { atMs: 155180, density: .12 },
   ]);
   for (const dimensions of [{ columns: 130, rows: 35 }, size, { columns: 220, rows: 60 }]) for (const lang of ['cn', 'en'] as const) {
     const r = new Renderer(new Director(film)), n = dimensions.columns * layout(dimensions).story.h;
@@ -31,7 +31,7 @@ test('the five corruption stages follow approved story anchors and preserve the 
       assert.ok(![...frame.regions.keys()].some(key => key.includes('.protected')));
     }
     for (const atMs of [140000, ...film.times.counts.map(t => t + 100)]) {
-      const frame = r.frame(atMs, dimensions, lang), budget = atMs < 148000 ? .04 : .16;
+      const frame = r.frame(atMs, dimensions, lang), budget = atMs < 148000 ? .04 : .12;
       assert.equal(damaged(frame).length, Math.floor(n * budget));
       assert.deepEqual(frame.validate(), []);
       assert.deepEqual(frame.plain().split('\n').slice(-2).map(line => line.trim()), subtitleLines(film, atMs, lang));
@@ -43,7 +43,7 @@ test('random addresses move across the entire canvas, recover next tick, and pre
   const source = new Canvas(80, 20);
   for (let y = 0; y < source.rows; y++) source.text(0, y, '中·네·0123456789ABCDEF '.repeat(4), {}, 80, 'original');
   source.regions.set('permission.protected', { x: 0, y: 0, w: 80, h: 20 });
-  const original = source.hash(), budget = Math.floor(source.cells.length * .16);
+  const original = source.hash(), budget = Math.floor(source.cells.length * .12);
   let previous = new Set<number>();
   const reached = new Set<number>();
   for (let tick = 0; tick < 12; tick++) {
@@ -111,13 +111,15 @@ test('the deletion draft is distinct from the one final system call, and the ter
   }
 });
 
-test('the pending deletion is 300ms later while the last lyric and actual purge stay fixed', () => {
-  assert.equal(film.times.finalDelete, 203540);
+test('the shortened pending deletion leaves the last lyric and actual purge fixed', () => {
+  assert.equal(film.times.finalDelete, 204290);
+  assert.equal(film.times.finalDelete - film.times.consoleReset, 1350);
+  assert.equal(film.times.purge - film.times.finalDelete, 1730);
   assert.equal(film.times.finalExecution, 205840);
   assert.equal(film.times.purge, 206020);
   const r = new Renderer(new Director(film));
   for (const lang of ['cn', 'en'] as const) {
-    for (const t of [203240, film.times.finalDelete - 1]) assert.ok(r.frame(t, size, lang).cells.every(c => c.g === ' '));
+    for (const t of [203240, 203540, film.times.finalDelete - 1]) assert.ok(r.frame(t, size, lang).cells.every(c => c.g === ' '));
     assert.ok(r.frame(film.times.finalDelete, size, lang).plain().includes(image.path));
     assert.ok(!r.frame(film.times.purge - 1, size, lang).plain().includes('PROGRAM DELETED'));
     assert.ok(r.frame(film.times.purge, size, lang).plain().includes('PROGRAM DELETED'));

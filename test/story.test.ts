@@ -98,9 +98,9 @@ test('own data really disappears while runtime and external objects survive; onl
   assert.ok(!stopped.state.sent.some(request => request.atMs > film.times.close));
 });
 
-test('all six counts share the 16% viewport budget, keep red log warnings and continue flickering', () => {
+test('all six counts share the 12% viewport budget, keep red log warnings and continue flickering', () => {
   const renderer = new Renderer(new Director(film));
-  const budget = Math.floor(size.columns * layout(size).story.h * .16);
+  const budget = Math.floor(size.columns * layout(size).story.h * .12);
   for (let i = 0; i < 6; i++) {
     const t = film.times.counts[i], a = renderer.frame(t + 100, size, 'cn'), b = renderer.frame(t + 280, size, 'cn');
     assert.equal(a.cells.filter(cell => cell.semantic === 'corruption').length, budget);

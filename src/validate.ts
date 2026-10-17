@@ -81,7 +81,8 @@ export function validateFilm(film: Film, release = false, depth: 'full' | 'model
   check(film.cues.filter(cue => cue.command.kind === 'ATTEMPT' && cue.command.operation !== 'root-request').every(cue => cue.atMs >= film.times.executionStart), 'E_NO_PREMATURE_SUBMISSION');
   const probes = film.cues.flatMap(cue => cue.command.kind === 'ATTEMPT' && cue.command.operation !== 'root-request' ? [cue.command.operation] : []);
   check(probes.length === 6 && new Set(probes).size === 6, 'E_UNIQUE_PROBES');
-  check(film.corruption.length === 5 && film.corruption.every((stage, i) => stage.density === .01 * 2 ** i && stage.density <= .16
+  const densities = [.01, .02, .04, .08, .12];
+  check(film.corruption.length === densities.length && film.corruption.every((stage, i) => stage.density === densities[i]
     && stage.atMs >= 0 && stage.atMs < film.times.interrupt && (!i || stage.atMs > film.corruption[i - 1].atMs)), 'E_CORRUPTION_STAGES');
   check(film.corruption[0]?.atMs === film.cues.find(cue => cue.id === 'erase.copy.0.0')?.atMs, 'E_CORRUPTION_START');
   check(film.times.selfErase < film.times.deletionAnnouncement && film.times.counts[0] - film.times.deletionAnnouncement >= 3000, 'E_DELETE_NARRATIVE_ORDER');

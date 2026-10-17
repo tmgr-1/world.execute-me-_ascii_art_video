@@ -1,0 +1,122 @@
+V4.4 implementation validation — 2026-10-17
+Baseline: 180bad1
+
+$ npm run check
+> world-execute-terminal-film@1.0.0 check
+> tsc --noEmit && node --import tsx src/cli.ts check
+
+内容结构通过；发布检查仍需精校锚点。
+E_ANCHOR_ROUGH:209
+
+$ npm run build
+> world-execute-terminal-film@1.0.0 build
+> tsc
+
+$ npm test
+> world-execute-terminal-film@1.0.0 test
+> node --import tsx --test --test-isolation=none test/*.test.ts
+
+✔ rehearsal loop ranges use media milliseconds and reject empty, reversed or tiny intervals (1.251142ms)
+✔ all content contracts pass; unreviewed machine anchors fail release validation (603.173101ms)
+✔ keyword and count syllable anchors cannot drift outside their lyric spans (1.466044ms)
+✔ typed values, UTF-8 references, byte order, alignment, and invalid-write rollback share one store (0.416153ms)
+✔ draft does not create a request or task; one send links history, transcript, task and rx (3.703822ms)
+✔ disconnect freezes external facts; predictions never become rx, ack or verification (42.784553ms)
+✔ erasure changes bytes and validity while protected session writes are rejected (38.678115ms)
+✔ a request allocates its typed boundary from semantic parameters without handwritten addresses (8.218359ms)
+✔ six stages arm without committing; the word end precedes intent and the write barrier (80.870226ms)
+✔ the patch is a draft before the check event and cannot acquire PASS from a later render (38.380352ms)
+✔ fixed ticks and checkpoints reproduce exact state across frame rates, dropped frames and reverse seeks (262.376707ms)
+✔ providers preserve circumference, tangent contact, current stages and era direction (0.189513ms)
+✔ AC/DC and AD/BC states land on their keyword anchors (12.071381ms)
+✔ media clock pause, speed and epochs are independent of render cadence (0.168365ms)
+✔ wide graphemes erase and clip as complete glyphs (0.128775ms)
+✔ 130x35 cn: all scene and count boundaries preserve valid glyphs (149.863716ms)
+✔ 130x35 cn: story freezes for 3000ms while captions follow the music (212.904402ms)
+✔ 130x35 en: all scene and count boundaries preserve valid glyphs (149.917246ms)
+✔ 130x35 en: story freezes for 3000ms while captions follow the music (208.526091ms)
+✔ 160x45 cn: all scene and count boundaries preserve valid glyphs (172.268467ms)
+✔ 160x45 cn: story freezes for 3000ms while captions follow the music (222.796961ms)
+✔ 160x45 en: all scene and count boundaries preserve valid glyphs (159.070054ms)
+✔ 160x45 en: story freezes for 3000ms while captions follow the music (223.121303ms)
+✔ the six words have independent assets and retain all six language sources (45.772001ms)
+✔ the complete Chinese title stays on one line at native size with both background borders intact (477.766556ms)
+✔ the simulation retains a draft target while its declaration scrolls, without prematurely displaying execution (45.960874ms)
+✔ damage frames reproduce after forward and reverse seeks (234.906806ms)
+✔ the opening uses quick drafts and real connection / selection events before the first simulation (8.752174ms)
+✔ vision is a linked request with degraded model state, ghosted panes and subsequent recovery (15.494133ms)
+✔ departure is readable before the result, followed by a short feedback timeout (24.503681ms)
+✔ waiting moves from status to demand; the first sim first-person line is the final demand (83.404209ms)
+✔ own data really disappears while runtime and external objects survive; only system execution is fatal (43.575771ms)
+✔ all six counts share the 12% viewport budget, keep red log warnings and continue flickering (63.207822ms)
+✔ 130x35 cn: full title, plain console, frozen analysis and final purge (132.094302ms)
+✔ 130x35 en: full title, plain console, frozen analysis and final purge (136.265138ms)
+✔ 160x45 cn: full title, plain console, frozen analysis and final purge (136.165276ms)
+✔ 160x45 en: full title, plain console, frozen analysis and final purge (134.975893ms)
+✔ JSON protocol fixture: load paused, exact seek, speed, frozen pause, EOF and own-child cleanup (543.288195ms)
+✔ invalid files and missing players fail and clean up rather than becoming story termination (48.662794ms)
+✔ single output adapter uses terminal-kit, emits whole glyphs and restores terminal modes (15.607202ms)
+✔ terminal output includes the side panels and bottom edge beyond the reference viewport after resizing (29.181873ms)
+✔ backpressure bounds pending work and only encodes the latest dropped-frame replacement (12.170486ms)
+✔ boot percentages are monotonic and complete at simulation readiness (32.362418ms)
+✔ the closed session remains alone for 1.5 seconds; timeout starts inspection, not another long wait (23.413042ms)
+✔ each autonomous candidate has one combined cyan hypothesis; God needs ROOT and user proof (51.643159ms)
+✔ attribute write focus follows the actual field, address and changed bytes without delaying lyrics (38.111139ms)
+✔ the execution sequence ends before Ein; guard warning refreshes never issue new operations (45.429128ms)
+✔ count warnings append and scroll normally while both old and new lines accept transient noise (301.074994ms)
+✔ all 93 translations fit; English count meanings occupy only the second caption row (0.278062ms)
+✔ captions survive corruption, frozen termination, POST, core analysis and final deletion at every supported size (662.169929ms)
+✔ continuous playback renders the actual wrapped tail of one event log through every scene transition (10249.983753ms)
+✔ message styles belong to the record; past gray messages survive the cyan transition and APIs follow ordinary cyan output (51.832377ms)
+✔ user drafts, sent history and log requests are green; departure emphasis stays in User Input (78.459203ms)
+✔ weighted boot work advances in deterministic batches with plateaus and one ASCII percentage bar (46.363581ms)
+✔ attribute writes stay stable; real fragment deletion starts global noise without altering source inputs (540.473494ms)
+✔ six source-bound private copies wipe top-to-bottom; real bytes, validity, memory focus and originals agree (173.181803ms)
+✔ Challenging your God traces a read-only authority chain and checks a draft before any new submission (55.46217ms)
+✔ outro holds until debug closes; deletion is prepared on a fresh console before the last lyric (485.326837ms)
+✔ the greeting is one second later; only display recording waits 300 ms, while lyric-bound requests keep their times (100.804841ms)
+✔ the connected input always has a prompt and a deterministic ASCII cursor, including idle periods (324.625225ms)
+✔ API calls share the cyan style of ordinary sim output in both logs and graphics (53.86731ms)
+✔ timeout and re-estimation are separated once; the final vocal leaves a 750 ms alternative-search pause (40.182328ms)
+✔ the final host closes debug, clears, prepares deletion, holds DELETED and leaves one blank row before test 329 (599.392555ms)
+✔ the post-EOF clock continues silently, freezes for pause, respects speed and returns to the media epoch (0.212126ms)
+✔ the five corruption stages follow approved story anchors and preserve the global 12% ceiling (525.074639ms)
+✔ random addresses move across the entire canvas, recover next tick, and preserve complete glyphs and untouched data (22.777713ms)
+✔ six distinct probes are submitted once; status-only beats do not resubmit or fabricate guard denials (50.196362ms)
+✔ the deletion draft is distinct from the one final system call, and the termination panel uses a stop code (321.041686ms)
+✔ the shortened pending deletion leaves the last lyric and actual purge fixed (74.123758ms)
+✔ the optional Easter egg gates both authored events and playback length, even after backwards seeks (1264.057305ms)
+✔ patch checks retain their event and archive causality without generating a model log line (44.01332ms)
+✔ input prediction starts once in the gray log without spoiling candidates or generating external feedback (115.498688ms)
+✔ delivery status, packets, sine plots and two-row activity channels stay disjoint at all supported sizes (247.06543ms)
+✔ content validation enforces the explicit 12% final stage rather than automatic doubling (1.261439ms)
+ℹ tests 74
+ℹ suites 0
+ℹ pass 74
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 21646.088702
+
+$ npm run test:e2e
+> world-execute-terminal-film@1.0.0 test:e2e
+> python3 test/pty_smoke.py
+
+CLI cases passed: localized help, no README hint, arbitrary MP3 filenames and paths, default and opt-in frame exports.
+PTY fixture passed: ready/start, termination, pause, resize, seek, quit, terminal restore, no duplicate requests.
+PTY player-failure case passed: full-screen panels at 220x60 / 240x64, real ERROR, no story termination, terminal restored.
+PTY loop case passed: repeated exact media seeks, deterministic rebuild, no duplicate requests, terminal restored.
+PTY default EOF case passed: immediate finish, one deletion, no Easter-egg event, terminal restored.
+PTY default hold case passed: DELETED retained until explicit quit, no implicit Easter egg.
+PTY EOF case passed: no early exit, silent pause/resize/resume, one Easter egg, no music replay, automatic finish.
+PTY tail-entry case passed: direct post-EOF start, rewind to media, deterministic history, hold final frame, explicit quit.
+
+Frame review: exported 30 deterministic HTML/cell/PNG frames in .cache/v4.4-previews (not committed).
+Delivery frames cover 130x35, 160x45, 220x60 in Chinese and English, before and after result delivery attempts.
+Inspected PNGs: delivery-cn-130, prediction-en-160, delivery-en-220, count-six, ready-cn, ready-en, delete-pending.
+Status and packet animation occupy five rows above the plot; each TX/RX channel has two separate rows below it.
+Timing assertions: deletion announcement 204290ms; last Execution 205840ms; actual purge 206020ms; pending interval 1730ms.
+Corruption assertions: 1%, 2%, 4%, 8%, 12%; whole story canvas sampled anew, shared multilingual/noise budget, subtitles excluded.
+
+Limits: 209 anchors retain their existing rough status. PTY checks use the explicit fake-mpv protocol fixture; audible synchronization has not been remeasured. Music and the original root lyric file remain excluded from Git.

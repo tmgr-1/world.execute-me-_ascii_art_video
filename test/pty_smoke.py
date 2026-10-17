@@ -46,6 +46,7 @@ try:
  deadline=time.monotonic()+8
  while '按回车开始'.encode() not in output and time.monotonic()<deadline and process.poll() is None:drain(.1)
  assert '按回车开始'.encode() in output,output.decode(errors='replace')[-1500:]
+ assert '歌词锚点'.encode() not in output and '实机精校'.encode() not in output,'Ready slate still shows the removed anchor notice.'
  os.write(master,b'\r');drain(1.1)
  assert b'0xE0000001' in output and b'PROCESS_TERMINATED' in output,'Termination foreground not submitted.'
  assert b'lyric.76' not in output,'Rehearsal annotation bypassed the viewport corruption.'
@@ -106,10 +107,11 @@ try:
  command[command.index('--export-dir')+1]=str(destination)
  command[command.index('--seek')+1]='03:31.8'
  output=bytearray();resize(130,35)
- process=subprocess.Popen(command+['--speed','2'],cwd=root,stdin=slave,stdout=slave,stderr=slave,start_new_session=True)
+ process=subprocess.Popen(command+['--speed','2','--lang','en'],cwd=root,stdin=slave,stdout=slave,stderr=slave,start_new_session=True)
  deadline=time.monotonic()+5
- while '按回车开始'.encode() not in output and time.monotonic()<deadline and process.poll() is None:drain(.1)
- assert '按回车开始'.encode() in output
+ while b'Ready; press Enter to start' not in output and time.monotonic()<deadline and process.poll() is None:drain(.1)
+ assert b'Ready; press Enter to start' in output
+ assert b'Machine-aligned' not in output and b'listening review' not in output,'English ready slate still shows the removed anchor notice.'
  started=time.monotonic();os.write(master,b'\r')
  while process.poll() is None and time.monotonic()-started<2:drain(.05)
  assert process.poll() is not None,'Default EOF retained the silent Easter-egg tail.'

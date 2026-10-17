@@ -20,10 +20,11 @@ export function makeFilm(overrides?: Anchor[], options: { easterEgg?: boolean } 
   const deletionAnnouncement = Math.min(start(70), counts[0] - 3300);
   const executionStart = end(66) + 1500, executionEnd = end(72), violationWarning = start(72) + 120;
   const outroHold = end(92), finalExecution = start(93), debugClose = finalExecution - 4000;
-  const consoleReset = debugClose + 1100, finalDelete = consoleReset + 600, purge = finalExecution + 180;
+  const consoleReset = debugClose + 1100, finalDelete = consoleReset + 1350, purge = finalExecution + 180;
   const easterEgg = purge + 8000, easterEggEnabled = options.easterEgg === true;
   const presentationEndMs = easterEggEnabled ? Math.max(timing.durationMs, easterEgg + 2000) : timing.durationMs;
-  const corruption = [61, 63, 66, 67, 70].map((n, i) => ({ atMs: i === 0 ? keyword(61, 'erase') : start(n), density: .01 * 2 ** i }));
+  const densities = [.01, .02, .04, .08, .12];
+  const corruption = [61, 63, 66, 67, 70].map((n, i) => ({ atMs: i === 0 ? keyword(61, 'erase') : start(n), density: densities[i] }));
   const cues: Cue[] = [], programs: Program[] = [];
   let order = 0;
   const cue = (id: string, atMs: number, command: Command, priority = 2): void => { cues.push({ id, atMs: Math.round(atMs), command, priority, order: order++ }); };
@@ -114,6 +115,7 @@ export function makeFilm(overrides?: Anchor[], options: { easterEgg?: boolean } 
   cue('session.close', close, { kind: 'CLOSE' }, 1);
   chat('feedback.timeout', feedbackTimeout, 'sim.feedback_timeout');
   chat('feedback.reestimate', reestimate, 'sim.reestimate');
+  chat('feedback.prediction', start(31), 'sim.predict_input');
   program('retry-candidate', [[0, { op: 'WAIT', condition: 'RX_EMPTY' }]]);
   const retryStart = start(33);
   program('on_disconnect', [[0, { op: 'WAIT', condition: 'RETRY' }],
@@ -202,7 +204,7 @@ export function makeFilm(overrides?: Anchor[], options: { easterEgg?: boolean } 
   const scenes: Scene[] = boundaries.map(([id, startMs], i) => ({ id, number: i + 1, startMs, endMs: boundaries[i + 1]?.[1] ?? presentationEndMs }));
   const translations = new Map(chineseLyrics.map(l => [l.number, l.text]));
   const meanings: Record<number, string> = { 73: '(one, two)', 74: '(three, four)', 75: '(five, six)' };
-  return { id: 'world-execute', version: '4.3.0', durationMs: timing.durationMs, presentationEndMs, easterEggEnabled, corruption, audioSha256: timing.audioSha256, originAudioMs: timing.originAudioMs, defaultSeed: 1041,
+  return { id: 'world-execute', version: '4.4.0', durationMs: timing.durationMs, presentationEndMs, easterEggEnabled, corruption, audioSha256: timing.audioSha256, originAudioMs: timing.originAudioMs, defaultSeed: 1041,
     anchors, lyrics: lyrics.map(l => ({ ...l, translation: translations.get(l.number) ?? '', englishMeaning: meanings[l.number], startMs: start(l.number), endMs: end(l.number) })), schemas, cues, interactions, programs, scenes,
     times: { intro: end(8), close, result, feedbackTimeout, reestimate, eraseBegin, executionStart, executionEnd, violationWarning, selfErase, deletionAnnouncement, outroHold, debugClose, consoleReset, intent, interrupt, holdEnd, patch: start(85), counts, finalDelete, finalExecution, purge, easterEgg } };
 }

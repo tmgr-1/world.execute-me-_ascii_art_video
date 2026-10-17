@@ -58,7 +58,7 @@ export async function play(film: Film, options: PlayOptions): Promise<void> {
       const started = performance.now(), t = clamp(story(), 0, film.presentationEndMs), dimensions = size();
       let frame;
       if (!validSize()) frame = renderer.slate(dimensions, lang, 'error.terminal_small');
-      else if (state === 'READY') frame = renderer.slate(dimensions, lang, 'app.ready', options.rehearsal ? tr(lang, 'app.rough') : '');
+      else if (state === 'READY') frame = renderer.slate(dimensions, lang, 'app.ready');
       else {
         frame = renderer.frame(t, dimensions, lang);
         if (options.rehearsal && t < film.corruption[0].atMs) {

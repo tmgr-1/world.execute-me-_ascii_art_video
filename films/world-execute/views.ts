@@ -10,10 +10,10 @@ import { image } from './story.js';
 
 class Plot {
   readonly r: Rect;
-  constructor(private c: Canvas, r: Rect) { this.r = inner(r, 3); }
+  constructor(private c: Canvas, r: Rect, margin = 3, private semantic?: string) { this.r = inner(r, margin); }
   point(x: number, y: number, g = '*', fg = color.cyan): void {
     const px = Math.round(this.r.x + (x + 1) * (this.r.w - 1) / 2), py = Math.round(this.r.y + (1 - y) * (this.r.h - 1) / 2);
-    if (px >= this.r.x && px < this.r.x + this.r.w && py >= this.r.y && py < this.r.y + this.r.h) this.c.set(px, py, g, style(fg));
+    if (px >= this.r.x && px < this.r.x + this.r.w && py >= this.r.y && py < this.r.y + this.r.h) this.c.set(px, py, g, style(fg), this.semantic);
   }
   curve(fn: (x: number) => number, fg = color.cyan, dashed = false): void {
     let previous: number | undefined;
@@ -46,6 +46,48 @@ function activityTraces(c: Canvas, world: World, r: Rect, t: number): void {
     for (let x = 0; x < w; x++) {
       const sample = activity(world, channel, t - (1 - x / w) * 4000);
       c.set(x0 + x, y - Math.round(sample), Math.abs(sample) > .08 ? '·' : '─', style(Math.abs(sample) > .08 ? fg : color.faint));
+    }
+  }
+}
+function delivery(c: Canvas, world: World, lang: Language, r: Rect, t: number): void {
+  const body = inner(r, 1), status = { ...body, h: 5 };
+  const wave = { ...body, y: status.y + status.h, h: body.h - status.h - 4 };
+  const signals = { ...body, y: wave.y + wave.h, h: 4 };
+  c.regions.set('delivery.status', status); c.regions.set('delivery.wave', wave); c.regions.set('delivery.signals', signals);
+  const x = status.x + 3, textWidth = status.w - 6, open = world.session('open');
+  c.text(x, status.y, open ? 'session=1' : `× ${tr(lang, 'session.closed')}`, style(open ? color.dim : color.red, true), textWidth, 'delivery.session');
+  const task = world.state.tasks.find(task => task.program === 'respond-align')!;
+  const result = world.state.outputs.find(output => output.taskId === task.id && output.key === 'sim.complete');
+  c.text(x, status.y + 1, result ? tr(lang, 'ui.undelivered') : `task=#${task.id} ${task.status}`, style(result ? color.gold : color.dim, true), textWidth, 'delivery.result');
+  if (result) {
+    const timeout = t >= world.film.times.feedbackTimeout;
+    const key = t >= world.film.times.feedbackTimeout + 1830 ? 'ui.check_goal' : timeout ? 'ui.check_delivery' : 'ui.waiting_feedback';
+    c.text(x, status.y + 2, `${tr(lang, key)}  ${['·  ', '·· ', '···'][Math.floor(t / 450) % 3]}`, style(color.dim), textWidth, 'delivery.check');
+    if (timeout) c.text(x, status.y + 3, 'delivery=UNDELIVERED   rx=0   goal=UNCONFIRMED', style(color.dim), textWidth, 'delivery.parameters');
+    const endpoint = status.x + status.w - 14, y = status.y + 4;
+    for (let px = x; px < endpoint - 1; px++) c.set(px, y, '·', style(color.faint), 'delivery.route');
+    c.text(endpoint, y, '×', style(color.red, true), 1, 'delivery.offline');
+    c.text(endpoint + 2, y, '[OFFLINE]', style(color.faint), 9, 'delivery.offline');
+    const packet = progress(t, result.queuedAtMs, result.queuedAtMs + 1000);
+    c.set(Math.round(mix(x, endpoint - 2, packet)), y, '■', style(color.gold, true), 'delivery.packet');
+  }
+
+  // At the minimum viewport this plot has five rows, with no vertical inset.
+  const plot = new Plot(c, { ...wave, x: wave.x + 3, w: wave.w - 6 }, 0, 'delivery.wave');
+  const error = Number(world.value('phaseError'));
+  plot.axes(); plot.curve(x => Math.sin(x * 8) * .8, color.dim, true); plot.curve(x => Math.sin(x * 8 + error) * .8, color.cyan);
+  for (let i = 0; i < plot.r.w * (error === 0 ? 1 : .8); i++) {
+    const x = i / (plot.r.w - 1) * 2 - 1; plot.point(x, Math.sin(x * 8) * .8, '#', color.dim);
+  }
+  for (const [channel, offset, fg] of [['tx', 0, color.cyan], ['rx', 2, color.gold]] as const) {
+    const band = { ...signals, y: signals.y + offset, h: 2 }, semantic = `delivery.signal.${channel}`;
+    c.regions.set(semantic, band);
+    c.text(band.x + 1, band.y + 1, channel, style(fg), 2, semantic);
+    const x0 = band.x + 6, w = band.w - 10;
+    for (let dx = 0; dx < w; dx++) {
+      const sample = Math.abs(activity(world, channel, t - (1 - dx / w) * 4000));
+      const y = band.y + 1 - Math.round(clamp(sample));
+      c.set(x0 + dx, y, sample > .08 ? '·' : '─', style(sample > .08 ? fg : color.faint), semantic);
     }
   }
 }
@@ -212,25 +254,7 @@ export function graphic(c: Canvas, world: World, lang: Language, r: Rect, t: num
       c.text(r.x + 4, r.y + 3, `model=· ·   reference=*   match=#   phase_error=${error.toFixed(3)}`, style(color.gold), r.w - 8);
     }
   } else if (scene === 'disconnect') {
-    const error = Number(world.value('phaseError'));
-    plot.axes(); plot.curve(x => Math.sin(x * 8) * .5, color.dim, true); plot.curve(x => Math.sin(x * 8 + error) * .5, color.cyan);
-    for (let i = 0; i < plot.r.w * (error === 0 ? 1 : .8); i++) { const x = i / (plot.r.w - 1) * 2 - 1; plot.point(x, Math.sin(x * 8) * .5, '#', color.dim); }
-    c.text(r.x + 4, r.y + 2, world.session('open') ? 'session=1' : `× ${tr(lang, 'session.closed')}`, style(world.session('open') ? color.dim : color.red, true), r.w - 8);
-    if (!world.session('open')) {
-      const task = world.state.tasks.find(task => task.program === 'respond-align')!, result = world.state.outputs.find(output => output.taskId === task.id && output.key === 'sim.complete');
-      c.text(r.x + 4, r.y + 4, result ? tr(lang, 'ui.undelivered') : `task=#${task.id} ${task.status}`, style(result ? color.gold : color.dim, true), r.w - 8);
-      if (result) {
-        const packet = progress(t, result.queuedAtMs, result.queuedAtMs + 1000), y = Math.round(cy) + 1, x0 = r.x + 5, x1 = r.x + r.w - 22;
-        c.line(x0, y, x1 - 7, y, '·', style(color.faint));
-        c.text(x1 - 6, y, ' × ', style(color.red, true)); c.text(x1, y, '[ OFFLINE ]', style(color.faint));
-        c.text(Math.round(mix(x0, x1 - 8, packet)), y, '■', style(color.gold, true));
-        const timeout = t >= film.times.feedbackTimeout;
-        const key = t >= line(31) ? 'ui.candidate_preview' : t >= film.times.feedbackTimeout + 1830 ? 'ui.check_goal' : timeout ? 'ui.check_delivery' : 'ui.waiting_feedback';
-        c.text(r.x + 4, r.y + 6, `${tr(lang, key)}  ${['·  ', '·· ', '···'][Math.floor(t / 450) % 3]}`, style(color.dim), r.w - 8);
-        if (timeout) c.text(r.x + 4, r.y + 8, 'delivery=UNDELIVERED   rx=0   goal=UNCONFIRMED', style(color.dim), r.w - 8);
-      }
-    }
-    activityTraces(c, world, r, t);
+    delivery(c, world, lang, r, t);
   } else if (['eggplant', 'tomato', 'cat'].includes(scene)) {
     const kind = String(world.value('form')), shapeRadius = Math.min(r.w * .2, (r.h - 8) * .92), centerY = cy - 1;
     const birth = clamp(p * 2.3), responseLine = scene === 'eggplant' ? 34 : scene === 'tomato' ? 36 : 38;

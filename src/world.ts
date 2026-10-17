@@ -274,7 +274,7 @@ export class World {
       case 'PATCH_CHECK':
         if (!this.state.patch || this.state.patch.check !== 'PENDING') throw new Error('E_PATCH_CHECK_ORDER');
         this.state.patch.check = 'PASS'; this.state.patch.checkedAtMs = atMs; this.state.patch.status = 'WAITING_SAFEPOINT';
-        this.event('model', 'PATCH_CHECK', atMs, { check: 'PASS', waitingFor: 'ROOT_SAFEPOINT' }); this.chat('model', 'ui.safepoint', atMs); break;
+        this.event('model', 'PATCH_CHECK', atMs, { check: 'PASS', waitingFor: 'ROOT_SAFEPOINT' }); break;
       case 'PREPARE_DISPOSE': this.preparePlan(atMs); break;
       case 'ARM':
         if (!this.state.plan || command.ordinal !== this.state.plan.armed + 1) throw new Error('E_ARM_ORDER');
