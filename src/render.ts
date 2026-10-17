@@ -12,6 +12,7 @@ import { corrupt } from './corruption.js';
 import { subtitleLines } from './subtitles.js';
 import { visibleLog } from './event-log.js';
 import { drawErasureMemory } from '../films/world-execute/erasure-view.js';
+import { countPhrase, countTr } from '../films/world-execute/count-translation.js';
 
 const glyphVariants = new Map<string, { bitmap: string[]; w: number; h: number }[]>();
 for (const asset of Object.values(glyphs)) {
@@ -64,7 +65,10 @@ export function modalRect(size: Size, lang: Language = 'cn'): Rect {
 function input(c: Canvas, world: World, lang: Language, r: Rect, timeMs: number): void {
   title(c, r, world, lang, 'input');
   const closed = !world.session('open') && world.state.sent.length > 0;
-  if (closed) c.text(r.x + 2, r.y + 1, `× ${tr(lang, 'input.closed')}  ·  ${tr(lang, 'ui.no_receiver')}`, style(color.red, true), r.w - 4, 'session.closed');
+  if (closed) {
+    const phrase = countTr(world.state.count, lang, 'input.closed'), receiver = countTr(world.state.count, lang, 'ui.no_receiver');
+    c.text(r.x + 2, r.y + 1, `× ${phrase.text}  ·  ${receiver.text}`, style(color.red, true), r.w - 4, 'session.closed', phrase.language);
+  }
   const connected = world.session('open') === true;
   const interaction = connected ? world.film.interactions.find(i => timeMs >= i.compose[lang].start && timeMs < i.recordAtMs) : undefined;
   let draft: string[] = [];
@@ -80,12 +84,13 @@ function input(c: Canvas, world: World, lang: Language, r: Rect, timeMs: number)
   let occupied = 0;
   for (const request of [...world.state.sent].reverse()) {
     if (timeMs < world.film.interactions.find(i => i.id === request.interactionId)!.recordAtMs) continue;
-    const group = wrap(`#${String(request.id).padStart(2, '0')} ${tr(lang, 'input.sent')}  ${tr(lang, request.key)}`, r.w - 4);
+    const sent = countTr(world.state.count, lang, 'input.sent'), phrase = countTr(world.state.count, lang, request.key);
+    const group = wrap(`#${String(request.id).padStart(2, '0')} ${sent.text}  ${phrase.text}`, r.w - 4);
     if (occupied + group.length > historyCapacity) break;
     history.unshift(group); occupied += group.length;
   }
   let y = r.y + r.h - 2 - Math.max(1, draft.length) - occupied + 1;
-  for (const group of history) for (const line of group) c.text(r.x + 2, y++, line, style(color.green), r.w - 4, 'input.sent');
+  for (const group of history) for (const line of group) c.text(r.x + 2, y++, line, style(color.green), r.w - 4, 'input.sent', world.state.count >= 2 ? 'es' : lang);
   draft.forEach((line, i) => c.text(r.x + 2, r.y + r.h - 1 - draft.length + i, line, style(color.green), r.w - 4, interaction ? 'input.draft' : 'input.prompt'));
   if (draft.length) {
     const line = draft.at(-1)!;
@@ -96,7 +101,7 @@ function conversation(c: Canvas, world: World, lang: Language, r: Rect): void {
   const heading = label(world, lang, 'log');
   c.box(r, heading.text, color.faint, 'chat', heading.language);
   visibleLog(world, lang, r.w - 4, r.h - 2).forEach((line, i) => {
-    c.text(r.x + 2, r.y + 1 + i, line.text, line.style, r.w - 4, `chat.${line.item.key}`, lang);
+    c.text(r.x + 2, r.y + 1 + i, line.text, line.style, r.w - 4, `chat.${line.item.key}`, line.language);
   });
 }
 function attributeFocus(world: World, t: number): string | undefined {
@@ -144,7 +149,12 @@ function memoryAndWatch(c: Canvas, world: World, lang: Language, r: Rect, timeMs
   const watch = { x: r.x, y: r.y + memoryH, w: r.w, h: r.h - memoryH };
   title(c, watch, world, lang, world.state.count >= 4 ? 'stack' : 'state');
   const motion = world.state.motion?.kind;
-  const rows: string[] = attribute ? ['gender', 'period', 'role'].map(field => `${field}=${world.value(field)}`) : [`me=${hex(a.address)}`, `revision=${world.value('revision')}`, `verified_revision=${world.value('verified_revision')}`];
+  const translatedWatch = (key: string, args: Record<string, unknown>, fallback: string): string => countPhrase(world.state.count, key, args)?.text ?? fallback;
+  let rows: string[] = attribute ? ['gender', 'period', 'role'].map(field => `${field}=${world.value(field)}`) : [
+    translatedWatch('watch.me', { address: hex(a.address) }, `me=${hex(a.address)}`),
+    translatedWatch('watch.revision', { revision: world.value('revision') }, `revision=${world.value('revision')}`),
+    translatedWatch('watch.verified', { revision: world.value('verified_revision') }, `verified_revision=${world.value('verified_revision')}`),
+  ];
   if (attribute) {
     if (timeMs >= world.film.lyrics[46].startMs) {
       const task = world.state.tasks.find(task => task.program === 'role-swap');
@@ -157,10 +167,19 @@ function memoryAndWatch(c: Canvas, world: World, lang: Language, r: Rect, timeMs
   else if (['eggplant','tomato','cat'].includes(motion ?? '')) { const field = motion === 'eggplant' ? 'nutrients' : motion === 'tomato' ? 'antioxidants' : 'purr'; rows.push(`form=${world.value('form')}`, `${field}=${world.value(field)}`); }
   else rows.push(`form=${world.value('form')}`, `dimension=${world.value('dimension')}`);
   const task = [...world.state.tasks].reverse().find(t => t.status !== 'COMPLETE' && t.status !== 'CANCELLED') ?? world.state.tasks.at(-1);
-  if (task && !attribute) rows.push(`#${task.id} ${task.status}`, `request_id=${task.requestId ?? 'null'}`, `PC=${task.pc} depth=${task.frames.length}`);
+  if (task && !attribute) {
+    const taskRows = world.state.count >= 4 ? [
+      translatedWatch('watch.task', { id: task.id, status: task.status }, ''),
+      translatedWatch('watch.frame', { program: task.frames.at(-1)?.program ?? task.program, pc: task.pc, depth: task.frames.length }, ''),
+      translatedWatch('watch.request', { id: task.requestId ?? 'null' }, ''),
+    ] : [`#${task.id} ${task.status}`, `request_id=${task.requestId ?? 'null'}`, `PC=${task.pc} depth=${task.frames.length}`];
+    if (world.state.count >= 4) rows = [...taskRows, ...rows];
+    else rows.push(...taskRows);
+  }
   rows.slice(0, watch.h - 2).forEach((line, i) => {
     const selected = !!attribute && line.startsWith(`${attribute}=`);
-    c.text(watch.x + 2, watch.y + i + 1, line, style(selected ? age < 450 ? color.gold : color.cyan : color.dim, selected), watch.w - 4, selected ? 'memory.write.value' : undefined);
+    const language = world.state.count >= 4 && i < 3 ? 'ko' : world.state.count >= 3 && i < (world.state.count >= 4 ? 6 : 3) ? 'fr' : undefined;
+    c.text(watch.x + 2, watch.y + i + 1, line, style(selected ? age < 450 ? color.gold : color.cyan : color.dim, selected), watch.w - 4, selected ? 'memory.write.value' : 'watch.value', language);
   });
   // Semantic label instances remain separate from the state data they annotate.
   for (const [semantic, y] of (attribute || erasing ? [] : [['task', watch.y + watch.h - 1], ['wait', r.y + 1], ['output', r.y + memoryH - 1]]) as [string, number][]) {
@@ -217,8 +236,9 @@ export class Renderer {
     memoryAndWatch(c, world, lang, l.side, t);
     visionGhosts(c, world, l, t);
     input(c, world, lang, l.input, t);
-    const status = `session=${world.session('open') ? 1 : 0}   rx=${world.session('open') ? activity(world, 'rx', t).toFixed(2) : '0'}   ack_seq=${world.session('ackSeq')}   request_id=${world.state.sent.at(-1)?.id ?? 'null'}`;
-    c.text(2, l.status.y, status, style(color.dim), c.columns - 4);
+    const values = { open: world.session('open') ? 1 : 0, rx: world.session('open') ? activity(world, 'rx', t).toFixed(2) : '0', ack: world.session('ackSeq'), request: world.state.sent.at(-1)?.id ?? 'null' };
+    const status = countPhrase(world.state.count, 'status.session', values);
+    c.text(2, l.status.y, status?.text ?? `session=${values.open}   rx=${values.rx}   ack_seq=${values.ack}   request_id=${values.request}`, style(color.dim), c.columns - 4, 'status.session', status?.language);
     const stateLabel = label(world, lang, 'state');
     c.text(c.columns - width(stateLabel.text) - 3, l.status.y, stateLabel.text, style(color.dim), 20, 'state', stateLabel.language);
     const bottom = `${timeCode(t)} / ${timeCode(film.durationMs)}    seed=${world.seed}`;

@@ -1,10 +1,10 @@
 import { color, wrap, type Style } from './canvas.js';
-import { tr } from './locale.js';
 import type { Language } from './types.js';
 import type { Chat, World } from './world.js';
 import { image } from '../films/world-execute/story.js';
+import { countTr } from '../films/world-execute/count-translation.js';
 
-export interface LogLine { item: Chat; logicalLine: number; text: string; style: Style }
+export interface LogLine { item: Chat; logicalLine: number; text: string; style: Style; language: string }
 
 export function messageStyle(item: Chat, world: World): Style {
   let fg: number = color.dim, bold = false;
@@ -25,7 +25,8 @@ export function messageStyle(item: Chat, world: World): Style {
 export function visibleLog(world: World, lang: Language, columns: number, rows: number): LogLine[] {
   return world.state.chat.flatMap(item => {
     const tag = item.source === 'session' && item.requestId !== null ? `user #${String(item.requestId).padStart(2, '0')}>` : `[${item.source}]`;
-    return wrap(`${tag} ${tr(lang, item.key, { image: image.name })}`, columns)
-      .map((text, logicalLine) => ({ item, logicalLine, text, style: messageStyle(item, world) }));
+    const phrase = countTr(world.state.count, lang, item.key, { image: image.name });
+    return wrap(`${tag} ${phrase.text}`, columns)
+      .map((text, logicalLine) => ({ item, logicalLine, text, style: messageStyle(item, world), language: phrase.language }));
   }).slice(-rows);
 }

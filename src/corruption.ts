@@ -10,7 +10,7 @@ export function corruptionDensity(film: Film, timeMs: number): number {
 
 const ascii = Array.from('#/\\:;|_.01+=');
 const noise = countText.map(data => Array.from(data.noise).filter(g => width(g) === 1));
-const fragments = countText.map(data => data.fragments.map(text => graphemes(text.replaceAll(' ', '·'))));
+const fragments = countText.map(data => data.fragments.map(text => graphemes(text)));
 
 /** One transient, viewport-wide budget. Nothing from a previous frame is retained. */
 export function corrupt(c: Canvas, film: Film, seed: number, timeMs: number, count: number): void {
@@ -34,7 +34,7 @@ export function corrupt(c: Canvas, film: Film, seed: number, timeMs: number, cou
     if (end < c.columns && c.get(end, y)!.continuation) end++;
     return { x, y, n: end - x };
   };
-  const write = (index: number, columns: number, text: string[], language?: string): boolean => {
+  const write = (index: number, columns: number, text: string[], language?: string, region?: string): boolean => {
     const { x, y, n } = span(index, columns), at = y * c.columns + x;
     if (n > remaining || changed.subarray(at, at + n).some(Boolean)) return false;
     // Clear the entire selected span first, so every changed cell carries the
@@ -51,16 +51,27 @@ export function corrupt(c: Canvas, film: Film, seed: number, timeMs: number, cou
       dx += w;
     }
     remaining -= n;
+    if (region) c.regions.set(region, { x, y, w: n, h: 1 });
     return true;
   };
 
   // Existing languages accumulate, but their addresses are resampled each tick.
-  // These streams share the same budget as isolated random characters.
-  for (let stage = 0; stage < count; stage++) {
+  // A growing share of the SAME budget becomes text spill at each count.
+  // Meaningful translations belong to the base view, not this noise stream.
+  const budget = remaining, spillTarget = Math.floor(budget * ([0, .08, .18, .28, .40, .53, .67][count] ?? .67));
+  let spill = 0;
+  for (let i = 0; count && (i < count || spill < spillTarget) && i < 64; i++) {
+    const stage = i % count;
     const text = fragments[stage][Math.floor(random() * fragments[stage].length)];
     const columns = text.reduce((n, g) => n + width(g), 0);
-    for (let attempt = 0; attempt < 12; attempt++) {
-      if (write(Math.floor(random() * total), columns, text, countLanguages[stage])) break;
+    for (let attempt = 0; attempt < 24; attempt++) {
+      const index = Math.floor(random() * total);
+      if (index % c.columns + columns > c.columns) continue;
+      const before = remaining;
+      if (write(index, columns, text, countLanguages[stage], `spill.${countLanguages[stage]}.${i}`)) {
+        spill += before - remaining;
+        break;
+      }
     }
   }
 
