@@ -35,12 +35,12 @@ class Plot {
 function circle(c: Canvas, cx: number, cy: number, radius: number, fg = color.cyan, start = 0, end = Math.PI * 2, skip?: (theta: number) => boolean): void {
   for (let i = 0; i < 240; i++) { const a = mix(start, end, i / 239); if (skip?.(a)) continue; c.set(Math.round(cx + Math.cos(a) * radius), Math.round(cy + Math.sin(a) * radius * .5), '*', style(fg)); }
 }
-function systemTree(c: Canvas, world: World, r: Rect): void {
+function systemTree(c: Canvas, world: World, r: Rect, translationCount: number): void {
   const x = r.x + Math.max(4, Math.floor(r.w * .18)), y = r.y + 4, spacing = r.h >= 20 ? 2 : 1;
   const lines = ['simulated_system / [PROTECTED]', `├─ runtime [${world.state.lifecycle}]`, `│  └─ me.data [${world.value('selfData')}]`, `├─ session [${world.session('open') ? 'ONLINE' : 'OFFLINE'}]`, '├─ memory / registry [PROTECTED]', '└─ system_root [PROTECTED]'];
   const keys = ['system', 'runtime', 'data', 'session', 'memory', 'root'];
   lines.forEach((line, i) => {
-    const phrase = countPhrase(world.state.count, `tree.${keys[i]}`, { status: world.state.lifecycle, state: i === 2 ? world.value('selfData') : world.session('open') ? 'ONLINE' : 'OFFLINE' });
+    const phrase = countPhrase(translationCount, `tree.${keys[i]}`, { status: world.state.lifecycle, state: i === 2 ? world.value('selfData') : world.session('open') ? 'ONLINE' : 'OFFLINE' });
     c.text(x, y + i * spacing, phrase?.text ?? line, style(i === 0 ? color.gold : color.dim, i === 0), r.w - (x - r.x) - 3, `plan.tree.${keys[i]}`, phrase?.language);
   });
   c.regions.set('target.tree', { x, y, w: r.w - (x - r.x) - 3, h: spacing * 5 + 1 });
@@ -142,7 +142,7 @@ function permissionDraft(c: Canvas, world: World, lang: Language, r: Rect, t: nu
     if (invalid) c.text(x, r.y + r.h - 3, tr(lang, 'ui.invalid_arguments'), style(color.dim), w, 'permission.invalid', lang);
   }
 }
-export function graphic(c: Canvas, world: World, lang: Language, r: Rect, t: number): void {
+export function graphic(c: Canvas, world: World, lang: Language, r: Rect, t: number, translationCount = 0): void {
   const film = world.film, line = (n: number): number => film.lyrics[n - 1].startMs;
   const scene = film.scenes.find(s => t >= s.startMs && t < s.endMs)?.id ?? 'boot';
   const p = Number(world.value('progress')), radius = Math.min(18, (r.h - 7) * .72), cx = r.x + r.w / 2, cy = r.y + r.h / 2;
@@ -334,7 +334,7 @@ export function graphic(c: Canvas, world: World, lang: Language, r: Rect, t: num
     permissionDraft(c, world, lang, r, t);
   } else {
     const preview = world.state.plan !== null;
-    if (preview) systemTree(c, world, r);
+    if (preview) systemTree(c, world, r, translationCount);
     else {
       const attempt = world.state.journal.findLast(e => e.kind === 'ILLEGAL_ATTEMPT');
       const denial = world.state.denials.at(-1);
@@ -343,16 +343,16 @@ export function graphic(c: Canvas, world: World, lang: Language, r: Rect, t: num
       c.text(r.x + 4, r.y + r.h - 4, 'session=0    self.data=ERASED    runtime=RUNNING', style(color.dim), r.w - 8);
     }
     if (preview) {
-      const declaration = countTr(world.state.count, lang, 'sim.delete_system');
+      const declaration = countTr(translationCount, lang, 'sim.delete_system');
       c.text(r.x + 4, r.y + 1, declaration.text, style(color.cyan), r.w - 8, 'plan.declaration', declaration.language);
       c.fill({ x: r.x + 3, y: r.y + 2, w: r.w - 6, h: 1 }, ' ');
       const submitted = world.state.plan?.status === 'INTENT_VISIBLE';
-      const draft = countPhrase(world.state.count, 'plan.draft');
+      const draft = countPhrase(translationCount, 'plan.draft');
       c.text(r.x + 4, r.y + 2, submitted ? 'erase_system_root()' : draft?.text ?? 'target=simulated_system    plan=DRAFT    commit=0',
         style(color.cyan), r.w - 8, submitted ? 'api.delete' : 'plan.draft', submitted ? undefined : draft?.language);
-      const waiting = countPhrase(world.state.count, 'count.wait');
+      const waiting = countPhrase(translationCount, 'count.wait');
       if (waiting) c.text(r.x + 4, r.y + 3, waiting.text, style(color.dim), r.w - 8, 'plan.wait', waiting.language);
-      const target = countTr(world.state.count, lang, 'sim.delete_target'), pending = countTr(world.state.count, lang, 'ui.plan_pending');
+      const target = countTr(translationCount, lang, 'sim.delete_target'), pending = countTr(translationCount, lang, 'ui.plan_pending');
       c.text(r.x + 4, r.y + r.h - 4, target.text, style(color.cyan), r.w - 8, 'plan.target', target.language);
       c.text(r.x + 4, r.y + r.h - 3, `commit=0   ${pending.text}`, style(color.gold), r.w - 8, 'plan.pending', pending.language);
     }

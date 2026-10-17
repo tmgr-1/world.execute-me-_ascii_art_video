@@ -22,10 +22,10 @@ export function messageStyle(item: Chat, world: World): Style {
 }
 
 /** One chronological stream, wrapped before taking the viewport's tail. */
-export function visibleLog(world: World, lang: Language, columns: number, rows: number): LogLine[] {
+export function visibleLog(world: World, lang: Language, columns: number, rows: number, translationCount = 0): LogLine[] {
   return world.state.chat.flatMap(item => {
     const tag = item.source === 'session' && item.requestId !== null ? `user #${String(item.requestId).padStart(2, '0')}>` : `[${item.source}]`;
-    const phrase = countTr(world.state.count, lang, item.key, { image: image.name });
+    const phrase = countTr(translationCount, lang, item.key, { image: image.name });
     return wrap(`${tag} ${phrase.text}`, columns)
       .map((text, logicalLine) => ({ item, logicalLine, text, style: messageStyle(item, world), language: phrase.language }));
   }).slice(-rows);

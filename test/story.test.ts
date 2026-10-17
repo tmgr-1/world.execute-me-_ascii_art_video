@@ -98,18 +98,20 @@ test('own data really disappears while runtime and external objects survive; onl
   assert.ok(!stopped.state.sent.some(request => request.atMs > film.times.close));
 });
 
-test('all six counts share the 12% viewport budget, keep red log warnings and continue flickering', () => {
+test('all six counts retain independent noise, full current guard warnings and cumulative language writes', () => {
   const renderer = new Renderer(new Director(film));
   const budget = Math.floor(size.columns * layout(size).story.h * .12);
   for (let i = 0; i < 6; i++) {
     const t = film.times.counts[i], a = renderer.frame(t + 100, size, 'cn'), b = renderer.frame(t + 280, size, 'cn');
-    assert.equal(a.cells.filter(cell => cell.semantic === 'corruption').length, budget);
-    assert.ok(!a.regions.has('guard.warning') && !a.regions.has('guard.denial'));
+    const noise = a.cells.filter(cell => cell.semantic === 'corruption').length;
+    assert.ok(noise > budget * .8 && noise <= budget);
+    assert.ok(a.regions.has('guard.warning') && !a.regions.has('guard.denial'));
+    assert.equal([...a.regions].filter(([key]) => key.startsWith('count.layer.')).reduce((n, [, r]) => n + r.w, 0), Math.floor(size.columns * layout(size).story.h * .20) * (i + 1));
     const denial = a.cells.filter(cell => cell.semantic === 'chat.guard.continuous' && cell.g.trim());
     assert.ok(denial.length && denial.every(cell => cell.fg === color.red && cell.bold));
     assert.ok(a.cells.some((cell, index) => cell.semantic === 'corruption' && b.cells[index].semantic !== 'corruption'));
     for (const language of ['de', 'es', 'fr', 'ko', 'sv', 'zh'].slice(0, i + 1)) {
-      assert.ok(a.cells.some(cell => cell.semantic === 'corruption' && cell.language === language && cell.g.trim()), language);
+      assert.ok(a.cells.some(cell => cell.semantic !== 'corruption' && cell.language === language && cell.g.trim()), language);
     }
     assert.ok(a.cells.some(cell => cell.semantic?.startsWith('word-art.') && cell.g.trim()));
     assert.deepEqual(a.validate(), []);

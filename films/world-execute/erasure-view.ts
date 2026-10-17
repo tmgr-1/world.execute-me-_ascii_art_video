@@ -34,9 +34,9 @@ export function erasureMemory(world: World, t: number): ErasureMemory | undefine
     writes: world.store.erasures.filter(w => w.scope === 'fragments' && w.address >= address && w.address < address + 8 && w.atMs <= t) };
 }
 
-export function drawErasureMemory(c: Canvas, world: World, _lang: Language, r: Rect, t: number): boolean {
+export function drawErasureMemory(c: Canvas, world: World, _lang: Language, r: Rect, t: number, translationCount = 0): boolean {
   const view = erasureMemory(world, t); if (!view) return false;
-  const phase = countPhrase(world.state.count, `memory.${view.phase}`);
+  const phase = countPhrase(translationCount, `memory.${view.phase}`);
   c.text(r.x + 2, r.y + 1, `${phase?.text ?? view.phase} ${view.label} / ${view.size} B`, style(view.phase === 'SELECT' ? color.cyan : color.dim), r.w - 4, 'memory.erase.label', phase?.language);
   const groups = Math.min(Math.floor((r.h - 3) / 2), Math.ceil(view.size / 4));
   for (let group = 0; group < groups; group++) for (const [source, values, dy] of [['PRE', view.before, 0], ['NOW', view.now, 1]] as const) {
@@ -52,7 +52,7 @@ export function drawErasureMemory(c: Canvas, world: World, _lang: Language, r: R
     const ascii = values.slice(offset, offset + 4).map(b => b >= 32 && b < 127 ? String.fromCharCode(b) : '.').join('');
     c.text(r.x + 27, y, `|${ascii}|`, style(color.faint), r.w - 29, `memory.erase.ascii.${semantic}`);
   }
-  const range = countPhrase(world.state.count, 'memory.range'), objectLabel = countPhrase(world.state.count, 'memory.objects');
+  const range = countPhrase(translationCount, 'memory.range'), objectLabel = countPhrase(translationCount, 'memory.objects');
   const objects = view.total === undefined ? '' : ` ${objectLabel?.text ?? 'objects'}=${view.completed}/${view.total}`;
   c.text(r.x + 2, r.y + r.h - 1, ` ${range?.text ?? 'view'} ${Math.min(view.size, groups * 4)}/${view.size} B${objects} `, style(color.dim), r.w - 4, 'memory.erase.range', range?.language);
   return true;

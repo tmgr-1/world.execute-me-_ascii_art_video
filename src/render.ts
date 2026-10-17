@@ -13,6 +13,7 @@ import { subtitleLines } from './subtitles.js';
 import { visibleLog } from './event-log.js';
 import { drawErasureMemory } from '../films/world-execute/erasure-view.js';
 import { countPhrase, countTr } from '../films/world-execute/count-translation.js';
+import { makeCountLayer, drawCountLayer, type CountLayer } from '../films/world-execute/count-overlay.js';
 
 const glyphVariants = new Map<string, { bitmap: string[]; w: number; h: number }[]>();
 for (const asset of Object.values(glyphs)) {
@@ -35,13 +36,13 @@ export function layout(size: Size): Layout {
 }
 const labelKey: Record<string, string> = { memory: 'ui.memory', wait: 'ui.wait', task: 'ui.tasks', log: 'ui.chat', input: 'ui.input', stack: 'ui.stack', output: 'ui.output', state: 'ui.state' };
 const labelSteps: Record<string, number> = { task: 1, log: 2, input: 2, memory: 3, stack: 4, wait: 4, state: 5, output: 6 };
-function label(world: World, lang: Language, key: string): { text: string; language: string } {
+function label(world: World, lang: Language, key: string, translationCount: number): { text: string; language: string } {
   const step = labelSteps[key];
-  if (!world.terminated && step && world.state.count >= step) { const language = countLanguages[step - 1]; return { text: countLocales[language][key], language }; }
+  if (!world.terminated && step && translationCount >= step) { const language = countLanguages[step - 1]; return { text: countLocales[language][key], language }; }
   return { text: tr(lang, labelKey[key] ?? key), language: lang };
 }
-function title(c: Canvas, r: Rect, world: World, lang: Language, semantic: string): void {
-  const l = label(world, lang, semantic); c.box(r, l.text, color.faint, semantic, l.language);
+function title(c: Canvas, r: Rect, world: World, lang: Language, semantic: string, translationCount: number): void {
+  const l = label(world, lang, semantic, translationCount); c.box(r, l.text, color.faint, semantic, l.language);
 }
 export function wordArt(c: Canvas, word: string, rect: Rect, fg: number, bg = color.bg): void {
   const variants = glyphVariants.get(word);
@@ -62,11 +63,11 @@ export function modalRect(size: Size, lang: Language = 'cn'): Rect {
   return { x: 1, y: clamp(Math.floor((l.story.h - h) / 2), minY, l.story.h - h - 1), w: size.columns - 2, h };
 }
 
-function input(c: Canvas, world: World, lang: Language, r: Rect, timeMs: number): void {
-  title(c, r, world, lang, 'input');
+function input(c: Canvas, world: World, lang: Language, r: Rect, timeMs: number, translationCount: number): void {
+  title(c, r, world, lang, 'input', translationCount);
   const closed = !world.session('open') && world.state.sent.length > 0;
   if (closed) {
-    const phrase = countTr(world.state.count, lang, 'input.closed'), receiver = countTr(world.state.count, lang, 'ui.no_receiver');
+    const phrase = countTr(translationCount, lang, 'input.closed'), receiver = countTr(translationCount, lang, 'ui.no_receiver');
     c.text(r.x + 2, r.y + 1, `× ${phrase.text}  ·  ${receiver.text}`, style(color.red, true), r.w - 4, 'session.closed', phrase.language);
   }
   const connected = world.session('open') === true;
@@ -84,23 +85,23 @@ function input(c: Canvas, world: World, lang: Language, r: Rect, timeMs: number)
   let occupied = 0;
   for (const request of [...world.state.sent].reverse()) {
     if (timeMs < world.film.interactions.find(i => i.id === request.interactionId)!.recordAtMs) continue;
-    const sent = countTr(world.state.count, lang, 'input.sent'), phrase = countTr(world.state.count, lang, request.key);
+    const sent = countTr(translationCount, lang, 'input.sent'), phrase = countTr(translationCount, lang, request.key);
     const group = wrap(`#${String(request.id).padStart(2, '0')} ${sent.text}  ${phrase.text}`, r.w - 4);
     if (occupied + group.length > historyCapacity) break;
     history.unshift(group); occupied += group.length;
   }
   let y = r.y + r.h - 2 - Math.max(1, draft.length) - occupied + 1;
-  for (const group of history) for (const line of group) c.text(r.x + 2, y++, line, style(color.green), r.w - 4, 'input.sent', world.state.count >= 2 ? 'es' : lang);
+  for (const group of history) for (const line of group) c.text(r.x + 2, y++, line, style(color.green), r.w - 4, 'input.sent', translationCount >= 2 ? 'es' : lang);
   draft.forEach((line, i) => c.text(r.x + 2, r.y + r.h - 1 - draft.length + i, line, style(color.green), r.w - 4, interaction ? 'input.draft' : 'input.prompt'));
   if (draft.length) {
     const line = draft.at(-1)!;
     c.set(r.x + 1 + width(line), r.y + r.h - 2, line.at(-1)!, style(color.green), 'input.cursor');
   }
 }
-function conversation(c: Canvas, world: World, lang: Language, r: Rect): void {
-  const heading = label(world, lang, 'log');
+function conversation(c: Canvas, world: World, lang: Language, r: Rect, translationCount: number): void {
+  const heading = label(world, lang, 'log', translationCount);
   c.box(r, heading.text, color.faint, 'chat', heading.language);
-  visibleLog(world, lang, r.w - 4, r.h - 2).forEach((line, i) => {
+  visibleLog(world, lang, r.w - 4, r.h - 2, translationCount).forEach((line, i) => {
     c.text(r.x + 2, r.y + 1 + i, line.text, line.style, r.w - 4, `chat.${line.item.key}`, line.language);
   });
 }
@@ -108,7 +109,7 @@ function attributeFocus(world: World, t: number): string | undefined {
   if (t < world.film.lyrics[40].startMs || t >= world.film.lyrics[48].startMs) return undefined;
   return t >= world.film.lyrics[44].startMs ? 'role' : t >= world.film.lyrics[42].startMs ? 'period' : 'gender';
 }
-function memoryAndWatch(c: Canvas, world: World, lang: Language, r: Rect, timeMs: number): void {
+function memoryAndWatch(c: Canvas, world: World, lang: Language, r: Rect, timeMs: number, translationCount: number): void {
   const attribute = attributeFocus(world, timeMs);
   const change = attribute ? world.store.changes.get(`me:${attribute}`) : undefined;
   const age = change ? timeMs - change.atMs : Infinity;
@@ -120,13 +121,13 @@ function memoryAndWatch(c: Canvas, world: World, lang: Language, r: Rect, timeMs
     c.text(r.x + 2, r.y + 1, text, style(age < 450 ? color.gold : color.cyan, true), r.w - 4, 'memory.write.label');
     const entry = world.film.lyrics[attribute === 'role' ? 44 : attribute === 'period' ? 42 : 40].startMs;
     if (age < 650 || timeMs - entry < 300) c.text(r.x - 10, r.y + 1, '→ MEM', style(color.cyan, true), 8, 'memory.write.arrow');
-  } else title(c, memory, world, lang, 'memory');
+  } else title(c, memory, world, lang, 'memory', translationCount);
   const a = world.store.allocation('me'), fields = world.store.layouts.get(a.type)!.fields;
   const bytesPerRow = r.w >= 40 ? 6 : 4;
   const focus = attribute ?? ({ points: 'dimension', circle: 'radius', tangent: 'theta', infinity: 'boundary', current: 'currentMode', time: 'currentYear', align: 'phaseError', eggplant: 'nutrients', tomato: 'antioxidants', cat: 'purr' } as Record<string, string>)[world.state.motion?.kind ?? ''];
   const offset = focus ? Math.max(0, Math.floor(world.store.field('me', focus).offset / bytesPerRow) * bytesPerRow - bytesPerRow) : 0;
   const changes = [...world.store.changes.values()];
-  const erasing = drawErasureMemory(c, world, lang, memory, timeMs);
+  const erasing = drawErasureMemory(c, world, lang, memory, timeMs, translationCount);
   for (let row = 0; !erasing && row < memory.h - (attribute ? 4 : 3); row++) {
     const start = offset + row * bytesPerRow, address = a.address + start;
     const y = r.y + row + (attribute ? 3 : 2);
@@ -147,9 +148,9 @@ function memoryAndWatch(c: Canvas, world: World, lang: Language, r: Rect, timeMs
     c.text(r.x + 12 + bytesPerRow * 3, y, `|${ascii}|`, style(color.faint), bytesPerRow + 2);
   }
   const watch = { x: r.x, y: r.y + memoryH, w: r.w, h: r.h - memoryH };
-  title(c, watch, world, lang, world.state.count >= 4 ? 'stack' : 'state');
+  title(c, watch, world, lang, translationCount >= 4 ? 'stack' : 'state', translationCount);
   const motion = world.state.motion?.kind;
-  const translatedWatch = (key: string, args: Record<string, unknown>, fallback: string): string => countPhrase(world.state.count, key, args)?.text ?? fallback;
+  const translatedWatch = (key: string, args: Record<string, unknown>, fallback: string): string => countPhrase(translationCount, key, args)?.text ?? fallback;
   let rows: string[] = attribute ? ['gender', 'period', 'role'].map(field => `${field}=${world.value(field)}`) : [
     translatedWatch('watch.me', { address: hex(a.address) }, `me=${hex(a.address)}`),
     translatedWatch('watch.revision', { revision: world.value('revision') }, `revision=${world.value('revision')}`),
@@ -168,22 +169,22 @@ function memoryAndWatch(c: Canvas, world: World, lang: Language, r: Rect, timeMs
   else rows.push(`form=${world.value('form')}`, `dimension=${world.value('dimension')}`);
   const task = [...world.state.tasks].reverse().find(t => t.status !== 'COMPLETE' && t.status !== 'CANCELLED') ?? world.state.tasks.at(-1);
   if (task && !attribute) {
-    const taskRows = world.state.count >= 4 ? [
+    const taskRows = translationCount >= 4 ? [
       translatedWatch('watch.task', { id: task.id, status: task.status }, ''),
       translatedWatch('watch.frame', { program: task.frames.at(-1)?.program ?? task.program, pc: task.pc, depth: task.frames.length }, ''),
       translatedWatch('watch.request', { id: task.requestId ?? 'null' }, ''),
     ] : [`#${task.id} ${task.status}`, `request_id=${task.requestId ?? 'null'}`, `PC=${task.pc} depth=${task.frames.length}`];
-    if (world.state.count >= 4) rows = [...taskRows, ...rows];
+    if (translationCount >= 4) rows = [...taskRows, ...rows];
     else rows.push(...taskRows);
   }
   rows.slice(0, watch.h - 2).forEach((line, i) => {
     const selected = !!attribute && line.startsWith(`${attribute}=`);
-    const language = world.state.count >= 4 && i < 3 ? 'ko' : world.state.count >= 3 && i < (world.state.count >= 4 ? 6 : 3) ? 'fr' : undefined;
+    const language = translationCount >= 4 && i < 3 ? 'ko' : translationCount >= 3 && i < (translationCount >= 4 ? 6 : 3) ? 'fr' : undefined;
     c.text(watch.x + 2, watch.y + i + 1, line, style(selected ? age < 450 ? color.gold : color.cyan : color.dim, selected), watch.w - 4, selected ? 'memory.write.value' : 'watch.value', language);
   });
   // Semantic label instances remain separate from the state data they annotate.
   for (const [semantic, y] of (attribute || erasing ? [] : [['task', watch.y + watch.h - 1], ['wait', r.y + 1], ['output', r.y + memoryH - 1]]) as [string, number][]) {
-    const l = label(world, lang, semantic); c.text(r.x + r.w - width(l.text) - 3, y, l.text, style(color.dim), r.w - 4, semantic, l.language);
+    const l = label(world, lang, semantic, translationCount); c.text(r.x + r.w - width(l.text) - 3, y, l.text, style(color.dim), r.w - 4, semantic, l.language);
   }
 
 }
@@ -214,10 +215,24 @@ function countWord(c: Canvas, world: World): void {
   wordArt(c, word, { x: 6, y: Math.floor(c.rows / 2) - 9, w: c.columns - 12, h: 18 }, color.text);
 }
 
+function countWarning(c: Canvas, world: World, lang: Language, r: Rect): void {
+  const countAt = world.film.times.counts[world.state.count - 1];
+  const warning = world.state.chat.findLast(item => item.key === 'guard.continuous' && item.atMs >= countAt);
+  if (!warning) return;
+  visibleLog(world, lang, r.w - 4, r.h - 2).forEach((line, i) => {
+    if (line.item.id !== warning.id) return;
+    const rect = { x: r.x + 2, y: r.y + 1 + i, w: Math.min(width(line.text), r.w - 4), h: 1 };
+    c.text(rect.x, rect.y, line.text, line.style, rect.w, 'chat.guard.continuous', lang);
+    c.regions.set(`guard.warning.${world.state.count}.${line.logicalLine}`, rect);
+    c.regions.set('guard.warning', rect);
+  });
+}
+
 export class Renderer {
   private frozen = new Map<string, Canvas>();
+  private languageWrites = new Map<string, CountLayer[]>();
   constructor(readonly director: Director) {}
-  normal(world: World, t: number, size: Size, lang: Language): Canvas {
+  private base(world: World, t: number, size: Size, lang: Language, translationCount = 0): Canvas {
     const l = layout(size), c = new Canvas(size.columns, l.story.h), film = world.film;
     const scene = film.scenes.find(s => t >= s.startMs && t < s.endMs) ?? film.scenes.at(-1)!;
     const views = filmViews.get(film.id); if (!views) throw new Error(`E_FILM_VIEWS:${film.id}`);
@@ -225,7 +240,7 @@ export class Renderer {
     c.text(2, 0, 'world.execute(me);', style(color.cyan, true));
     const top = `${String(scene.number).padStart(2, '0')}/25   ${hex(world.store.allocation('me').address)}   ${String(world.value('status'))}`;
     c.text(c.columns - width(top) - 3, 0, top, style(color.dim));
-    conversation(c, world, lang, l.chat); views.graphic(c, world, lang, l.main, t);
+    conversation(c, world, lang, l.chat, translationCount); views.graphic(c, world, lang, l.main, t, translationCount);
     const focus = attributeFocus(world, t);
     if (focus) {
       const changed = world.store.changes.get(`me:${focus}`), entry = film.lyrics[focus === 'role' ? 44 : focus === 'period' ? 42 : 40].startMs;
@@ -233,19 +248,40 @@ export class Renderer {
         const cell = c.get(x, y)!; if ([color.dim, color.faint].includes(cell.fg)) cell.fg = 236;
       }
     }
-    memoryAndWatch(c, world, lang, l.side, t);
+    memoryAndWatch(c, world, lang, l.side, t, translationCount);
     visionGhosts(c, world, l, t);
-    input(c, world, lang, l.input, t);
+    input(c, world, lang, l.input, t, translationCount);
     const values = { open: world.session('open') ? 1 : 0, rx: world.session('open') ? activity(world, 'rx', t).toFixed(2) : '0', ack: world.session('ackSeq'), request: world.state.sent.at(-1)?.id ?? 'null' };
-    const status = countPhrase(world.state.count, 'status.session', values);
+    const status = countPhrase(translationCount, 'status.session', values);
     c.text(2, l.status.y, status?.text ?? `session=${values.open}   rx=${values.rx}   ack_seq=${values.ack}   request_id=${values.request}`, style(color.dim), c.columns - 4, 'status.session', status?.language);
-    const stateLabel = label(world, lang, 'state');
+    const stateLabel = label(world, lang, 'state', translationCount);
     c.text(c.columns - width(stateLabel.text) - 3, l.status.y, stateLabel.text, style(color.dim), 20, 'state', stateLabel.language);
     const bottom = `${timeCode(t)} / ${timeCode(film.durationMs)}    seed=${world.seed}`;
     c.text(2, l.status.y + 1, bottom, style(color.faint));
     c.text(c.columns - 41, l.status.y + 1, t >= film.times.interrupt ? 'process=TERMINATED  applied=0' : `Space:${tr(lang, 'controls.pause')}  q:${tr(lang, 'controls.quit')}`, style(color.faint), 39);
-    if (world.state.count && t < film.times.interrupt) countWord(c, world);
+    return c;
+  }
+  private countLayers(size: Size, lang: Language): CountLayer[] {
+    const film = this.director.film, seed = this.director.world.seed, key = `${size.columns}:${size.rows}:${lang}:${seed}`;
+    let layers = this.languageWrites.get(key);
+    if (!layers) {
+      const snapshots = new Director(film, seed);
+      layers = film.times.counts.map((atMs, i) => {
+        const source = this.base(snapshots.at(atMs), atMs, size, lang, i + 1);
+        return makeCountLayer(source, seed, i + 1);
+      });
+      if (this.languageWrites.size >= 4) this.languageWrites.clear();
+      this.languageWrites.set(key, layers);
+    }
+    return layers;
+  }
+  normal(world: World, t: number, size: Size, lang: Language): Canvas {
+    const c = this.base(world, t, size, lang), film = world.film;
+    if (t >= film.times.holdEnd) return c;
+    const counting = world.state.count > 0 && t < film.times.interrupt;
+    if (counting) for (const layer of this.countLayers(size, lang).slice(0, world.state.count)) drawCountLayer(c, layer);
     corrupt(c, film, world.seed, t, world.state.count);
+    if (counting) { countWord(c, world); countWarning(c, world, lang, layout(size).chat); }
     if (t >= film.times.intent && t < film.times.interrupt) {
       // Damage resolves a wide glyph crossing the future modal edge into two
       // single cells before capture, so overlaying cannot erase an outside cell.
@@ -305,6 +341,7 @@ export class Renderer {
     centerText(c, mid, tr(lang, state, { columns: 130, rows: 35 }), color.text);
     if (details) centerText(c, Math.min(c.rows - 1, mid + 2), details, color.dim);
     if (state === 'app.ready') {
+      if (size.columns >= 130 && size.rows >= 35) this.countLayers(size, lang);
       centerText(c, Math.max(0, mid - 1), tr(lang, 'ui.canvas_size', { columns: size.columns, rows: size.rows }), color.dim);
       centerText(c, Math.min(c.rows - 1, mid + 4), tr(lang, 'app.controls'), color.dim);
     }

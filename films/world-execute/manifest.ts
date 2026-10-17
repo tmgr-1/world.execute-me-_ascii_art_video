@@ -206,7 +206,7 @@ export function makeFilm(overrides?: Anchor[], options: { easterEgg?: boolean } 
   const scenes: Scene[] = boundaries.map(([id, startMs], i) => ({ id, number: i + 1, startMs, endMs: boundaries[i + 1]?.[1] ?? presentationEndMs }));
   const translations = new Map(chineseLyrics.map(l => [l.number, l.text]));
   const meanings: Record<number, string> = { 73: '(one, two)', 74: '(three, four)', 75: '(five, six)' };
-  return { id: 'world-execute', version: '5.0.0', durationMs: timing.durationMs, presentationEndMs, easterEggEnabled, corruption, audioSha256: timing.audioSha256, originAudioMs: timing.originAudioMs, defaultSeed: 1041,
+  return { id: 'world-execute', version: '5.1.0', durationMs: timing.durationMs, presentationEndMs, easterEggEnabled, corruption, audioSha256: timing.audioSha256, originAudioMs: timing.originAudioMs, defaultSeed: 1041,
     anchors, lyrics: lyrics.map(l => ({ ...l, translation: translations.get(l.number) ?? '', englishMeaning: meanings[l.number], startMs: start(l.number), endMs: end(l.number) })), schemas, cues, interactions, programs, scenes,
     times: { intro: end(8), close, result, feedbackTimeout, reestimate, eraseBegin, executionStart, executionEnd, violationWarning, selfErase, deletionAnnouncement, outroHold, debugOpen, debugClose, consoleReset, intent, interrupt, holdEnd, patch: start(85), counts, finalDelete, finalExecution, purge, easterEgg } };
 }

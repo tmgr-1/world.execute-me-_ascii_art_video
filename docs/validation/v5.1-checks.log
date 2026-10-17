@@ -1,0 +1,41 @@
+V5.1 fixed count-language writes and foreground guard validation
+Baseline: 2d40360
+Film version: 5.1.0
+
+$ npm run check
+PASS: TypeScript and content/model validation.
+Existing release-review warning retained: E_ANCHOR_ROUGH:209.
+
+$ npm test
+Tests: 87. Passed: 87. Failed: 0.
+New / revised checks cover:
+- Each language writes 20% of distinct story cells, including complete wide glyphs.
+- Previous languages remain at their original positions unless a new write cuts them.
+- The Korean entrance does not add or relocate German, Spanish or French text.
+- Only the current warning is forced clear, starting at the existing +60 ms event.
+- The warning follows its actual chronological log record when later entries scroll it.
+- Fixed language layers do not share the independent, resampled 12% noise budget.
+- Captions, deterministic seeks, erasure evidence, debugger and endings remain valid.
+
+$ npm run build
+PASS.
+
+$ npm run test:e2e
+PASS: CLI help and audio path cases; PTY ready/start/termination/pause/resize/seek/quit;
+player failure; rehearsal loop; debugger; default EOF; held EOF; optional Easter egg;
+post-EOF entry and rewind. All cases use the explicit fake-mpv protocol fixture.
+
+Visual exports:
+60 frame JSONs and PNGs under ignored .cache/v5.1-review/.
+Dimensions: 130x35, 160x45, 220x60. Languages: cn, en.
+Times: all six counts +100 ms; Korean -1 ms / +59 ms; final system intent +1 ms;
+and process termination. Selected PNGs inspected for accumulated multilingual
+overwrites, foreground warning, count strokes and independent captions.
+
+$ npm run benchmark -- --size 220x60 --lang cn --step 250 --output .cache/v5.1-review/benchmark-220-cn.json
+PASS with the script's --max-old-space-size=64 --max-semi-space-size=4 flags.
+Samples: 848. Mean: 4.0944 ms. P95: 7.4953 ms. Maximum: 84.2661 ms.
+Peak RSS: 141.0781 MiB; V8 old-space limit is not a process RSS limit.
+Environment: Linux x64, Node v24.19.0, Intel Core i5-14600K.
+Scope: deterministic model and frame composition. Terminal transport, real mpv
+playback and audible synchronization were not benchmarked or recalibrated.
