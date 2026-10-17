@@ -146,8 +146,8 @@ for (const dimensions of [size, { columns: 160, rows: 45 }]) for (const lang of 
     assert.deepEqual(d.world.state.archive, snapshot);
     const final = renderer.frame(film.times.purge + 100, dimensions, lang).plain();
     assert.ok(final.includes(image.path) && final.includes('PROGRAM DELETED'));
-    assert.ok(final.includes('wait_for_reply') && final.includes('exit_branch: NOT REACHED')); assert.equal(d.world.state.lifecycle, 'PURGED');
-    assert.ok(renderer.frame(film.times.blackout, dimensions, lang).cells.every(cell => cell.g === ' '));
+    assert.ok(!final.includes('wait_for_reply') && !final.includes('exit_branch: NOT REACHED')); assert.equal(d.world.state.lifecycle, 'PURGED');
+    assert.ok(renderer.frame(film.times.consoleReset, dimensions, lang).cells.every(cell => cell.g === ' '));
     d.at(1000); assert.equal(d.at(film.times.purge).state.lifecycle, 'PURGED');
   });
 }

@@ -10,7 +10,7 @@ export function messageStyle(item: Chat, world: World): Style {
   let fg: number = color.dim, bold = false;
   if (item.source === 'guard') { fg = color.red; bold = true; }
   else if (item.source === 'session') fg = item.key === 'session.closed' ? color.red : color.green;
-  else if (item.source === 'sim' && !item.key.startsWith('attempt.')) {
+  else if (item.source === 'sim') {
     fg = item.atMs >= world.film.lyrics[32].startMs ? color.cyan : color.dim;
     const level = Number(item.key.match(/^sim\.wait\.(\d)$/)?.[1] ?? 0);
     if (level) {

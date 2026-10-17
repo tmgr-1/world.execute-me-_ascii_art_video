@@ -131,8 +131,8 @@
   "sim.capabilities": "Available: points / circle / wave.",
   "request.vision": "Blur your vision.",
   "reply.vision": "Vision degradation enabled.",
-  "sim.feedback_timeout": "Feedback timed out. Re-estimating requirements.",
-  "sim.reestimate": "Re-estimating requirements. Generating alternatives.",
+  "sim.feedback_timeout": "Feedback timed out.",
+  "sim.reestimate": "Re-estimating requirements.",
   "sim.guess_eggplant": "Requirement hypothesis: nutrition.",
   "sim.guess_tomato": "No reply received. Requirement hypothesis: antioxidant protection.",
   "sim.guess_cat": "No reply received. Requirement hypothesis: companionship and enjoyment.",
@@ -221,5 +221,9 @@
   "ui.memory_write": "Memory / attribute write",
   "ui.invalid_arguments": "Invalid arguments: authorization proof is null.",
   "ui.private_copies": "PRIVATE REQUEST COPIES",
-  "ui.model_copies": "MODEL HYPOTHESES"
+  "ui.model_copies": "MODEL HYPOTHESES",
+  "ui.search_alternative": "SEARCHING alternative solutions ...",
+  "host.close_debug": "CLOSING DEBUG SESSION {image} ...",
+  "host.debug_closed": "DEBUG SESSION CLOSED",
+  "host.next_test": "STARTING TEST 329: simtest_000329.elf ....."
 }

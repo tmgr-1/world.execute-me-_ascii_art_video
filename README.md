@@ -66,7 +66,7 @@ npm run play -- --music-file "./world.execute (me) ; - Mili.mp3" --rehearsal --l
 | `--speed 0.5` | 调整播放速度，范围为 0.25–2 |
 | `--no-color` | 使用无彩色显示 |
 | `--mpv-path /path/to/mpv` | 指定播放器路径 |
-| `--hold-end` | 音乐结束后保留画面，按 q 退出 |
+| `--hold-end` | 影片结束后保留画面，按 q 退出 |
 
 运行时不需要 Python、PyTorch、Whisper 或网络连接。
 

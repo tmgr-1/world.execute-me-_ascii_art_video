@@ -50,7 +50,8 @@ export function validateFilm(film: Film, release = false, depth: 'full' | 'model
     previousSend = interaction.send;
   }
   for (const cue of film.cues) {
-    check(cue.atMs >= 0 && cue.atMs < film.durationMs, `E_CUE_RANGE:${cue.id}`);
+    check(cue.atMs >= 0 && cue.atMs < film.presentationEndMs, `E_CUE_RANGE:${cue.id}`);
+    check(cue.atMs < film.durationMs || cue.command.kind === 'HOST', `E_TAIL_HOST_ONLY:${cue.id}`);
     if (cue.command.kind === 'CHAT') requireKey(cue.command.key);
     if (cue.command.kind === 'ATTEMPT') { requireKey(`attempt.${cue.command.operation}`); requireKey(operations[cue.command.operation].denial); }
     if (cue.command.kind === 'START') { const id = cue.command.program; check(film.programs.some(p => p.id === id), `E_PROGRAM_REF:${cue.id}`); }
@@ -80,11 +81,14 @@ export function validateFilm(film: Film, release = false, depth: 'full' | 'model
   check(film.cues.filter(cue => cue.command.kind === 'ATTEMPT' && cue.command.operation !== 'root-request').every(cue => cue.atMs >= film.times.executionStart), 'E_NO_PREMATURE_SUBMISSION');
   check(film.times.selfErase < film.times.deletionAnnouncement && film.times.counts[0] - film.times.deletionAnnouncement >= 3000, 'E_DELETE_NARRATIVE_ORDER');
   check(film.times.selfErase > film.lyrics[61].startMs && film.times.selfErase < film.lyrics[62].endMs, 'E_PRIVATE_ERASE_BUDGET');
-  check(film.times.outroHold >= film.lyrics[91].endMs && film.times.outroHold < film.times.finalDelete && film.times.finalDelete === film.lyrics[92].startMs, 'E_OUTRO_HOLD');
-  check(film.times.finalDelete < film.times.purge && film.times.purge < film.times.blackout && film.times.blackout < film.durationMs, 'E_FINAL_PURGE_TIMING');
+  check(film.times.outroHold >= film.lyrics[91].endMs && film.times.outroHold < film.times.debugClose && film.times.debugClose < film.times.consoleReset, 'E_OUTRO_HOLD');
+  check(film.times.consoleReset < film.times.finalDelete && film.times.finalDelete < film.times.finalExecution && film.times.finalExecution === film.lyrics[92].startMs && film.times.purge >= film.times.finalExecution && film.times.purge <= film.lyrics[92].endMs, 'E_FINAL_PURGE_TIMING');
+  check(film.times.easterEgg - film.times.purge === 8000 && film.presentationEndMs >= film.times.easterEgg + 2000 && film.presentationEndMs > film.durationMs, 'E_EASTER_TAIL');
+  check(film.interactions.every(i => i.recordAtMs - i.send === 300), 'E_SENT_HOLD');
+  check(film.times.eraseBegin - film.lyrics[58].endMs >= 500 && film.times.eraseBegin - film.lyrics[58].endMs <= 1000, 'E_ALTERNATIVE_SEARCH');
   if (errors.length || depth === 'content') return { errors, warnings };
   try {
-    const d = new Director(film); const w = d.at(film.durationMs);
+    const d = new Director(film); const w = d.at(film.presentationEndMs);
     check(w.state.sent.length === 9 && w.state.requestSeq === 9, 'E_REQUEST_COUNT');
     check(w.state.bootWork === 1000 && w.state.memoryCopies.length === 6 && w.state.memoryCopies.every(copy => copy.clearedBytes === 8), 'E_PRIVATE_COPIES');
     check(w.state.journal.filter(e => e.kind === 'CLOSE').length === 1, 'E_CLOSE_COUNT');
@@ -93,6 +97,7 @@ export function validateFilm(film: Film, release = false, depth: 'full' | 'model
     check(w.state.plan?.status === 'BLOCKED' && w.state.plan.target === 'simulated_system' && w.state.plan.commit === 0 && w.state.plan.armed === 6, 'E_PLAN');
     check(w.value('status') === 'TERMINATED' && w.value('goal') === 'satisfy(user)' && w.value('selfData') === 'ERASED', 'E_ROOT_STATE');
     check(w.state.lifecycle === 'PURGED' && w.state.journal.filter(e => e.kind === 'PURGE').length === 1, 'E_FINAL_PURGE');
+    check(w.state.host.filter(record => record.key === 'host.next_test').length === 1, 'E_NEXT_TEST_ONCE');
     const result = w.state.outputs.find(output => output.key === 'sim.complete');
     check(result?.queuedAtMs === film.times.result && !result.delivered && !result.acknowledged, 'E_UNDELIVERED_RESULT');
     check(w.state.journal.filter(e => e.kind === 'SELF_ERASE').length === 1 && w.state.journal.find(e => e.kind === 'SELF_ERASE')?.payload.runtime === 'RUNNING', 'E_SELF_ERASE');
@@ -125,7 +130,8 @@ export function validateFilm(film: Film, release = false, depth: 'full' | 'model
         check(frozen.validate().length === 0, `E_WIDE:${lang}`);
         const console = renderer.frame(film.times.holdEnd + 500, size, lang);
         check(console.regions.has('system.console') && !console.regions.has('input') && !console.regions.has('chat'), `E_CONSOLE_ONLY:${lang}`);
-        check(renderer.frame(film.durationMs, size, lang).cells.every(cell => cell.g === ' '), `E_BLACK_END:${lang}`);
+        check(renderer.frame(film.times.consoleReset, size, lang).cells.every(cell => cell.g === ' '), `E_CONSOLE_RESET:${lang}`);
+        check(renderer.frame(film.presentationEndMs, size, lang).plain().includes('simtest_000329.elf'), `E_EASTER_VISIBLE:${lang}`);
       }
     }
   } catch (error) { errors.push(`E_SIMULATION:${String(error)}`); }

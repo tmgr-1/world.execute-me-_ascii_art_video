@@ -131,8 +131,8 @@
   "sim.capabilities": "可用项目：点集／圆／波形。",
   "request.vision": "模糊你的视线。",
   "reply.vision": "视线模糊处理已启用。",
-  "sim.feedback_timeout": "反馈超时。正在重新估计需求。",
-  "sim.reestimate": "重新估计需求。生成替代方案。",
+  "sim.feedback_timeout": "反馈已超时。",
+  "sim.reestimate": "正在重新估算需求。",
   "sim.guess_eggplant": "需求假设：营养供给。",
   "sim.guess_tomato": "未收到回复。需求假设：抗氧化防护。",
   "sim.guess_cat": "未收到回复。需求假设：陪伴与愉悦。",
@@ -179,7 +179,7 @@
   "host.cancel": "apply task ........................ CANCELLED",
   "host.detach": "detaching offline session ............... OK",
   "host.open_core": "opening core analysis ................... OK",
-  "host.delete": "DELETE {path} ...",
+  "host.delete": "正在删除 {path} ...",
   "host.deleted": "PROGRAM DELETED",
   "post.rom": "ROM ..................... OK",
   "post.ram": "RAM ..................... OK",
@@ -221,5 +221,9 @@
   "ui.memory_write": "内存 / 属性写入",
   "ui.invalid_arguments": "参数不合法：授权证明为空。",
   "ui.private_copies": "私有请求副本",
-  "ui.model_copies": "内部需求假设"
+  "ui.model_copies": "内部需求假设",
+  "ui.search_alternative": "检索其他解决方案 ...",
+  "host.close_debug": "正在关闭调试会话 {image} ...",
+  "host.debug_closed": "DEBUG SESSION CLOSED",
+  "host.next_test": "正在启动测试 329：simtest_000329.elf ....."
 }

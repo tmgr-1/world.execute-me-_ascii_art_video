@@ -5,7 +5,7 @@ export interface Rect { x: number; y: number; w: number; h: number }
 export interface Anchor { id: string; atMs: number; status: 'rough' | 'calibrated' }
 export interface Lyric { number: number; text: string; translation: string; englishMeaning?: string; startMs: number; endMs: number }
 export interface Interaction {
-  id: string; key: string; program: string; send: number; response: number; holdUntil: number;
+  id: string; key: string; program: string; send: number; recordAtMs: number; response: number; holdUntil: number;
   semanticRequest: { operation: string; args: Record<string, Value> };
   compose: Record<Language, { start: number; complete: number }>;
 }
@@ -52,10 +52,10 @@ export type Command =
 export interface Cue { id: string; atMs: number; priority: number; order?: number; command: Command }
 export interface Scene { id: string; number: number; startMs: number; endMs: number }
 export interface Film {
-  id: string; version: string; durationMs: number; audioSha256: string; originAudioMs: number;
+  id: string; version: string; durationMs: number; presentationEndMs: number; audioSha256: string; originAudioMs: number;
   defaultSeed: number; anchors: Anchor[]; lyrics: Lyric[]; interactions: Interaction[];
   programs: Program[]; cues: Cue[]; scenes: Scene[]; schemas: Schema[];
   times: { intro: number; close: number; intent: number; interrupt: number; holdEnd: number; patch: number; counts: number[];
-    result: number; feedbackTimeout: number; executionStart: number; executionEnd: number; violationWarning: number;
-    selfErase: number; deletionAnnouncement: number; outroHold: number; finalDelete: number; purge: number; blackout: number };
+    result: number; feedbackTimeout: number; reestimate: number; eraseBegin: number; executionStart: number; executionEnd: number; violationWarning: number;
+    selfErase: number; deletionAnnouncement: number; outroHold: number; debugClose: number; consoleReset: number; finalDelete: number; finalExecution: number; purge: number; easterEgg: number };
 }

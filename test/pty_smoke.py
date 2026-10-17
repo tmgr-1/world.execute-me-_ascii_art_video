@@ -86,6 +86,62 @@ try:
  assert termios.tcgetattr(slave)==before
  assert b'\x1b[?1049l' in output
  print('PTY loop case passed: repeated exact media seeks, deterministic rebuild, no duplicate requests, terminal restored.')
+ # Audio EOF must leave the silent visual tail alive. Pausing/resizing freezes
+ # its clock; test 329 appears only after the retained DELETED interval.
+ destination=root/'.cache/pty-v42-eof';destination.mkdir(parents=True,exist_ok=True)
+ trace=destination/'commands.jsonl';trace.unlink(missing_ok=True)
+ command[command.index('--export-dir')+1]=str(destination)
+ command[command.index('--seek')+1]='03:31.8'
+ output=bytearray();resize(130,35)
+ process=subprocess.Popen(command+['--speed','2'],cwd=root,stdin=slave,stdout=slave,stderr=slave,start_new_session=True,
+                          env={**os.environ,'FAKE_MPV_COMMAND_LOG':str(trace)})
+ deadline=time.monotonic()+5
+ while '按回车开始'.encode() not in output and time.monotonic()<deadline and process.poll() is None:drain(.1)
+ assert '按回车开始'.encode() in output
+ os.write(master,b'\r');drain(.4)
+ assert process.poll() is None,'Application exited at audio EOF before the Easter egg.'
+ assert b'PROGRAM DELETED' in output and b'simtest_000329.elf' not in output
+ os.write(master,b' ');drain(1.3)
+ assert process.poll() is None and b'simtest_000329.elf' not in output,'Paused tail kept advancing.'
+ resize(100,30);os.kill(process.pid,signal.SIGWINCH);drain(.1)
+ resize(130,35);os.kill(process.pid,signal.SIGWINCH);drain(.3)
+ assert process.poll() is None and b'simtest_000329.elf' not in output,'Resize resumed the silent tail.'
+ os.write(master,b' ')
+ deadline=time.monotonic()+5
+ while process.poll() is None and time.monotonic()<deadline:drain(.1)
+ process.wait(timeout=2)
+ assert process.returncode==0,output.decode(errors='replace')[-1500:]
+ assert b'simtest_000329.elf' in output and termios.tcgetattr(slave)==before
+ events=json.loads((destination/'events.json').read_text())
+ assert sum(event.get('key')=='host.next_test' for event in events)==1
+ commands=[json.loads(line) for line in trace.read_text().splitlines()]
+ assert sum(command[0]=='loadfile' for command in commands)==1,'EOF tail replayed the song.'
+ assert sum(command[:3]==['set_property','pause',False] for command in commands)==1,'Silent resume restarted audio.'
+ print('PTY EOF case passed: no early exit, silent pause/resize/resume, one Easter egg, no music replay, automatic finish.')
+ # Direct rehearsal entry into the visual tail supports rewinding into audio;
+ # --hold-end then preserves the final Easter-egg frame until explicit quit.
+ destination=root/'.cache/pty-v42-tail-seek';destination.mkdir(parents=True,exist_ok=True)
+ trace=destination/'commands.jsonl';trace.unlink(missing_ok=True)
+ command[command.index('--export-dir')+1]=str(destination)
+ command[command.index('--seek')+1]='03:33.4'
+ output=bytearray()
+ process=subprocess.Popen(command+['--speed','2','--hold-end'],cwd=root,stdin=slave,stdout=slave,stderr=slave,start_new_session=True,
+                          env={**os.environ,'FAKE_MPV_COMMAND_LOG':str(trace)})
+ deadline=time.monotonic()+5
+ while '按回车开始'.encode() not in output and time.monotonic()<deadline and process.poll() is None:drain(.1)
+ assert '按回车开始'.encode() in output
+ os.write(master,b'\r');drain(.1);os.write(master,b'\x1b[D');drain(.2)
+ deadline=time.monotonic()+6
+ while b'simtest_000329.elf' not in output and time.monotonic()<deadline and process.poll() is None:drain(.1)
+ assert b'simtest_000329.elf' in output and process.poll() is None,output.decode(errors='replace')[-1500:]
+ drain(1.3);assert process.poll() is None,'--hold-end did not retain the Easter egg.'
+ os.write(master,b'q');drain(.3);process.wait(timeout=5)
+ assert process.returncode==0 and termios.tcgetattr(slave)==before
+ events=json.loads((destination/'events.json').read_text())
+ assert sum(event.get('key')=='host.next_test' for event in events)==1 and sum(event['kind']=='rx' for event in events)==9
+ commands=[json.loads(line) for line in trace.read_text().splitlines()]
+ assert any(command[0]=='seek' and command[1]<211 for command in commands),'Tail rewind never returned to media.'
+ print('PTY tail-entry case passed: direct post-EOF start, rewind to media, deterministic history, hold final frame, explicit quit.')
 finally:
  if process.poll() is None:
   process.terminate()

@@ -18,10 +18,10 @@ const consume = chunk => {
     if (process.env.FAKE_MPV_COMMAND_LOG) appendFileSync(process.env.FAKE_MPV_COMMAND_LOG, JSON.stringify(command) + '\n');
     if (command[0] === 'observe_property') observed = true;
     else if (command[0] === 'loadfile') {
-      try { statSync(command[1]); position = 0; anchor = performance.now(); event = 'file-loaded'; }
+      try { statSync(command[1]); position = 0; ended = false; anchor = performance.now(); event = 'file-loaded'; }
       catch { send({ event: 'end-file', reason: 'error', file_error: 'fixture-missing-file' }); }
     } else if (command[0] === 'get_property') {
-      data = ({ 'time-pos': now() / 1000, duration: duration / 1000, pause: paused, speed })[command[1]];
+      data = ({ 'time-pos': ended ? undefined : now() / 1000, duration: duration / 1000, pause: paused, speed })[command[1]];
       if (data === undefined) error = 'property unavailable';
     } else if (command[0] === 'set_property') {
       position = now(); anchor = performance.now();

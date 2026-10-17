@@ -63,24 +63,32 @@ function input(c: Canvas, world: World, lang: Language, r: Rect, timeMs: number)
   title(c, r, world, lang, 'input');
   const closed = !world.session('open') && world.state.sent.length > 0;
   if (closed) c.text(r.x + 2, r.y + 1, `× ${tr(lang, 'input.closed')}  ·  ${tr(lang, 'ui.no_receiver')}`, style(color.red, true), r.w - 4, 'session.closed');
-  const interaction = world.session('open') ? world.film.interactions.find(i => timeMs >= i.compose[lang].start && timeMs < i.send) : undefined;
+  const connected = world.session('open') === true;
+  const interaction = connected ? world.film.interactions.find(i => timeMs >= i.compose[lang].start && timeMs < i.recordAtMs) : undefined;
   let draft: string[] = [];
-  if (interaction) {
-    const track = interaction.compose[lang], text = graphemes(tr(lang, interaction.key));
-    const p = progress(timeMs, track.start, track.complete), count = Math.min(text.length, Math.floor(p * (text.length + 1)));
-    const cursor = Math.floor(timeMs / 400) % 2 === 0 ? '▌' : ' ';
-    draft = wrap(`user> ${text.slice(0, count).join('')}${cursor}`, r.w - 4);
+  if (connected) {
+    const text = interaction ? graphemes(tr(lang, interaction.key)) : [];
+    const track = interaction?.compose[lang];
+    const p = track ? progress(timeMs, track.start, track.complete) : 0, count = Math.min(text.length, Math.floor(p * (text.length + 1)));
+    const openedAt = world.state.chat.find(item => item.key === 'session.connected')!.atMs;
+    const cursor = Math.floor((timeMs - openedAt) / 400) % 2 === 0 ? '_' : ' ';
+    draft = wrap(`user > ${text.slice(0, count).join('')}${cursor}`, r.w - 4);
   }
   const rows = r.h - 2, historyCapacity = rows - Math.max(1, draft.length) - (closed ? 1 : 0), history: string[][] = [];
   let occupied = 0;
   for (const request of [...world.state.sent].reverse()) {
+    if (timeMs < world.film.interactions.find(i => i.id === request.interactionId)!.recordAtMs) continue;
     const group = wrap(`#${String(request.id).padStart(2, '0')} ${tr(lang, 'input.sent')}  ${tr(lang, request.key)}`, r.w - 4);
     if (occupied + group.length > historyCapacity) break;
     history.unshift(group); occupied += group.length;
   }
   let y = r.y + r.h - 2 - Math.max(1, draft.length) - occupied + 1;
   for (const group of history) for (const line of group) c.text(r.x + 2, y++, line, style(color.green), r.w - 4, 'input.sent');
-  draft.forEach((line, i) => c.text(r.x + 2, r.y + r.h - 1 - draft.length + i, line, style(color.green), r.w - 4, 'input.draft'));
+  draft.forEach((line, i) => c.text(r.x + 2, r.y + r.h - 1 - draft.length + i, line, style(color.green), r.w - 4, interaction ? 'input.draft' : 'input.prompt'));
+  if (draft.length) {
+    const line = draft.at(-1)!;
+    c.set(r.x + 1 + width(line), r.y + r.h - 2, line.at(-1)!, style(color.green), 'input.cursor');
+  }
 }
 function conversation(c: Canvas, world: World, lang: Language, r: Rect): void {
   const heading = label(world, lang, 'log');
@@ -354,9 +362,8 @@ export class Renderer {
   }
   frame(timeMs: number, size: Size, lang: Language): Canvas {
     const film = this.director.film;
-    const time = clamp(Math.round(timeMs), 0, film.durationMs);
+    const time = clamp(Math.round(timeMs), 0, film.presentationEndMs);
     const world = this.director.at(time);
-    if (time >= film.times.blackout) return new Canvas(size.columns, size.rows);
     if (time >= film.times.interrupt && time < film.times.holdEnd) {
       const key = `${size.columns}:${size.rows}:${lang}:${world.seed}`;
       let result = this.frozen.get(key);

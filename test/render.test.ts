@@ -33,7 +33,7 @@ for (const size of [{ columns: 130, rows: 35 }, { columns: 160, rows: 45 }]) for
     assert.equal(story(new Renderer(new Director(film)).frame(film.times.interrupt + 1500, size, lang)), story(first));
     assert.notDeepEqual(renderer.frame(film.times.interrupt + 1500, size, lang).cells.slice(storyH * size.columns), first.cells.slice(storyH * size.columns));
     assert.notEqual(renderer.frame(film.times.holdEnd, size, lang).hash(), first.hash());
-    assert.ok(renderer.frame(film.durationMs, size, lang).cells.every(cell => cell.g === ' '));
+    assert.ok(renderer.frame(film.presentationEndMs, size, lang).plain().includes('simtest_000329.elf'));
   });
 }
 test('the six words have independent assets and retain all six language sources', () => {

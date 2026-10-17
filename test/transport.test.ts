@@ -20,6 +20,8 @@ test('JSON protocol fixture: load paused, exact seek, speed, frozen pause, EOF a
     await a.setSpeed(2); await a.setPaused(false); await delay(80); assert.ok(a.clock.read() > 120080);
     await a.setPaused(true); const at = a.clock.read(); await delay(100); assert.equal(a.clock.read(), at);
     await a.seek(211800); const ended = new Promise<void>(resolve => a.once('ended', resolve)); await a.setPaused(false); await ended; assert.equal(a.clock.read(), a.durationMs);
+    await a.seek(190000); assert.ok(Math.abs(a.clock.read() - 190000) < 20, 'cannot return from EOF to media');
+    await a.setPaused(false); await delay(80); assert.ok(a.clock.read() > 190080);
     assert.deepEqual(failures, []);
   } finally { await a.close(); await a.close(); }
 });

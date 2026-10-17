@@ -99,22 +99,22 @@
     },
     {
       "id": "intro.greeting.type",
-      "atMs": 16180,
+      "atMs": 17180,
       "status": "rough"
     },
     {
       "id": "intro.greeting.complete",
-      "atMs": 17330,
+      "atMs": 18660,
       "status": "rough"
     },
     {
       "id": "intro.greeting.send",
-      "atMs": 17780,
+      "atMs": 18780,
       "status": "rough"
     },
     {
       "id": "intro.greeting.reply",
-      "atMs": 18480,
+      "atMs": 19480,
       "status": "rough"
     },
     {

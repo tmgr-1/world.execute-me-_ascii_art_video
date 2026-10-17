@@ -125,7 +125,7 @@ async function main(): Promise<void> {
   if (command === 'benchmark') {
     const timings: number[] = [], step = finite(values.step, 250, 'E_STEP'); if (step < 10) throw new Error('E_STEP');
     let peakRss = process.memoryUsage().rss;
-    for (let t = 0; t < film.durationMs; t += step) { const start = performance.now(); renderer.frame(t, dimensions, lang); timings.push(performance.now() - start); peakRss = Math.max(peakRss, process.memoryUsage().rss); }
+    for (let t = 0; t < film.presentationEndMs; t += step) { const start = performance.now(); renderer.frame(t, dimensions, lang); timings.push(performance.now() - start); peakRss = Math.max(peakRss, process.memoryUsage().rss); }
     timings.sort((a, b) => a - b);
     const report = { environment: { os: process.platform, arch: process.arch, cpu: cpus()[0]?.model, node: process.version, size: dimensions, language: lang },
       samples: timings.length, meanMs: timings.reduce((a, b) => a + b, 0) / timings.length, p95Ms: timings[Math.floor(timings.length * .95)], maxMs: timings.at(-1), peakRssMiB: peakRss / 1048576, memory: process.memoryUsage(),

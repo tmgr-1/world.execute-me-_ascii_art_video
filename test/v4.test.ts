@@ -108,7 +108,7 @@ test('all 93 translations fit; English count meanings occupy only the second cap
 test('captions survive corruption, frozen termination, POST, core analysis and final deletion at every supported size', () => {
   for (const size of [small, { columns: 160, rows: 45 }, { columns: 220, rows: 60 }]) for (const lang of ['cn', 'en'] as const) {
     const r = new Renderer(new Director(film));
-    for (const t of [film.times.counts[5] + 100, film.times.interrupt + 1200, film.times.holdEnd + 400, film.times.patch + 500, film.times.finalDelete + 500]) {
+    for (const t of [film.times.counts[5] + 100, film.times.interrupt + 1200, film.times.holdEnd + 400, film.times.patch + 500, film.times.finalExecution + 500]) {
       const frame = r.frame(t, size, lang), texts = frame.plain().split('\n').slice(-2).map(s => s.trim());
       assert.deepEqual(texts, subtitleLines(film, t, lang));
       const ink = frame.cells.slice((size.rows - 2) * size.columns).filter(c => c.g.trim());

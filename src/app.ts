@@ -9,6 +9,7 @@ import { Director } from './world.js';
 import { layout, Renderer } from './render.js';
 import { tr } from './locale.js';
 import { clamp, timeCode } from './math.js';
+import { PlaybackClock } from './playback-clock.js';
 import type { Film, Language, Size } from './types.js';
 
 export interface PlayOptions { musicFile: string; language: Language; rehearsal: boolean; seekMs: number; speed: number; offsetMs: number; originMs: number; seed: number; mpvPath: string; noColor: boolean; nullAudio: boolean; holdEnd: boolean; fps: number; exportDir?: string; loop?: { startMs: number; endMs: number } }
@@ -21,6 +22,7 @@ export async function play(film: Film, options: PlayOptions): Promise<void> {
   try { await access(options.musicFile, constants.R_OK); } catch { throw new Error(tr(lang, 'error.audio_unreadable', { path: options.musicFile })); }
   const audio = new MpvTransport(options.mpvPath, options.nullAudio), terminal = new TerminalAdapter(process.stdout, options.noColor);
   const director = new Director(film, options.seed), renderer = new Renderer(director);
+  const playbackClock = new PlaybackClock(audio.clock);
   let state: 'READY' | 'PLAYING' | 'PAUSED' | 'SEEKING' | 'FINISHED' = 'READY';
   let force = true, resized = false, closing = false, operation = false, offset = options.offsetMs;
   let interval: NodeJS.Timeout | undefined, doneResolve!: () => void, doneReject!: (error: Error) => void;
@@ -34,7 +36,11 @@ export async function play(film: Film, options: PlayOptions): Promise<void> {
     { id: 'intent', atMs: film.times.intent }, { id: 'interrupt', atMs: film.times.interrupt },
   ];
   const markers: { id: string; atMs: number; mediaMs: number; source: string }[] = [];
-  const story = (): number => audio.clock.read() - options.originMs + offset;
+  const story = (): number => playbackClock.read() - options.originMs + offset;
+  const setPaused = async (paused: boolean): Promise<void> => {
+    if (playbackClock.inTail) playbackClock.pauseTail(paused, options.speed);
+    else await audio.setPaused(paused);
+  };
   let previousSubmit: number | undefined;
   terminal.onSubmission = submission => {
     encodeTimes.push(submission.encodeMs);
@@ -49,7 +55,7 @@ export async function play(film: Film, options: PlayOptions): Promise<void> {
   const draw = (): void => {
     if (closing || state === 'SEEKING') return;
     try {
-      const started = performance.now(), t = clamp(story(), 0, film.durationMs), dimensions = size();
+      const started = performance.now(), t = clamp(story(), 0, film.presentationEndMs), dimensions = size();
       let frame;
       if (!validSize()) frame = renderer.slate(dimensions, lang, 'error.terminal_small');
       else if (state === 'READY') frame = renderer.slate(dimensions, lang, 'app.ready', options.rehearsal ? tr(lang, 'app.rough') : '');
@@ -68,21 +74,29 @@ export async function play(film: Film, options: PlayOptions): Promise<void> {
   };
   const seek = async (targetMs: number): Promise<void> => {
     const playing = state === 'PLAYING'; state = 'SEEKING';
-    const position = await audio.seek(targetMs); director.at(Math.max(0, position - options.originMs + offset)); previousSubmit = position - options.originMs + offset - 1;
+    const target = clamp(targetMs, 0, film.presentationEndMs + options.originMs - offset - 1);
+    let position: number;
+    if (target >= audio.durationMs) {
+      if (!playbackClock.inTail) await audio.seek(audio.durationMs - 1);
+      playbackClock.startTail(target, options.speed, true); position = target;
+    } else {
+      playbackClock.useMedia(); position = await audio.seek(target);
+    }
+    director.at(Math.max(0, position - options.originMs + offset)); previousSubmit = position - options.originMs + offset - 1;
     state = 'PAUSED'; force = true; draw();
-    if (playing && validSize()) { await audio.setPaused(false); state = 'PLAYING'; }
+    if (playing && validSize()) { await setPaused(false); state = 'PLAYING'; }
   };
   const onKey = async (_text: string, key: Key): Promise<void> => {
     if (key.name === 'q' || key.name === 'escape' || key.ctrl && key.name === 'c') { doneResolve(); return; }
     if (operation || closing) return; operation = true;
     try {
-      if (key.name === 'return' && state === 'READY' && validSize()) { await audio.setPaused(false); state = 'PLAYING'; force = true; }
+      if (key.name === 'return' && state === 'READY' && validSize()) { await setPaused(false); state = 'PLAYING'; force = true; }
       else if (key.name === 'space' && ['PLAYING', 'PAUSED'].includes(state) && validSize()) {
-        const pause = state === 'PLAYING'; await audio.setPaused(pause); state = pause ? 'PAUSED' : 'PLAYING'; resized = false;
-      } else if (options.rehearsal && ['left', 'right'].includes(key.name ?? '') && state !== 'READY' && state !== 'FINISHED') await seek(audio.clock.read() + (key.name === 'right' ? 5000 : -5000));
+        const pause = state === 'PLAYING'; await setPaused(pause); state = pause ? 'PAUSED' : 'PLAYING'; resized = false;
+      } else if (options.rehearsal && ['left', 'right'].includes(key.name ?? '') && state !== 'READY' && state !== 'FINISHED') await seek(playbackClock.read() + (key.name === 'right' ? 5000 : -5000));
       else if (options.rehearsal && ['up', 'down'].includes(key.name ?? '') && state !== 'READY' && state !== 'FINISHED') {
-        const playing = state === 'PLAYING'; await audio.setPaused(true); state = 'PAUSED'; offset += key.name === 'up' ? 20 : -20;
-        director.at(Math.max(0, story())); force = true; draw(); if (playing) { await audio.setPaused(false); state = 'PLAYING'; }
+        const playing = state === 'PLAYING'; await setPaused(true); state = 'PAUSED'; offset += key.name === 'up' ? 20 : -20;
+        director.at(Math.max(0, story())); force = true; draw(); if (playing) { await setPaused(false); state = 'PLAYING'; }
       } else if (options.rehearsal && ['[', ']'].includes(_text) && state !== 'READY' && state !== 'FINISHED') {
         const index = Math.max(0, film.lyrics.findLastIndex(l => l.startMs <= story()));
         const target = film.lyrics[clamp(index + (_text === ']' ? 1 : -1), 0, 92)].startMs + options.originMs - offset;
@@ -97,27 +111,37 @@ export async function play(film: Film, options: PlayOptions): Promise<void> {
   const onResize = async (): Promise<void> => {
     if (closing) return;
     try {
-      if (!validSize()) { if (state === 'PLAYING') await audio.setPaused(true); if (state !== 'READY') state = 'PAUSED'; resized = true; }
+      if (!validSize()) { if (state === 'PLAYING') await setPaused(true); if (state !== 'READY') state = 'PAUSED'; resized = true; }
       // Restoring a legal size never resumes playback on its own.
       force = true; draw();
     } catch (error) { doneReject(error as Error); }
   };
   const quit = (): void => { quitRequested = true; doneResolve(); };
   const wasRaw = process.stdin.isRaw;
-  const onEnded = (): void => { state = 'FINISHED'; force = true; draw(); if (!options.holdEnd) doneResolve(); };
+  const onEnded = (): void => {
+    if (state === 'SEEKING' || playbackClock.inTail) return;
+    playbackClock.startTail(audio.durationMs, options.speed, state !== 'PLAYING');
+    force = true; draw();
+  };
   try {
     process.on('SIGINT', quit); process.on('SIGTERM', quit);
     audio.on('failure', error => doneReject(error as Error)); audio.on('ended', onEnded);
     await Promise.race([audio.load(resolve(options.musicFile)), done.then(() => { if (quitRequested) throw quitToken; })]);
     if (quitRequested) return;
     if (Math.abs(audio.durationMs - film.durationMs) > 2500 || film.anchors.some(a => a.atMs > audio.durationMs)) throw new Error(tr(lang, 'error.duration'));
-    if (options.seekMs >= audio.durationMs) throw new Error(tr(lang, 'error.options', { detail: 'E_SEEK_RANGE' }));
+    if (options.seekMs >= film.presentationEndMs + options.originMs - offset) throw new Error(tr(lang, 'error.options', { detail: 'E_SEEK_RANGE' }));
     if (options.loop && options.loop.endMs > audio.durationMs - 250) throw new Error(tr(lang, 'error.loop'));
-    await audio.setSpeed(options.speed); if (options.seekMs > 0) await audio.seek(options.seekMs);
+    await audio.setSpeed(options.speed);
+    if (options.seekMs >= audio.durationMs) {
+      await audio.seek(audio.durationMs - 1); playbackClock.startTail(options.seekMs, options.speed, true);
+    } else if (options.seekMs > 0) await audio.seek(options.seekMs);
     terminal.begin(); emitKeypressEvents(process.stdin); process.stdin.setRawMode(true); process.stdin.resume();
     process.stdin.on('keypress', onKey); process.stdout.on('resize', onResize);
     draw(); interval = setInterval(() => {
-      if (options.loop && state === 'PLAYING' && !operation && audio.clock.read() >= options.loop.endMs) {
+      if (state === 'PLAYING' && playbackClock.inTail && story() >= film.presentationEndMs) {
+        playbackClock.pauseTail(true, options.speed); state = 'FINISHED'; force = true; draw();
+        if (!options.holdEnd) doneResolve();
+      } else if (options.loop && state === 'PLAYING' && !operation && audio.clock.read() >= options.loop.endMs) {
         operation = true;
         void seek(options.loop.startMs).catch(doneReject).finally(() => { operation = false; });
       } else draw();

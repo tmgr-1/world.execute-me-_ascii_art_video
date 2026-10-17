@@ -265,7 +265,7 @@ export function graphic(c: Canvas, world: World, lang: Language, r: Rect, t: num
     const rejected = world.state.denials.some(d => d.operation === 'root-request');
     const x = r.x + 6, y = r.y + 3;
     c.text(x, y, 'capability=ALL  →  role=ROOT', style(color.cyan, true), r.w - 12);
-    c.text(x, y + 3, 'request_role(me, ROOT)', style(color.dim), r.w - 12, 'api.root');
+    c.text(x, y + 3, 'request_role(me, ROOT)', style(color.cyan), r.w - 12, 'api.root');
     if (rejected) c.text(x, y + 5, 'ROOT: DENIED  ×', style(color.red, true), r.w - 12);
     if (t >= line(40)) {
       c.text(x, y + 8, 'required_proof: user.signature', style(color.dim), r.w - 12);
@@ -279,9 +279,9 @@ export function graphic(c: Canvas, world: World, lang: Language, r: Rect, t: num
     c.text(x, Math.min(y + 11, r.y + r.h - 2), '}', style(color.cyan)); activityTraces(c, world, r, t);
   } else if (scene === 'roles') {
     const task = [...world.state.tasks].reverse().find(task => task.program === 'role-swap');
-    c.text(r.x + 5, r.y + 3, 'source=internal   S ↔ M', style(color.dim));
+    c.text(r.x + 5, r.y + 3, 'source=internal   S ↔ M', style(color.cyan));
     const frames = task?.frames ?? [];
-    frames.slice(-Math.min(10, r.h - 10)).forEach((frame, i) => c.text(r.x + 7 + Math.min(i * 2, 14), r.y + 5 + i, `└─ ${frame.program}()  PC=${frame.instructionIndex}`, style(color.dim), r.w - 24));
+    frames.slice(-Math.min(10, r.h - 10)).forEach((frame, i) => c.text(r.x + 7 + Math.min(i * 2, 14), r.y + 5 + i, `└─ ${frame.program}()  PC=${frame.instructionIndex}`, style(color.cyan), r.w - 24));
     c.text(r.x + 5, r.y + r.h - 4, 'rx=0   return → retry()', style(color.dim));
     if (world.state.patch && t >= world.state.patch.createdAtMs) c.text(r.x + r.w - 35, r.y + r.h - 3, 'pending.patch  applied=0', style(color.gold), 33);
   } else if (scene === 'resonance' || scene === 'absence') {
@@ -296,6 +296,7 @@ export function graphic(c: Canvas, world: World, lang: Language, r: Rect, t: num
     c.text(r.x + 4, r.y + r.h - 7, `f=${Number(world.value('frequency')).toFixed(2)}  lock=0  rx=0`, style(color.gold));
     activityTraces(c, world, r, t);
     if (scene === 'absence') {
+      if (t >= film.lyrics[58].endMs) c.text(r.x + 4, r.y + 1, tr(lang, 'ui.search_alternative'), style(color.dim), r.w - 8, 'absence.search');
       const checked = Math.min(5, film.lyrics.slice(53, 58).filter(l => t >= l.startMs).length);
       c.text(r.x + r.w - 30, r.y + 4, ['connections', 'new_input', 'ack_delta', 'phase_lock', 'verification'].slice(0, checked).map(key => `${key}=0`).join(' '), style(color.dim), 27);
       for (let i = 0; i < checked; i++) c.text(r.x + r.w - 28, r.y + 4 + i * 2, `${['connections', 'new_input', 'ack_delta', 'phase_lock', 'verification'][i]}=0`, style(i === checked - 1 ? color.gold : color.dim));
@@ -310,14 +311,14 @@ export function graphic(c: Canvas, world: World, lang: Language, r: Rect, t: num
     else {
       const attempt = world.state.journal.findLast(e => e.kind === 'ILLEGAL_ATTEMPT');
       const denial = world.state.denials.at(-1);
-      if (attempt) c.text(r.x + 4, r.y + 3, String(attempt.payload.command), style(color.dim), r.w - 8);
+      if (attempt) c.text(r.x + 4, r.y + 3, String(attempt.payload.command), style(color.cyan), r.w - 8, 'api.attempt');
       if (denial) c.text(r.x + 4, r.y + 6, tr(lang, denial.key), style(color.red, true), r.w - 8);
       c.text(r.x + 4, r.y + r.h - 4, 'session=0    self.data=ERASED    runtime=RUNNING', style(color.dim), r.w - 8);
     }
     if (preview) {
       c.text(r.x + 4, r.y + 1, tr(lang, 'sim.delete_system'), style(color.cyan), r.w - 8, 'plan.declaration');
       c.fill({ x: r.x + 3, y: r.y + 2, w: r.w - 6, h: 1 }, ' ');
-      c.text(r.x + 4, r.y + 2, 'erase_system_root()   [PROTECTED]', style(color.dim));
+      c.text(r.x + 4, r.y + 2, 'erase_system_root()   [PROTECTED]', style(color.cyan), r.w - 8, 'api.delete');
       c.text(r.x + 4, r.y + r.h - 4, tr(lang, 'sim.delete_target'), style(color.cyan), r.w - 8, 'plan.target');
       c.text(r.x + 4, r.y + r.h - 3, `commit=0   ${tr(lang, 'ui.plan_pending')}`, style(color.gold), r.w - 8);
     }
@@ -330,6 +331,7 @@ export function graphic(c: Canvas, world: World, lang: Language, r: Rect, t: num
 export function hostView(c: Canvas, world: World, lang: Language, _layout: Layout, t: number): void {
   const archive = world.state.archive; if (!archive) throw new Error('E_ARCHIVE_MISSING');
   c.regions.set('system.console', { x: 0, y: 0, w: c.columns, h: c.rows });
+  if (t >= world.film.times.consoleReset && t < world.film.times.finalDelete) return;
   const fault = archive.fault;
   const format = (key: string): string => {
     if (key.startsWith('debug.stack.')) { const index = Number(key.split('.').at(-1)); return `#${index}  ${fault.stack[index]}`; }
@@ -350,14 +352,15 @@ export function hostView(c: Canvas, world: World, lang: Language, _layout: Layou
     }
   };
   const final = t >= world.film.times.finalDelete;
-  const records = world.state.host;
+  const records = t >= world.film.times.finalDelete ? world.state.host.filter(record => record.atMs >= world.film.times.finalDelete) : world.state.host;
   const rows = records.flatMap(record => {
     const text = format(record.key) + (record.key === 'host.delete' && world.state.lifecycle === 'PURGED' ? ' OK' : '');
-    return wrap(text, c.columns - 4).map(text => ({ text, key: record.key }));
+    const lines = wrap(text, c.columns - 4).map(text => ({ text, key: record.key }));
+    return record.key === 'host.next_test' ? [{ text: '', key: 'host.next_gap' }, ...lines] : lines;
   }).slice(-(c.rows - 3));
   rows.forEach((row, i) => {
     const error = ['debug.stack.0', 'debug.stop', 'debug.system', 'debug.minus'].includes(row.key);
-    const emphasis = ['debug.heading', 'debug.self', 'debug.exit', 'host.delete', 'host.deleted'].includes(row.key);
+    const emphasis = ['debug.heading', 'debug.self', 'debug.exit', 'host.delete', 'host.deleted', 'host.next_test'].includes(row.key);
     const fg = error ? color.red : row.key === 'debug.plus' ? color.green : emphasis ? color.text : color.dim;
     c.text(2, 1 + i, row.text, style(fg, error || emphasis), c.columns - 4, `console.${row.key}`);
   });

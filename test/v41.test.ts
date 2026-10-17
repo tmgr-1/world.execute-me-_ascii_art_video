@@ -32,26 +32,26 @@ test('continuous playback renders the actual wrapped tail of one event log throu
   }
 });
 
-test('message styles belong to the record; past gray messages survive the cyan transition and APIs remain gray', () => {
+test('message styles belong to the record; past gray messages survive the cyan transition and APIs follow ordinary cyan output', () => {
   const d = new Director(film), r = new Renderer(d), t = film.lyrics[32].startMs;
   const frame = r.frame(t + 50, small, 'cn');
-  for (const key of ['sim.complete', 'sim.feedback_timeout']) {
+  for (const key of ['sim.feedback_timeout', 'sim.reestimate']) {
     const cells = ink(frame, `chat.${key}`);
     assert.ok(cells.length && cells.every(cell => cell.fg === color.dim && !cell.bold));
   }
   const cyan = ink(frame, 'chat.sim.guess_eggplant');
   assert.ok(cyan.length && cyan.every(cell => cell.fg === color.cyan && !cell.bold));
   assert.equal(tr('cn', 'sim.guess_eggplant'), '需求假设：营养供给。');
-  assert.equal(d.world.state.chat.filter(item => ['sim.inspect_goal', 'sim.reestimate', 'sim.preview_candidates'].includes(item.key)).length, 0);
+  assert.equal(d.world.state.chat.filter(item => ['sim.inspect_goal', 'sim.preview_candidates'].includes(item.key)).length, 0);
   const gray = d.world.state.chat.find(item => item.key === 'sim.feedback_timeout')!;
   const recorded = messageStyle(gray, d.world);
   const later = d.at(film.times.intent - 1);
   assert.deepEqual(messageStyle(gray, later), recorded);
   for (const item of later.state.chat.filter(item => item.source === 'sim' && item.atMs >= t && !item.key.startsWith('sim.wait.'))) {
-    assert.deepEqual(messageStyle(item, later), { fg: item.key.startsWith('attempt.') ? color.dim : color.cyan, bg: 0, bold: false }, item.key);
+    assert.deepEqual(messageStyle(item, later), { fg: color.cyan, bg: 0, bold: false }, item.key);
   }
   const root = r.frame(film.lyrics[38].startMs + 400, small, 'en');
-  assert.ok(ink(root, 'api.root').every(cell => cell.fg === color.dim && !cell.bold));
+  assert.ok(ink(root, 'api.root').every(cell => cell.fg === color.cyan && !cell.bold));
 });
 
 test('user drafts, sent history and log requests are green; departure emphasis stays in User Input', () => {
@@ -61,7 +61,7 @@ test('user drafts, sent history and log requests are green; departure emphasis s
       const draft = r.frame(interaction.compose[lang].complete - 10, small, lang);
       const cells = ink(draft, 'input.draft');
       assert.ok(cells.length && cells.every(cell => cell.fg === color.green && !cell.bold));
-      const sent = r.frame(interaction.send + 1, small, lang);
+      const sent = r.frame(interaction.recordAtMs + 1, small, lang);
       for (const semantic of ['input.sent', `chat.${interaction.key}`]) {
         const cells = ink(sent, semantic);
         assert.ok(cells.length && cells.every(cell => cell.fg === color.green && !cell.bold));
@@ -143,7 +143,7 @@ test('six source-bound private copies wipe top-to-bottom; real bytes, validity, 
   assert.equal(done.state.lifecycle, 'RUNNING');
   for (const size of [small, { columns: 160, rows: 45 }, { columns: 220, rows: 60 }]) for (const lang of ['cn', 'en'] as const) {
     const main = layout(size).main;
-    for (const t of [film.lyrics[59].startMs + 100, 120340, 121800, 123300, film.times.selfErase + 1]) {
+    for (const t of [film.times.eraseBegin + 100, 120340, 121800, 123300, film.times.selfErase + 1]) {
       const frame = r.frame(t, size, lang);
       frame.cells.forEach((cell, n) => {
         if (cell.semantic?.startsWith('copy.') || cell.semantic?.startsWith('copies.')) assert.ok(inside(n % size.columns, Math.floor(n / size.columns), main));
@@ -176,23 +176,24 @@ test('Challenging your God traces a read-only authority chain and checks a draft
   assert.equal(d.at(film.times.executionStart).state.journal.findLast(event => event.kind === 'ILLEGAL_ATTEMPT')?.atMs, film.times.executionStart);
 });
 
-test('instrumental outro holds the complete host frame; the last sung Execution appends deletion with independent captions', () => {
+test('outro holds until debug closes; deletion is prepared on a fresh console before the last lyric', () => {
   for (const size of [small, { columns: 160, rows: 45 }, { columns: 220, rows: 60 }]) for (const lang of ['cn', 'en'] as const) {
     const d = new Director(film), r = new Renderer(d), story = layout(size).story;
     const hold = r.frame(film.times.outroHold, size, lang), fixed = crop(hold, story);
-    for (const t of [film.times.outroHold + 300, 198000, 203000, film.times.finalDelete - 1]) {
+    for (const t of [film.times.outroHold + 300, 198000, film.times.debugClose - 1]) {
       const frame = r.frame(t, size, lang);
       assert.deepEqual(crop(frame, story), fixed, `${t}: outro moved`);
       assert.ok(!frame.plain().includes(`DELETE ${image.path}`) && !ink(frame, 'console.cursor').length);
       assert.deepEqual(frame.plain().split('\n').slice(-2).map(s => s.trim()), subtitleLines(film, t, lang));
     }
     const last = r.frame(film.times.finalDelete, size, lang);
-    for (const text of ['exit_branch: NOT REACHED', '[FROZEN]', `DELETE ${image.path}`]) assert.ok(last.plain().includes(text));
-    assert.ok(ink(last, 'subtitle.original').map(cell => cell.g).join('').includes('Execution'));
+    assert.ok(last.plain().includes(image.path));
+    assert.ok(!last.plain().includes('exit_branch: NOT REACHED'));
+    assert.ok(ink(r.frame(film.times.finalExecution, size, lang), 'subtitle.original').map(cell => cell.g).join('').includes('Execution'));
     assert.equal(d.world.state.lifecycle, 'TERMINATED');
     assert.ok(r.frame(film.times.purge, size, lang).plain().includes('PROGRAM DELETED'));
     assert.equal(d.world.state.lifecycle, 'PURGED');
-    assert.ok(r.frame(film.times.blackout, size, lang).cells.every(cell => cell.g === ' '));
-    assert.ok(film.times.blackout < film.durationMs);
+    assert.ok(r.frame(film.times.consoleReset, size, lang).cells.every(cell => cell.g === ' '));
+    assert.ok(r.frame(film.presentationEndMs, size, lang).plain().includes('simtest_000329.elf'));
   }
 });

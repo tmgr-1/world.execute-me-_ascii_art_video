@@ -35,6 +35,7 @@ export class MpvTransport extends EventEmitter {
   private seeking = false;
   private closed = false;
   private ended = false;
+  private mediaPath = '';
   private timer?: NodeJS.Timeout;
   private diagnostics = '';
   private requests = new Map<number, { resolve: (value: unknown) => void; reject: (error: Error) => void; timer: NodeJS.Timeout; epoch: number }>();
@@ -59,7 +60,7 @@ export class MpvTransport extends EventEmitter {
       // Pause/speed transitions are published only together with a confirmed position.
     }
     if (reply.event === 'end-file') {
-      if (reply.reason === 'eof') { this.ended = true; if (this.timer) clearInterval(this.timer); this.position = this.durationMs; this.paused = true; this.publish(); this.emit('ended'); }
+      if (reply.reason === 'eof') { this.ended = true; this.position = this.durationMs; this.paused = true; this.publish(); this.emit('ended'); }
       else if (reply.reason === 'error') this.fail(new Error(`E_AUDIO_FAILED:${reply.file_error ?? 'decode'}`));
     }
     if (reply.event) this.emit(`mpv:${reply.event}`, reply);
@@ -87,6 +88,7 @@ export class MpvTransport extends EventEmitter {
     return { promise, cancel: stop };
   }
   async load(path: string): Promise<void> {
+    this.mediaPath = path;
     // mpv officially accepts an inherited duplex pipe as a JSON IPC client.
     // It is private to the child and works without listening on a filesystem socket.
     const inheritedPipe = process.platform !== 'win32';
@@ -135,13 +137,17 @@ export class MpvTransport extends EventEmitter {
       querying = true; const epoch = this.epoch;
       this.command(['get_property', 'time-pos']).then(value => {
         if (epoch === this.epoch && !this.seeking && typeof value === 'number') { this.position = value * 1000; this.publish(); }
-      }).catch(error => { if (!this.ended) this.fail(error as Error); }).finally(() => { querying = false; });
+      }).catch(error => { if (!this.ended && epoch === this.epoch && !this.seeking) this.fail(error as Error); }).finally(() => { querying = false; });
     }, 75);
   }
   async setPaused(paused: boolean): Promise<void> {
     await this.command(['set_property', 'pause', paused]);
     this.paused = Boolean(await this.command(['get_property', 'pause']));
-    this.position = Number(await this.command(['get_property', 'time-pos'])) * 1000; this.publish();
+    if (!this.ended) {
+      try { this.position = Number(await this.command(['get_property', 'time-pos'])) * 1000; }
+      catch (error) { if (!this.ended) throw error; }
+    }
+    this.publish();
   }
   async setSpeed(speed: number): Promise<void> {
     if (!Number.isFinite(speed) || speed < .25 || speed > 2) throw new Error('E_SPEED');
@@ -150,9 +156,17 @@ export class MpvTransport extends EventEmitter {
     this.position = Number(await this.command(['get_property', 'time-pos'])) * 1000; this.publish();
   }
   async seek(mediaMs: number): Promise<number> {
-    await this.setPaused(true); this.seeking = true; this.epoch++;
+    this.seeking = true; this.epoch++;
     const target = Math.max(0, Math.min(this.durationMs - 1, mediaMs));
     try {
+      await this.setPaused(true);
+      if (this.ended) {
+        // mpv is idle after EOF; reload the same local file before seeking.
+        const loaded = this.waitEvent('file-loaded');
+        try { await this.command(['loadfile', this.mediaPath, 'replace']); await loaded.promise; }
+        finally { loaded.cancel(); }
+        this.ended = false; this.paused = true;
+      }
       await this.command(['seek', target / 1000, 'absolute+exact']);
       const deadline = performance.now() + this.timeoutMs;
       do {
