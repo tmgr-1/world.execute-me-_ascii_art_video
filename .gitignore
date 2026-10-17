@@ -23,9 +23,8 @@ coverage/
 *.wma
 *.aiff
 
-# Keep the original root lyric file and the pending v3 design local
+# Keep the original root lyric file local
 /world.execute (me) ; - Mili.lyc
-/design/story_revision_v3_review.md
 
 # Local credentials, agent state, editor files and operating-system metadata
 .env
