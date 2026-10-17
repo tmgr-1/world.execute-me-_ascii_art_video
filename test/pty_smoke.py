@@ -32,7 +32,8 @@ try:
  while '按回车开始'.encode() not in output and time.monotonic()<deadline and process.poll() is None:drain(.1)
  assert '按回车开始'.encode() in output,output.decode(errors='replace')[-1500:]
  os.write(master,b'\r');drain(1.1)
- assert b'PROCESS_TERMINATED' in output,'Termination foreground not submitted.'
+ assert b'simtest_000328.elf' in output and b'GUARD' in output,'Termination foreground not submitted.'
+ assert b'lyric.76' not in output,'Rehearsal annotation restored readable text during full-screen corruption.'
  os.write(master,b' ');drain(.1)
  resize(100,30);os.kill(process.pid,signal.SIGWINCH);drain(.2)
  assert '终端至少需要'.encode() in output,'Small terminal slate not submitted.'
@@ -44,7 +45,7 @@ try:
  assert b'\x1b[?1049h' in output and b'\x1b[?1049l' in output,'Alternate screen not restored.'
  assert termios.tcgetattr(slave)==before,'Raw input flags not restored.'
  events=json.loads((destination/'events.json').read_text())
- assert sum(event['kind']=='rx' for event in events)==8,'Requests duplicated after seek.'
+ assert sum(event['kind']=='rx' for event in events)==9,'Requests duplicated after seek.'
  assert sum(event['kind']=='CLOSE' for event in events)==1,'Close duplicated.'
  destination.mkdir(parents=True,exist_ok=True)
  (destination/'terminal.ansi').write_bytes(output)
@@ -61,7 +62,7 @@ try:
  assert '内存'.encode() in output and b'revision=' in output,'Full-screen side panels clipped beyond the reference viewport.'
  resize(240,64);os.kill(process.pid,signal.SIGWINCH);drain(2);process.wait(timeout=5)
  assert process.returncode==1
- assert b'\x1b[?1049l' in output and b'PROCESS_TERMINATED' not in output
+ assert b'\x1b[?1049l' in output and b'PROTECTED_SYSTEM_DELETE' not in output
  assert termios.tcgetattr(slave)==before
  print('PTY player-failure case passed: full-screen panels at 220x60 / 240x64, real ERROR, no story termination, terminal restored.')
  # Short rehearsal loops must actually seek the media and rebuild one request

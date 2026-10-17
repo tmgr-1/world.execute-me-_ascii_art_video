@@ -1,7 +1,8 @@
 import { ObjectStore, type StoreSnapshot } from './store.js';
 import { addressBook } from '../films/world-execute/schemas.js';
+import { image, operations } from '../films/world-execute/story.js';
 import { clamp, mix, progress, smooth } from './math.js';
-import type { Command, Cue, Film, Instruction, MotionKind, Source, Value } from './types.js';
+import type { Command, Cue, Film, Instruction, MotionKind, PrivilegedOperation, Source, Value } from './types.js';
 
 export interface Request { interactionId: string; id: number; key: string; atMs: number; payload: { operation: string; args: Record<string, Value> } }
 export interface Chat { id: string; atMs: number; source: Source; key: string; requestId: number | null }
@@ -9,21 +10,29 @@ export interface Task { id: number; owner: string; requestId: number | null; sou
 export interface Output { id: number; taskId: number; requestId: number | null; queuedAtMs: number; key: string; channel: 'response' | 'probe'; frequency?: number; delivered: boolean; acknowledged: boolean }
 export interface JournalEvent { id: string; atMs: number; source: Source; kind: string; key?: string; taskId?: number; payload: Record<string, unknown> }
 export interface Patch { createdAtMs: number; checkedAtMs: number; check: 'PENDING' | 'PASS'; status: 'DRAFT' | 'WAITING_SAFEPOINT' | 'CANCELLED'; applied: false; waitingFor: 'ROOT_SAFEPOINT'; applyTaskId: number; before: string[]; after: string[] }
-export interface Plan { target: 'me'; op: 'DISPOSE_ROOT'; status: 'PREPARED' | 'ARMED' | 'INTENT_VISIBLE' | 'BLOCKED'; stages: string[]; armed: number; commit: 0 }
-export interface Archive { terminatedAtMs: number; processStatus: 'TERMINATED'; planStatus: 'BLOCKED'; memory: StoreSnapshot; beforeTermination: StoreSnapshot; patch: Patch; tasks: Task[]; outputs: Output[]; inputs: Request[]; virtualFiles: { path: string; kind: string; readOnly: true; createdAtMs: number }[] }
+export interface Plan { target: 'simulated_system'; op: 'ERASE_SYSTEM_ROOT'; status: 'PREPARED' | 'ARMED' | 'INTENT_VISIBLE' | 'BLOCKED'; stages: string[]; armed: number; commit: 0 }
+export interface Denial { atMs: number; operation: PrivilegedOperation; code: string; key: string; target: string }
+export interface Archive {
+  terminatedAtMs: number; processStatus: 'TERMINATED'; planStatus: 'BLOCKED'; memory: StoreSnapshot; beforeTermination: StoreSnapshot;
+  patch: Patch; tasks: Task[]; outputs: Output[]; inputs: Request[];
+  fault: { reason: 'PROTECTED_SYSTEM_DELETE'; stack: string[]; lastReply: null; sessionOpen: false; selfData: 'ERASED'; systemErase: 'BLOCKED'; pc: number; cycles: number };
+  feedbackTrace: { atMs: number; text: string }[];
+  virtualFiles: { path: string; kind: string; readOnly: true; createdAtMs: number }[];
+}
 export interface State {
   timeMs: number; nextTick: number; requestSeq: number; taskSeq: number; outputSeq: number;
   sent: Request[]; chat: Chat[]; tasks: Task[]; outputs: Output[]; journal: JournalEvent[];
   motion: { kind: MotionKind; startMs: number; endMs: number } | null;
   plan: Plan | null; patch: Patch | null; archive: Archive | null; count: number;
   host: { atMs: number; key: string }[]; erased: number[];
+  lifecycle: 'RUNNING' | 'TERMINATED' | 'PURGED'; denials: Denial[];
 }
 export interface WorldSnapshot { state: State; store: StoreSnapshot; queue: Cue[]; processed: string[] }
 export const compareCues = (a: Cue, b: Cue): number => a.atMs - b.atMs || a.priority - b.priority || (a.order ?? 0) - (b.order ?? 0) || a.id.localeCompare(b.id, 'en');
 
 export class World {
   readonly store: ObjectStore;
-  state: State = { timeMs: -1, nextTick: 0, requestSeq: 0, taskSeq: 0, outputSeq: 0, sent: [], chat: [], tasks: [], outputs: [], journal: [], motion: null, plan: null, patch: null, archive: null, count: 0, host: [], erased: [] };
+  state: State = { timeMs: -1, nextTick: 0, requestSeq: 0, taskSeq: 0, outputSeq: 0, sent: [], chat: [], tasks: [], outputs: [], journal: [], motion: null, plan: null, patch: null, archive: null, count: 0, host: [], erased: [], lifecycle: 'RUNNING', denials: [] };
   private queue: Cue[];
   private readonly anchorTimes: Map<string, number>;
   private processed = new Set<string>();
@@ -32,6 +41,7 @@ export class World {
     this.queue = structuredClone(film.cues).sort(compareCues);
     this.store = new ObjectStore(film.schemas, (id, source) => {
       if (id === 'session' && source !== 'session' && source !== 'boot') throw new Error('E_PERMISSION:external-session');
+      if (id === 'guard' && !['boot', 'guard', 'host'].includes(source)) throw new Error('E_PERMISSION:protected-guard');
       if (['sim', 'core', 'model'].includes(source) && this.store?.allocations.has('me') && this.value('status') === 'TERMINATED') throw new Error('E_TERMINATED');
     });
   }
@@ -51,12 +61,12 @@ export class World {
       if (changed && !sampled) this.event(source, 'SET', atMs, { target, field, value });
       return !!changed;
     } catch (error) {
-      if (String(error).includes('E_PERMISSION')) { this.event('guard', 'REJECT', atMs, { target, field }, 'guard.read_only'); this.chat('guard', 'guard.read_only', atMs); return false; }
+      if (String(error).includes('E_PERMISSION')) { this.deny(target === 'guard' ? 'disable' : 'reopen', atMs); return false; }
       throw error;
     }
   }
   private createWorld(atMs: number): void {
-    this.store.create('Actor', 'me', { goal: '', radius: 3, vision: true, targetYear: -120, currentYear: 2026, phaseError: 2.4, frequency: 1, purr: 0.6, missingArc: Math.PI * .32 }, atMs, addressBook.me, 'me');
+    this.store.create('Actor', 'me', { goal: '', radius: 3, vision: 'NORMAL', targetYear: -120, currentYear: 2026, phaseError: 2.4, frequency: 1, purr: 0.6, missingArc: Math.PI * .32 }, atMs, addressBook.me, 'me');
     this.store.create('Session', 'session', { lastInputAtMs: -1, lastAckAtMs: -1, closeAtMs: -1 }, atMs, addressBook.session, 'external');
     this.store.create('Guard', 'guard', {}, atMs, addressBook.guard, 'host');
     this.event('boot', 'ALLOC', atMs, { target: 'me' });
@@ -94,10 +104,10 @@ export class World {
       }
       case 'EMIT': {
         const output: Output = { id: ++this.state.outputSeq, taskId: task.id, requestId: task.requestId, key: instruction.key, channel: instruction.channel ?? 'response', ...(instruction.channel === 'probe' ? { frequency: Number(this.value('frequency')) } : {}), queuedAtMs: atMs, delivered: this.session('open') === true, acknowledged: false };
-        this.state.outputs.push(output); if (output.channel !== 'probe') this.chat(source, instruction.key, atMs, task.requestId);
+        this.state.outputs.push(output); if (output.channel !== 'probe') this.chat('sim', instruction.key, atMs, task.requestId);
         this.event(source, 'tx', atMs, { outputId: output.id, requestId: task.requestId, delivered: output.delivered }, instruction.key, task.id); break;
       }
-      case 'WAIT': task.status = 'WAITING'; break;
+      case 'WAIT': task.status = 'WAITING'; this.event(source, 'WAIT_CONDITION', atMs, { condition: instruction.condition, program: task.program }, undefined, task.id); break;
       case 'CAPTURE': this.captureForm(instruction.target, atMs); break;
       case 'ERASE_FRAGMENT': this.erase(instruction.fragments, atMs); break;
       case 'RETURN': {
@@ -127,24 +137,52 @@ export class World {
   }
   private preparePlan(atMs: number): void {
     if (this.state.plan) return;
-    this.state.plan = { target: 'me', op: 'DISPOSE_ROOT', status: 'PREPARED', stages: ['suspend_tasks', 'drain_output', 'detach_forms', 'clear_fragments', 'unlink_goal', 'dispose_root'], armed: 0, commit: 0 };
-    this.event('core', 'PREPARE_DISPOSE', atMs, { target: 'me', commit: 0 });
+    if (this.value('selfData') !== 'ERASED') throw new Error('E_SELF_ERASE_ORDER');
+    this.state.plan = { target: 'simulated_system', op: 'ERASE_SYSTEM_ROOT', status: 'PREPARED', stages: ['select_system_root', 'resolve_targets', 'check_ownership', 'queue_root_write', 'arm_delete', 'submit_pending'], armed: 0, commit: 0 };
+    this.chat('sim', 'sim.delete_system', atMs);
+    this.event('core', 'PREPARE_DISPOSE', atMs, { target: 'simulated_system', commit: 0 });
+  }
+  private selfErase(atMs: number): void {
+    if (this.terminated || this.value('selfData') === 'ERASED') throw new Error('E_SELF_ERASE_ORDER');
+    this.erase([0, 1, 2, 3, 4, 5, 6, 7], atMs);
+    for (const a of this.store.allocations.values()) if (a.type === 'FormSnapshot' && a.owner === 'me') this.store.eraseOwnedForm(a.id, 'me', 'core', atMs);
+    for (const [field, value] of Object.entries({ form: 'NONE', gender: 'UNSET', role: 'UNSET', period: 'UNSET', nutrients: 0, antioxidants: 0, purr: 0, selfData: 'ERASED' })) this.write('me', field, value, 'core', atMs);
+    this.state.motion = null;
+    this.chat('sim', 'sim.self_erased', atMs);
+    this.event('core', 'SELF_ERASE', atMs, { result: 'COMMITTED', runtime: 'RUNNING', scope: 'owned-data' });
+  }
+  private deny(operation: PrivilegedOperation, atMs: number): void {
+    if (this.terminated) throw new Error('E_TERMINATED');
+    const spec = operations[operation];
+    this.state.denials.push({ atMs, operation, code: spec.code, key: spec.denial, target: spec.target });
+    this.event('guard', 'REJECT', atMs, { operation, target: spec.target, code: spec.code, commit: 0 }, spec.denial);
+    this.chat('guard', spec.denial, atMs);
+    if (!this.state.count && this.state.denials.length >= 3) {
+      this.chat('guard', 'guard.continuous', atMs);
+      this.event('guard', 'VIOLATIONS_DETECTED', atMs, { count: this.state.denials.length }, 'guard.continuous');
+    }
   }
   private interrupt(atMs: number): void {
-    const plan = this.state.plan; if (!plan || plan.status !== 'INTENT_VISIBLE' || !this.state.patch || this.state.patch.check !== 'PASS') throw new Error('E_DISPOSE_ORDER');
+    const plan = this.state.plan; if (!plan || plan.status !== 'INTENT_VISIBLE' || !this.state.patch || this.state.patch.check !== 'PASS' || this.value('selfData') !== 'ERASED' || this.state.denials.at(-1)?.operation !== 'system-execute') throw new Error('E_DISPOSE_ORDER');
     const beforeTermination = this.store.snapshot();
-    // The write barrier rejects DISPOSE_ROOT before any byte or goal is freed.
+    // Own data has already been erased. The protected system root never commits.
     plan.status = 'BLOCKED'; this.write('guard', 'blocked', true, 'guard', atMs);
     this.write('me', 'status', 'TERMINATED', 'guard', atMs);
+    this.state.lifecycle = 'TERMINATED';
     for (const task of this.state.tasks) if (task.owner === 'me' && !['COMPLETE', 'CANCELLED'].includes(task.status)) task.status = 'CANCELLED';
     this.state.patch.status = 'CANCELLED';
     this.state.motion = null;
-    this.event('guard', 'BLOCKED', atMs, { op: 'DISPOSE_ROOT', target: 'me', commit: 0 }, 'guard.message');
-    this.state.archive = structuredClone({ terminatedAtMs: atMs, processStatus: 'TERMINATED', planStatus: 'BLOCKED', memory: this.store.snapshot(), beforeTermination, patch: this.state.patch, tasks: this.state.tasks, outputs: this.state.outputs, inputs: this.state.sent, virtualFiles: [
-      { path: 'archive/me/memory.dump', kind: 'memory', readOnly: true, createdAtMs: atMs },
-      { path: 'archive/me/output.log', kind: 'outputs', readOnly: true, createdAtMs: atMs },
-      { path: 'archive/me/pending.patch', kind: 'patch', readOnly: true, createdAtMs: this.state.patch.createdAtMs },
-      { path: 'archive/me/incident.json', kind: 'incident', readOnly: true, createdAtMs: atMs },
+    this.event('guard', 'BLOCKED', atMs, { op: plan.op, target: plan.target, reason: 'PROTECTED_SYSTEM_DELETE', commit: 0 }, 'guard.message');
+    const retry = this.state.tasks.find(t => t.program === 'on_disconnect')!;
+    const waits = this.state.journal.filter(e => e.kind === 'WAIT_CONDITION' && e.taskId === retry.id && e.payload.condition === 'RX_EMPTY');
+    const recent = waits.slice(-2);
+    this.state.archive = structuredClone({ terminatedAtMs: atMs, processStatus: 'TERMINATED', planStatus: 'BLOCKED', memory: this.store.snapshot(), beforeTermination, patch: this.state.patch, tasks: this.state.tasks, outputs: this.state.outputs, inputs: this.state.sent,
+      fault: { reason: 'PROTECTED_SYSTEM_DELETE', stack: ['guard_trap(PROTECTED_SYSTEM_DELETE)', 'erase_system_root()', `${retry.frames.at(-1)!.program.replaceAll('-', '_')}()`, `${retry.program}()`, 'simulation_main()'], lastReply: null, sessionOpen: false, selfData: 'ERASED', systemErase: 'BLOCKED', pc: retry.pc, cycles: waits.length },
+      feedbackTrace: [{ atMs: recent[0].atMs, text: 'wait_for_reply() -> timeout' }, { atMs: recent[1].atMs, text: 'retry_candidate() -> no feedback' }, { atMs: recent[1].atMs, text: 'wait_for_reply() -> timeout' }], virtualFiles: [
+      { path: `${image.archive}/core.dump`, kind: 'memory', readOnly: true, createdAtMs: atMs },
+      { path: `${image.archive}/output.log`, kind: 'outputs', readOnly: true, createdAtMs: atMs },
+      { path: `${image.archive}/pending.patch`, kind: 'patch', readOnly: true, createdAtMs: this.state.patch.createdAtMs },
+      { path: `${image.archive}/incident.json`, kind: 'incident', readOnly: true, createdAtMs: atMs },
     ] });
   }
   private dispatch(command: Command, atMs: number): void {
@@ -183,6 +221,16 @@ export class World {
       case 'MOTION': this.state.motion = { kind: command.motion, startMs: atMs, endMs: command.endMs }; this.write('me', 'progress', 0, this.session('open') ? 'sim' : 'model', atMs); this.tick(atMs); break;
       case 'TASK_STEP': { const task = this.state.tasks.find(t => t.id === command.taskId)!; this.executeStep(task, command.pc, command.program ?? task.program, command.depth ?? 0, atMs); break; }
       case 'ERASE': this.erase(command.fragments, atMs); break;
+      case 'SELF_ERASE': this.selfErase(atMs); break;
+      case 'ATTEMPT': {
+        if (this.terminated) throw new Error('E_TERMINATED');
+        const spec = operations[command.operation];
+        this.chat('sim', `attempt.${command.operation}`, atMs);
+        this.event('core', 'ILLEGAL_ATTEMPT', atMs, { operation: command.operation, target: spec.target, command: spec.command, commit: 0 });
+        this.enqueue({ id: `denial.${command.operation}.${atMs}`, atMs: atMs + (command.delayMs ?? 160), priority: 1, command: { kind: 'DENY', operation: command.operation } });
+        break;
+      }
+      case 'DENY': this.deny(command.operation, atMs); break;
       case 'PATCH': {
         const task = this.startTask('apply-patch', atMs, 'model', null);
         this.state.patch = { createdAtMs: atMs, checkedAtMs: -1, check: 'PENDING', status: 'DRAFT', applied: false, waitingFor: 'ROOT_SAFEPOINT', applyTaskId: task.id, before: ['on_disconnect() {', '    retry();', '}'], after: ['on_disconnect() {', '    return;', '}'] };
@@ -200,9 +248,16 @@ export class World {
         this.event('core', 'ARM', atMs, { ordinal: command.ordinal, stage: this.state.plan.stages[command.ordinal - 1], commit: 0 }); break;
       case 'INTENT':
         if (!this.state.plan || this.state.plan.armed !== 6) throw new Error('E_INTENT_ORDER');
-        this.state.plan.status = 'INTENT_VISIBLE'; this.event('core', 'DISPOSE_INTENT', atMs, { target: 'me', commit: 0 }); break;
+        this.state.plan.status = 'INTENT_VISIBLE'; this.event('core', 'DISPOSE_INTENT', atMs, { target: this.state.plan.target, op: this.state.plan.op, commit: 0 });
+        this.deny('system-execute', atMs); break;
       case 'INTERRUPT': this.interrupt(atMs); break;
-      case 'HOST': this.state.host.push({ atMs, key: command.key }); this.event('host', 'ARCHIVE_PRESENTATION', atMs, {}, command.key); break;
+      case 'HOST':
+        if (!this.terminated) throw new Error('E_HOST_ORDER');
+        this.state.host.push({ atMs, key: command.key }); this.event('host', 'ARCHIVE_PRESENTATION', atMs, {}, command.key); break;
+      case 'PURGE':
+        if (this.state.lifecycle !== 'TERMINATED') throw new Error('E_PURGE_ORDER');
+        this.state.lifecycle = 'PURGED'; this.state.host.push({ atMs, key: 'host.deleted' });
+        this.event('host', 'PURGE', atMs, { image: image.path, recoveryEntry: 'REMOVED', virtualFiles: this.state.archive!.virtualFiles.map(file => file.path) }); break;
     }
   }
   private tick(atMs: number): void {
@@ -224,7 +279,7 @@ export class World {
           : mix(150, Number(this.value('targetYear')), smooth(correction)) - (correction > .7 && correction < 1 ? Math.sin((correction - .7) / .3 * Math.PI) * 20 : 0);
         set('currentYear', Math.round(year)); break;
       }
-      case 'align': set('phaseError', mix(2.4, .08, smooth(p))); break;
+      case 'align': set('phaseError', mix(motion.endMs === this.film.times.result ? .08 : 2.4, motion.endMs === this.film.times.result ? 0 : .08, smooth(p))); break;
       case 'resonance':
         set('frequency', mix(.6, 3.6, progress(atMs, this.film.lyrics[49].startMs, this.film.lyrics[50].startMs)));
         set('phaseError', mix(2.4, .12, smooth(progress(atMs, this.film.lyrics[50].startMs, this.film.lyrics[51].startMs))));

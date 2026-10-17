@@ -27,6 +27,7 @@ export type Instruction =
 export interface Program { id: string; steps: { offsetMs: number; instruction: Instruction }[] }
 export type MotionKind = 'points' | 'circle' | 'tangent' | 'infinity' | 'current' | 'time' | 'align'
   | 'eggplant' | 'tomato' | 'cat' | 'world' | 'identity' | 'roles' | 'resonance' | 'retry';
+export type PrivilegedOperation = 'root-request' | 'root' | 'reopen' | 'inject' | 'disable' | 'erase-preflight' | 'arm-preflight' | 'system-execute';
 export type Command =
   | { kind: 'CREATE_WORLD' }
   | { kind: 'SET'; target: string; field: string; value: Value; source?: Source }
@@ -39,14 +40,18 @@ export type Command =
   | { kind: 'MOTION'; motion: MotionKind; endMs: number }
   | { kind: 'TASK_STEP'; taskId: number; pc: number; program?: string; depth?: number }
   | { kind: 'ERASE'; fragments: number[] }
+  | { kind: 'SELF_ERASE' }
+  | { kind: 'ATTEMPT'; operation: PrivilegedOperation; delayMs?: number }
+  | { kind: 'DENY'; operation: PrivilegedOperation }
   | { kind: 'PATCH' } | { kind: 'PATCH_CHECK' } | { kind: 'PREPARE_DISPOSE' }
   | { kind: 'ARM'; ordinal: number } | { kind: 'INTENT' } | { kind: 'INTERRUPT' }
-  | { kind: 'HOST'; key: string };
+  | { kind: 'HOST'; key: string } | { kind: 'PURGE' };
 export interface Cue { id: string; atMs: number; priority: number; order?: number; command: Command }
 export interface Scene { id: string; number: number; startMs: number; endMs: number }
 export interface Film {
   id: string; version: string; durationMs: number; audioSha256: string; originAudioMs: number;
   defaultSeed: number; anchors: Anchor[]; lyrics: Lyric[]; interactions: Interaction[];
   programs: Program[]; cues: Cue[]; scenes: Scene[]; schemas: Schema[];
-  times: { intro: number; close: number; intent: number; interrupt: number; holdEnd: number; patch: number; counts: number[] };
+  times: { intro: number; close: number; intent: number; interrupt: number; holdEnd: number; patch: number; counts: number[];
+    result: number; selfErase: number; deletionAnnouncement: number; finalDelete: number; purge: number; blackout: number };
 }

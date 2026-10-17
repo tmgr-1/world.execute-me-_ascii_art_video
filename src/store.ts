@@ -100,6 +100,19 @@ export class ObjectStore {
     a.missing.push({ offset, length });
     this.changes.set(`${id}:erase:${offset}`, { objectId: id, field: 'fragments', atMs, address: a.address + offset, size: length, before: null, after: 0, erased: true });
   }
+  eraseOwnedForm(id: string, owner: string, source: Source, atMs: number): void {
+    this.authorize(id, source);
+    const a = this.allocation(id);
+    if (a.type !== 'FormSnapshot' || a.owner !== owner) throw new Error('E_PERMISSION:SELF_ERASE');
+    // Destruction of an owned snapshot does not grant write access to external objects.
+    for (const f of this.layouts.get(a.type)!.fields) if (typeof f.type === 'object' && 'stringRef' in f.type) {
+      const ref = this.bytes.readUInt32LE(a.address - this.base + f.offset), length = this.strings.get(ref);
+      if (length !== undefined) { this.bytes.fill(0, ref - this.base, ref - this.base + length); this.strings.delete(ref); }
+    }
+    this.bytes.fill(0, a.address - this.base, a.address - this.base + a.size);
+    a.missing = [{ offset: 0, length: a.size }];
+    this.changes.set(`${id}:SELF_ERASE`, { objectId: id, field: 'SELF_ERASE', atMs, address: a.address, size: a.size, before: id, after: null, erased: true });
+  }
   private writeValue(type: FieldType, offset: number, value: Value): void {
     if (typeof type === 'string') {
       if (type === 'bool') { if (typeof value !== 'boolean') throw new Error('E_BOOL'); this.bytes.writeUInt8(value ? 1 : 0, offset); return; }

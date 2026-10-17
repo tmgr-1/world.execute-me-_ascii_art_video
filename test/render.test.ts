@@ -29,7 +29,7 @@ for (const size of [{ columns: 130, rows: 35 }, { columns: 160, rows: 45 }]) for
     for (const dt of [1, 250, 1500, 2999]) assert.equal(renderer.frame(film.times.interrupt + dt, size, lang).hash(), first.hash());
     assert.equal(new Renderer(new Director(film)).frame(film.times.interrupt + 1500, size, lang).hash(), first.hash());
     assert.notEqual(renderer.frame(film.times.holdEnd, size, lang).hash(), first.hash());
-    assert.equal(renderer.frame(film.lyrics[92].startMs, size, lang).hash(), renderer.frame(film.durationMs, size, lang).hash());
+    assert.ok(renderer.frame(film.durationMs, size, lang).cells.every(cell => cell.g === ' '));
   });
 }
 test('the six words have independent assets and retain all six language sources', () => {
@@ -38,11 +38,35 @@ test('the six words have independent assets and retain all six language sources'
   const frame = new Renderer(new Director(film)).frame(film.times.counts[5] + 20, { columns: 160, rows: 45 }, 'en');
   for (const language of ['de','es','fr','ko','sv','zh']) assert.ok(frame.cells.some(c => c.language === language && c.g.trim()), language);
 });
-test('the root and disposal target remain readable for over three seconds before counting', () => {
+test('the complete Chinese title stays on one line at native size with both background borders intact', () => {
+  const cases = [
+    { columns: 130, rows: 35, asset: '程序已被终止.compact', w: 125, h: 12 },
+    { columns: 160, rows: 45, asset: '程序已被终止', w: 154, h: 14 },
+    { columns: 220, rows: 60, asset: '程序已被终止.large', w: 214, h: 18 },
+    { columns: 240, rows: 64, asset: '程序已被终止.large', w: 214, h: 18 },
+    { columns: 280, rows: 64, asset: '程序已被终止.xlarge', w: 250, h: 20 },
+  ] as const;
+  for (const size of cases) {
+    const renderer = new Renderer(new Director(film)), before = renderer.frame(film.times.interrupt - 1, size, 'cn');
+    const frame = renderer.frame(film.times.interrupt, size, 'cn'), panel = modalRect(size);
+    const title = frame.regions.get('word-art.程序已被终止')!;
+    assert.equal(panel.x, 1); assert.equal(panel.w, size.columns - 2);
+    assert.ok(title.x >= panel.x + 1 && title.x + title.w <= panel.x + panel.w - 1);
+    assert.equal(title.w, size.w); assert.equal(title.h, size.h);
+    const expectedInk = glyphs[size.asset].bitmap.join('').split('#').length - 1;
+    assert.equal(frame.cells.filter(cell => cell.semantic === 'word-art.程序已被终止').length, expectedInk, 'title strokes were clipped or resampled');
+    assert.ok(!frame.regions.has('word-art.程序') && !frame.regions.has('word-art.已被终止'));
+    for (let y = 0; y < size.rows; y++) for (const x of [0, size.columns - 1]) assert.deepEqual(frame.get(x, y), before.get(x, y));
+    assert.deepEqual(frame.validate(), []);
+  }
+});
+test('the system deletion target and declaration stay readable for over three seconds before counting', () => {
   const r = new Renderer(new Director(film));
-  for (const t of [film.times.counts[0] - 4000, film.times.counts[0] - 1000]) {
+  assert.ok(film.times.counts[0] - film.times.deletionAnnouncement >= 3000);
+  for (const t of [film.times.deletionAnnouncement + 1, film.times.counts[0] - 1000]) {
     const frame = r.frame(t, { columns: 130, rows: 35 }, 'cn').plain();
-    assert.ok(frame.includes('dispose(me)')); assert.ok(frame.includes('me  0x00401000')); assert.ok(frame.includes('me.circle'));
+    assert.ok(frame.includes('正在删除系统')); assert.ok(frame.includes('整个模拟系统，包括我自己'));
+    assert.ok(frame.includes('erase_system_root()')); assert.ok(frame.includes('simulated_system / [PROTECTED]'));
   }
 });
 test('damage and canonical flashback frames reproduce after forward and reverse seeks', () => {

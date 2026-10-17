@@ -55,7 +55,9 @@ export async function play(film: Film, options: PlayOptions): Promise<void> {
       else if (state === 'READY') frame = renderer.slate(dimensions, lang, 'app.ready', options.rehearsal ? tr(lang, 'app.rough') : '');
       else {
         frame = renderer.frame(t, dimensions, lang);
-        if (options.rehearsal && !(t >= film.times.interrupt && t < film.times.holdEnd) && t < film.lyrics[92].startMs) {
+        // Rehearsal annotations must not restore a clean row during corruption
+        // or reintroduce the film UI after the host has taken over.
+        if (options.rehearsal && t < film.times.counts[0]) {
           const lyric = [...film.lyrics].reverse().find(l => l.startMs <= t);
           frame.fill({ x: 0, y: dimensions.rows - 1, w: dimensions.columns, h: 1 });
           frame.text(2, dimensions.rows - 1, `${timeCode(t)}  offset=${offset}ms  lyric.${String(lyric?.number ?? 1).padStart(2, '0')}  ${lyric?.text ?? ''}`, { fg: 244 }, dimensions.columns - 4);

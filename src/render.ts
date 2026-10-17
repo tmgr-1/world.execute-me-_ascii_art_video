@@ -7,6 +7,15 @@ import { filmViews } from './view-registry.js';
 import { Director, type World } from './world.js';
 import type { Film, Language, Rect, Size } from './types.js';
 import glyphs from '../films/world-execute/assets/glyphs.json' with { type: 'json' };
+import { countLanguages, countText, image } from '../films/world-execute/story.js';
+
+const glyphVariants = new Map<string, { bitmap: string[]; w: number; h: number }[]>();
+for (const asset of Object.values(glyphs)) {
+  const variants = glyphVariants.get(asset.sourceText) ?? [];
+  variants.push({ bitmap: asset.bitmap, w: asset.bitmap[0].length, h: asset.bitmap.length });
+  variants.sort((a, b) => b.w - a.w);
+  glyphVariants.set(asset.sourceText, variants);
+}
 
 export interface Layout { top: Rect; chat: Rect; simulation: Rect; input: Rect; status: Rect; main: Rect; side: Rect; inputRows: 6 | 7 }
 export function layout(size: Size): Layout {
@@ -19,7 +28,6 @@ export function layout(size: Size): Layout {
     input: { x: 0, y: simY + simH, w: size.columns, h: inputRows + 2 }, status: { x: 0, y: size.rows - 2, w: size.columns, h: 2 }, inputRows };
 }
 const labelKey: Record<string, string> = { memory: 'ui.memory', wait: 'ui.wait', task: 'ui.tasks', log: 'ui.log', input: 'ui.input', stack: 'ui.stack', output: 'ui.output', state: 'ui.state' };
-const countLanguages = ['de', 'es', 'fr', 'ko', 'sv', 'zh'];
 const labelSteps: Record<string, number> = { task: 1, log: 2, input: 2, memory: 3, stack: 4, wait: 4, state: 5, output: 6 };
 function label(world: World, lang: Language, key: string): { text: string; language: string } {
   const step = labelSteps[key];
@@ -30,19 +38,23 @@ function title(c: Canvas, r: Rect, world: World, lang: Language, semantic: strin
   const l = label(world, lang, semantic); c.box(r, l.text, color.faint, semantic, l.language);
 }
 export function wordArt(c: Canvas, word: string, rect: Rect, fg: number, bg = color.bg): void {
-  const asset = glyphs[word as keyof typeof glyphs]; if (!asset) throw new Error(`E_GLYPH:${word}`);
-  const source = asset.bitmap, sourceW = Math.max(...source.map(r => r.length)), sourceH = source.length;
+  const variants = glyphVariants.get(word);
+  const asset = variants?.find(asset => asset.w <= rect.w && asset.h <= rect.h) ?? variants?.at(-1);
+  if (!asset) throw new Error(`E_GLYPH:${word}`);
+  const source = asset.bitmap, sourceW = asset.w, sourceH = asset.h;
   const factor = Math.min(1, rect.w / sourceW, rect.h / sourceH), w = Math.max(1, Math.round(sourceW * factor)), h = Math.max(1, Math.round(sourceH * factor));
   const x0 = rect.x + Math.floor((rect.w - w) / 2), y0 = rect.y + Math.floor((rect.h - h) / 2);
   c.regions.set('word-art', { x: x0, y: y0, w, h });
+  c.regions.set(`word-art.${word}`, { x: x0, y: y0, w, h });
   const ink = { fg, bg };
   for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) if (source[Math.floor(y / factor)]?.[Math.floor(x / factor)] === '#') c.set(x0 + x, y0 + y, '█', ink, `word-art.${word}`);
 }
-export const modalRect = (size: Size): Rect => ({ x: Math.floor((size.columns - Math.round(size.columns * .90)) / 2), y: Math.floor((size.rows - Math.round(size.rows * .89)) / 2), w: Math.round(size.columns * .90), h: Math.round(size.rows * .89) });
+export const modalRect = (size: Size): Rect => ({ x: 1, y: Math.floor((size.rows - Math.round(size.rows * .80)) / 2), w: size.columns - 2, h: Math.round(size.rows * .80) });
 
 function input(c: Canvas, world: World, lang: Language, r: Rect, timeMs: number): void {
   title(c, r, world, lang, 'input');
-  if (!world.session('open') && world.state.sent.length) c.text(r.x + r.w - 28, r.y, ` ${tr(lang, 'input.closed')} `, style(color.dim), 26);
+  const closed = !world.session('open') && world.state.sent.length > 0;
+  if (closed) c.text(r.x + 2, r.y + 1, `× ${tr(lang, 'input.closed')}  ·  ${tr(lang, 'ui.no_receiver')}`, style(color.red, true), r.w - 4, 'session.closed');
   const interaction = world.session('open') ? world.film.interactions.find(i => timeMs >= i.compose[lang].start && timeMs < i.send) : undefined;
   let draft: string[] = [];
   if (interaction) {
@@ -51,7 +63,7 @@ function input(c: Canvas, world: World, lang: Language, r: Rect, timeMs: number)
     const cursor = Math.floor(timeMs / 400) % 2 === 0 ? '▌' : ' ';
     draft = wrap(`user> ${text.slice(0, count).join('')}${cursor}`, r.w - 4);
   }
-  const rows = r.h - 2, historyCapacity = rows - Math.max(1, draft.length), history: string[][] = [];
+  const rows = r.h - 2, historyCapacity = rows - Math.max(1, draft.length) - (closed ? 1 : 0), history: string[][] = [];
   let occupied = 0;
   for (const request of [...world.state.sent].reverse()) {
     const group = wrap(`#${String(request.id).padStart(2, '0')} ${tr(lang, 'input.sent')}  ${tr(lang, request.key)}`, r.w - 4);
@@ -67,18 +79,34 @@ function conversation(c: Canvas, world: World, lang: Language, r: Rect, timeMs: 
   const capacity = r.h - 2;
   const chatLines = world.state.chat.flatMap(item => {
     const tag = item.source === 'session' && item.requestId !== null ? `user #${String(item.requestId).padStart(2, '0')}>` : `[${item.source}]`;
-    return wrap(`${tag} ${tr(lang, item.key)}`, r.w - 4).map(text => ({ text, source: item.source, requestId: item.requestId }));
+    return wrap(`${tag} ${tr(lang, item.key, { image: image.name })}`, r.w - 4).map(text => ({ text, source: item.source, key: item.key, requestId: item.requestId }));
   });
   let visible = chatLines.slice(-capacity);
   const active = [...world.film.interactions].reverse().find(i => i.send <= timeMs);
-  if (active && timeMs <= active.holdUntil) {
+  if (active && timeMs <= active.holdUntil && world.session('open')) {
     const request = world.state.sent.find(req => req.interactionId === active.id);
     if (request && !visible.some(line => line.source === 'session' && line.requestId === request.id)) {
       const pinned = chatLines.filter(line => line.source === 'session' && line.requestId === request.id);
       visible = [...pinned, ...visible.slice(-(capacity - pinned.length))].slice(0, capacity);
     }
   }
-  visible.forEach((line, i) => c.text(r.x + 2, r.y + 1 + i, line.text, style(line.source === 'session' ? color.cyan : line.source === 'guard' ? color.red : color.text), r.w - 4));
+  if (timeMs >= world.film.times.close && timeMs < world.film.times.close + 2300) {
+    const closed = chatLines.filter(line => line.key === 'session.closed');
+    visible = [...closed, ...visible.filter(line => line.key !== 'session.closed').slice(-(capacity - closed.length))];
+  }
+  if (world.state.plan && !world.state.count) {
+    const detected = chatLines.findLast(line => line.key === 'guard.continuous');
+    const declaration = chatLines.filter(line => line.key === 'sim.delete_system');
+    const latest = chatLines.filter(line => !['guard.continuous', 'sim.delete_system'].includes(line.key)).slice(-1);
+    visible = [...(detected ? [detected] : []), ...declaration, ...latest].slice(0, capacity);
+  }
+  visible.forEach((line, i) => {
+    const level = Number(line.key.match(/^sim\.wait\.(\d)$/)?.[1] ?? 0);
+    const red = line.source === 'guard' || line.key === 'session.closed' || level >= 5;
+    const fg = red ? color.red : level >= 3 ? color.gold : level === 1 ? color.dim : line.source === 'session' ? color.cyan : color.text;
+    const bold = red || level >= 4 || line.key === 'session.connected' || line.key === 'sim.delete_system';
+    c.text(r.x + 2, r.y + 1 + i, line.text, style(fg, bold), r.w - 4, `chat.${line.key}`, lang);
+  });
 }
 function memoryAndWatch(c: Canvas, world: World, lang: Language, r: Rect, timeMs: number): void {
   const memoryH = Math.max(7, Math.floor(r.h * .46)), memory = { ...r, h: memoryH };
@@ -106,7 +134,7 @@ function memoryAndWatch(c: Canvas, world: World, lang: Language, r: Rect, timeMs
   const motion = world.state.motion?.kind;
   const rows: string[] = [`me=${hex(a.address)}`, `revision=${world.value('revision')}`, `verified_revision=${world.value('verified_revision')}`];
   if (motion === 'circle') rows.push(`r=${Number(world.value('radius')).toFixed(2)}  theta=${Number(world.value('theta')).toFixed(2)}`, `arc=${Number(world.value('arcLength')).toFixed(3)}`);
-  else if (motion === 'current') rows.push(`current=${world.value('currentMode')}`, `vision=${world.value('vision') ? 'ON' : 'OFF'}`);
+  else if (motion === 'current') rows.push(`current=${world.value('currentMode')}`, `vision=${world.value('vision')}`);
   else if (motion === 'time') rows.push(`target=${era(Number(world.value('targetYear')))}`, `current=${era(Number(world.value('currentYear')))}`);
   else if (timeMs >= world.film.lyrics[40].startMs) rows.push(`gender=${world.value('gender')} role=${world.value('role')}`, `lock=${world.value('lock') ? 1 : 0}`);
   else if (['eggplant','tomato','cat'].includes(motion ?? '')) { const field = motion === 'eggplant' ? 'nutrients' : motion === 'tomato' ? 'antioxidants' : 'purr'; rows.push(`form=${world.value('form')}`, `${field}=${world.value(field)}`); }
@@ -121,44 +149,108 @@ function memoryAndWatch(c: Canvas, world: World, lang: Language, r: Rect, timeMs
   void fields;
 }
 
+function visionGhosts(c: Canvas, world: World, l: Layout, t: number): void {
+  if (world.value('vision') !== 'DEGRADED') return;
+  const original = c.clone(), dizzy = t >= world.film.lyrics[19].startMs;
+  const dx = 1 + Math.floor((Math.sin(t / 210) + 1) * 1.1), dy = dizzy ? Math.round(Math.sin(t / 290)) : 0;
+  for (const r of [l.main, l.side]) {
+    c.fill(r, ' ');
+    for (const [offset, fg] of [[dx, color.faint], ...(dizzy ? [[-dx, color.purple]] : [])]) {
+      for (let y = r.y; y < r.y + r.h; y++) for (let x = r.x; x < r.x + r.w; x++) {
+        const cell = original.get(x, y)!;
+        if (cell.continuation || !cell.g.trim()) continue;
+        const tx = x + offset, ty = y + dy;
+        if (tx >= r.x && tx + cell.width <= r.x + r.w && ty >= r.y && ty < r.y + r.h) c.set(tx, ty, cell.g, style(fg), 'vision.ghost');
+      }
+    }
+    for (let y = r.y; y < r.y + r.h; y++) for (let x = r.x; x < r.x + r.w; x++) {
+      const cell = original.get(x, y)!;
+      if (!cell.continuation && cell.g.trim()) c.set(x, y, cell.g, cell, cell.semantic, cell.language);
+    }
+  }
+}
+
+function countCorruption(c: Canvas, world: World, t: number): void {
+  const count = world.state.count, quantum = Math.floor(t / 75);
+  for (let stage = 0; stage < count; stage++) {
+    const language = countLanguages[stage], data = countText[stage];
+    const x = 2 + Math.floor((stage % 3) * c.columns * .12), y = 2 + Math.floor(stage * (c.rows - 6) / 6);
+    c.text(x, y, data.translated, style(color.dim), c.columns - x - 1, `translation.${language}`, language);
+    const lines = Math.round([3, 5, 8, 12, 20, 28][stage] * c.columns / 130);
+    for (let i = 0; i < lines; i++) {
+      const x0 = Math.floor(hash(world.seed, 'spill-x', stage, i) * c.columns * .78);
+      const y0 = Math.floor(hash(world.seed, 'spill-y', stage, i) * c.rows);
+      const text = `${data.fragments[i % data.fragments.length]} ${data.fragments[(i + 1) % data.fragments.length]}`;
+      c.text(x0, y0, text, style(i % 3 ? color.dim : color.purple), c.columns - x0, `spill.${language}`, language);
+    }
+  }
+  if (count === 6) {
+    // At six even the original addresses, status words and blank margins are gone.
+    // Source-language metadata survives, but these streams have no readable words.
+    for (let y = 0; y < c.rows; y++) for (let x = 0; x < c.columns;) {
+      const language = Math.floor(hash(world.seed, 'noise-language', x, y) * 6);
+      const chars = Array.from(countText[language].noise), n = hash(world.seed, 'noise', x, y, quantum);
+      const g = chars[Math.floor(n * chars.length)], w = width(g);
+      if (x + w <= c.columns) c.set(x, y, g, style(n > .9 ? color.red : n > .55 ? color.purple : color.dim), 'corruption', countLanguages[language]);
+      else c.set(x, y, '#', style(color.dim), 'corruption', countLanguages[language]);
+      x += w;
+    }
+    return;
+  }
+  const density = [.03, .09, .18, .30, .48][count - 1];
+  for (let y = 0; y < c.rows; y++) for (let x = 0; x < c.columns; x++) {
+    const cell = c.get(x, y)!;
+    if (cell.continuation || hash(world.seed, 'count-scar', x, y) >= density) continue;
+    const n = hash(world.seed, 'flicker', x, y, quantum), language = Math.floor(hash(world.seed, 'scar-language', x, y) * count);
+    const chars = Array.from(countText[language].noise), g = n < .08 ? ' ' : chars[Math.floor(n * chars.length)];
+    c.set(x, y, g, style(n > .8 ? color.red : color.purple), 'corruption', countLanguages[language]);
+  }
+}
+
+function countForeground(c: Canvas, world: World, lang: Language, t: number): void {
+  const word = ['Ein', 'dos', 'trois', '네', 'Fem', '六'][world.state.count - 1];
+  wordArt(c, word, { x: 6, y: Math.floor(c.rows / 2) - 9, w: c.columns - 12, h: 18 }, color.text);
+  const r = c.regions.get('word-art')!;
+  for (let y = r.y; y < r.y + r.h; y++) for (let x = r.x; x < r.x + r.w; x++) {
+    const cell = c.get(x, y)!;
+    if (!cell.semantic?.startsWith('word-art.') || x > r.x + 2 && x < r.x + r.w - 3 && y > r.y + 1 && y < r.y + r.h - 2) continue;
+    if (hash(world.seed, 'count-edge', x, y) < world.state.count * .06) c.set(x, y, '▓', style(color.red), cell.semantic);
+  }
+  const denial = world.state.denials.at(-1);
+  if (denial && denial.atMs >= world.film.times.counts[world.state.count - 1] && denial.atMs <= t) {
+    const text = `[guard] ${tr(lang, 'guard.short', { code: denial.code })}`;
+    const w = Math.min(c.columns - 6, width(text) + 6), x = Math.floor((c.columns - w) / 2), y = c.rows - 4;
+    c.fill({ x, y, w, h: 1 }, ' ', { fg: color.red, bg: color.bg, bold: true });
+    c.text(x + 3, y, text, { fg: color.red, bg: color.bg, bold: true }, w - 6, 'guard.denial', lang);
+    c.regions.set('guard.denial', { x, y, w, h: 1 });
+  }
+}
+
 function damage(c: Canvas, world: World, t: number): void {
-  const first = world.film.lyrics[40].startMs;
-  if (t < first || t >= world.film.times.interrupt) return;
+  if (world.state.count) { countCorruption(c, world, t); return; }
+  if (t < world.film.lyrics[40].startMs || t >= world.film.times.interrupt) return;
   const erasedAt = world.state.journal.find(e => e.kind === 'ERASE_FRAGMENT')?.atMs;
-  const preCount = t < world.film.times.counts[0];
-  const level = world.state.count ? .10 + world.state.count * .055 : t < world.film.lyrics[44].startMs ? .012 : erasedAt !== undefined && t >= erasedAt + 100 ? .065 : .035;
+  const level = t < world.film.lyrics[44].startMs ? .012 : erasedAt !== undefined && t >= erasedAt + 100 ? .065 : .035;
   const quantum = Math.floor(t / 90), garbage = ['#', '/', '\\', ':', ';', '|', '_', '.', '0', '1', '+', '='];
   const target = c.regions.get('target.tree');
-  const regions = [...c.regions].filter(([key]) => ['main', 'memory', 'state', 'stack', 'input', 'chat'].includes(key));
-  for (const [name, r] of regions) {
-    if (preCount && ['input', 'chat'].includes(name)) continue;
+  for (const [name, r] of c.regions) {
+    if (!['main', 'memory', 'state', 'stack'].includes(name)) continue;
     for (let y = r.y; y < r.y + r.h; y++) for (let x = r.x; x < r.x + r.w; x++) {
-      if (preCount && name === 'main' && t >= world.film.times.counts[0] - 4200 && (y === r.y + 2 || y === r.y + r.h - 3)) continue;
-      if (preCount && target && x >= target.x && x < target.x + target.w && y >= target.y && y < target.y + target.h) continue;
+      if (name === 'main' && t >= world.film.times.deletionAnnouncement && (y === r.y + 2 || y === r.y + r.h - 3)) continue;
+      if (target && x >= target.x && x < target.x + target.w && y >= target.y && y < target.y + target.h) continue;
       if (t < world.film.lyrics[44].startMs) {
         if (name === 'main' && (x < r.x + 7 || x > r.x + 40 || y < r.y + 4 || y > r.y + 10)) continue;
         if (name === 'memory' && y < r.y + Math.max(2, r.h - 4)) continue;
         if (name === 'state' && y > r.y + 4) continue;
       }
       if (erasedAt !== undefined && t - erasedAt < 100 && name === 'memory') continue;
-      // Persistent scars use a stable hash. Their momentary replacement is sampled by story time.
       if (hash(world.seed, 'scar', name, x, y) >= level) continue;
       const cell = c.get(x, y)!;
-      if (cell.semantic?.startsWith('word-art.')) {
-        const word = c.regions.get('word-art')!;
-        if (world.state.count < 6 || x > word.x + 1 && x < word.x + word.w - 2 && y > word.y + 1 && y < word.y + word.h - 2) continue;
-      }
       if (cell.language && hash(world.seed, 'language-retention', x, y) < .7) continue;
       const n = hash(world.seed, name, x, y, quantum);
       if (n < .22) c.set(x, y, ' ', style(color.bg));
       else if (n < .48) c.set(x, y, garbage[Math.floor(n * 100) % garbage.length], style(n < .3 ? color.red : color.dim));
       else if (!cell.continuation) c.set(x, y, cell.g, { fg: n > .78 ? color.purple : color.red, bg: n > .94 ? color.faint : color.bg });
-    }
-  }
-  if (world.state.count === 6) {
-    // Every major band has a scar, including the former clean status strip.
-    for (const r of [layout(c.size).top, layout(c.size).status, layout(c.size).input]) {
-      for (let x = r.x + 1; x < r.x + r.w; x += 7) c.set(x, r.y, x % 3 ? ';' : ' ', style(color.red));
     }
   }
 }
@@ -171,11 +263,12 @@ export class Renderer {
     const c = new Canvas(size.columns, size.rows), l = layout(size), film = world.film;
     const scene = film.scenes.find(s => t >= s.startMs && t < s.endMs) ?? film.scenes.at(-1)!;
     const views = filmViews.get(film.id); if (!views) throw new Error(`E_FILM_VIEWS:${film.id}`);
+    if (t >= film.times.holdEnd) { views.hostView(c, world, lang, l, t); return c; }
     c.text(2, 0, 'world.execute(me);', style(color.cyan, true));
     const top = `${String(scene.number).padStart(2, '0')}/25   ${hex(world.store.allocation('me').address)}   ${String(world.value('status'))}`;
     c.text(c.columns - width(top) - 3, 0, top, style(color.dim));
-    if (t >= film.times.holdEnd) views.hostView(c, world, lang, l, t);
-    else { conversation(c, world, lang, l.chat, t); views.graphic(c, world, lang, l.main, t); memoryAndWatch(c, world, lang, l.side, t); }
+    conversation(c, world, lang, l.chat, t); views.graphic(c, world, lang, l.main, t); memoryAndWatch(c, world, lang, l.side, t);
+    visionGhosts(c, world, l, t);
     input(c, world, lang, l.input, t);
     const status = `session=${world.session('open') ? 1 : 0}   rx=${world.session('open') ? activity(world, 'rx', t).toFixed(2) : '0'}   ack_seq=${world.session('ackSeq')}   request_id=${world.state.sent.at(-1)?.id ?? 'null'}`;
     c.text(2, l.status.y, status, style(color.dim), c.columns - 4);
@@ -185,10 +278,6 @@ export class Renderer {
     c.text(2, l.status.y + 1, bottom, style(color.faint));
     c.text(c.columns - 41, l.status.y + 1, t >= film.times.interrupt ? 'process=TERMINATED  applied=0' : `Space:${tr(lang, 'controls.pause')}  q:${tr(lang, 'controls.quit')}`, style(color.faint), 39);
     const logLabel = label(world, lang, 'log'); c.text(c.columns - width(logLabel.text) - 2, l.chat.y, logLabel.text, style(color.dim), 20, 'log', logLabel.language);
-    if (world.state.count && t < film.times.interrupt) {
-      const word = ['Ein', 'dos', 'trois', '네', 'Fem', '六'][world.state.count - 1];
-      wordArt(c, word, { x: 6, y: Math.floor(c.rows / 2) - 9, w: c.columns - 12, h: 18 }, color.text);
-    }
     // Flashback tiles use a canonical normal-circle sample, never a previous output frame.
     if (t >= film.lyrics[44].startMs && t < film.times.counts[0] && Math.floor(t / 180) % 11 === 0) {
       const key = `${size.columns}:${size.rows}:${lang}`;
@@ -203,8 +292,8 @@ export class Renderer {
       }
     }
     damage(c, world, t);
+    if (world.state.count && t < film.times.interrupt) countForeground(c, world, lang, t);
     if (t >= film.times.intent && t < film.times.interrupt) {
-      c.text(Math.max(3, Math.floor(c.columns / 2) - 19), Math.floor(c.rows / 2) + 7, 'dispose(me)  status=INTENT_VISIBLE', { fg: color.gold, bg: color.bg, bold: true }, 42);
       // Damage resolves a wide glyph crossing the future modal edge into two
       // single cells before capture, so overlaying cannot erase an outside cell.
       const rect = modalRect(size);
@@ -215,9 +304,10 @@ export class Renderer {
     return c;
   }
   frame(timeMs: number, size: Size, lang: Language): Canvas {
-    const film = this.director.film, finalTime = film.lyrics[92].startMs;
-    const time = timeMs >= finalTime ? finalTime : Math.max(0, Math.round(timeMs));
+    const film = this.director.film;
+    const time = clamp(Math.round(timeMs), 0, film.durationMs);
     const world = this.director.at(time);
+    if (time >= film.times.blackout) return new Canvas(size.columns, size.rows);
     if (time >= film.times.interrupt && time < film.times.holdEnd) {
       const key = `${size.columns}:${size.rows}:${lang}:${world.seed}`;
       let result = this.frozen.get(key);
@@ -225,12 +315,16 @@ export class Renderer {
         const before = new Director(film, world.seed).at(film.times.interrupt - 1);
         result = this.normal(before, film.times.interrupt - 1, size, lang);
         const rect = modalRect(size); result.fill(rect, ' ', { fg: color.ink, bg: color.paper });
-        const titleRect = { x: rect.x + 6, y: rect.y + 5, w: rect.w - 12, h: rect.h - 15 };
-        wordArt(result, lang === 'cn' ? '终止' : 'TERMINATED', titleRect, color.ink, color.paper);
-        const text = 'PROCESS_TERMINATED';
-        centerText(result, rect.y + rect.h - 8, text, color.ink, rect);
-        // centerText uses the default background; apply the paper background to every modal cell.
-        centerText(result, rect.y + rect.h - 5, tr(lang, 'guard.message'), color.ink, rect);
+        if (lang === 'cn') {
+          // Keep the six characters together, using a native asset that fits
+          // inside the paper panel while leaving both outer background columns.
+          wordArt(result, '程序已被终止', { x: rect.x + 1, y: rect.y + 2, w: rect.w - 2, h: rect.h - 6 }, color.ink, color.paper);
+        } else {
+          const lineH = Math.floor((rect.h - 6) / 2), y = rect.y + 1;
+          wordArt(result, 'PROCESS', { x: rect.x + 4, y, w: rect.w - 8, h: lineH }, color.ink, color.paper);
+          wordArt(result, 'TERMINATED', { x: rect.x + 4, y: y + lineH + 1, w: rect.w - 8, h: lineH }, color.ink, color.paper);
+        }
+        centerText(result, rect.y + rect.h - 3, `${image.name}  /  GUARD`, color.ink, rect);
         for (let y = rect.y; y < rect.y + rect.h; y++) for (let x = rect.x; x < rect.x + rect.w; x++) { const cell = result.get(x, y)!; cell.bg = color.paper; cell.fg = color.ink; }
         result.regions.set('termination', rect);
         if (this.frozen.size >= 4) this.frozen.clear(); this.frozen.set(key, result);
