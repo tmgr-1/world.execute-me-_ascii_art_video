@@ -58,5 +58,5 @@ export interface Film {
   programs: Program[]; cues: Cue[]; scenes: Scene[]; schemas: Schema[];
   times: { intro: number; close: number; intent: number; interrupt: number; holdEnd: number; patch: number; counts: number[];
     result: number; feedbackTimeout: number; reestimate: number; eraseBegin: number; executionStart: number; executionEnd: number; violationWarning: number;
-    selfErase: number; deletionAnnouncement: number; outroHold: number; debugClose: number; consoleReset: number; finalDelete: number; finalExecution: number; purge: number; easterEgg: number };
+    selfErase: number; deletionAnnouncement: number; outroHold: number; debugOpen: number; debugClose: number; consoleReset: number; finalDelete: number; finalExecution: number; purge: number; easterEgg: number };
 }

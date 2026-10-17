@@ -102,6 +102,29 @@ try:
  assert termios.tcgetattr(slave)==before
  assert b'\x1b[?1049l' in output
  print('PTY loop case passed: repeated exact media seeks, deterministic rebuild, no duplicate requests, terminal restored.')
+ # Core analysis is a host-only four-pane view; resize and seek must not
+ # revive the stopped process or invent new user input.
+ destination=root/'.cache/pty-v5-debugger';destination.mkdir(parents=True,exist_ok=True)
+ command[command.index('--export-dir')+1]=str(destination)
+ command[command.index('--seek')+1]='03:00.8'
+ output=bytearray();resize(130,35)
+ process=subprocess.Popen(command,cwd=root,stdin=slave,stdout=slave,stderr=slave,start_new_session=True)
+ deadline=time.monotonic()+5
+ while '按回车开始'.encode() not in output and time.monotonic()<deadline and process.poll() is None:drain(.1)
+ assert '按回车开始'.encode() in output
+ os.write(master,b'\r');drain(.6)
+ for label in ('汇编 / Disassembly','调用栈 / Call stack','观察点 / 断点','READ ONLY','SOURCE: CORE_DUMP','TRACE FILTER'):
+  assert label.encode() in output,label+' missing from debugger'
+ os.write(master,b' ');drain(.1)
+ resize(220,60);os.kill(process.pid,signal.SIGWINCH);drain(.2)
+ os.write(master,b'\x1b[C');drain(.2)
+ assert b'verdict = UNKNOWN' in output,'Saved feedback expression missing after seek.'
+ os.write(master,b'q');drain(.3);process.wait(timeout=5)
+ assert process.returncode==0 and termios.tcgetattr(slave)==before
+ events=json.loads((destination/'events.json').read_text())
+ assert sum(event['kind']=='rx' for event in events)==9
+ assert not any(event['source']!='host' and event['atMs']>162550 for event in events)
+ print('PTY debugger case passed: four panes, frozen core, missing feedback, pause/resize/seek, nine original requests, terminal restored.')
  # Default playback ends at the real EOF, with no hidden Easter-egg wait.
  destination=root/'.cache/pty-v43-default-eof';destination.mkdir(parents=True,exist_ok=True)
  command[command.index('--export-dir')+1]=str(destination)

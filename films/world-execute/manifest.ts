@@ -17,6 +17,7 @@ export function makeFilm(overrides?: Anchor[], options: { easterEgg?: boolean } 
   const reestimate = Math.round((feedbackTimeout + start(33)) / 2), eraseBegin = end(59) + 750;
   const counts = Array.from({ length: 6 }, (_, i) => at(`count.${i + 1}`));
   const intent = end(76), interrupt = intent + 250, holdEnd = interrupt + 3000;
+  const debugOpen = holdEnd + 2700 + 5 * 520;
   const deletionAnnouncement = Math.min(start(70), counts[0] - 3300);
   const executionStart = end(66) + 1500, executionEnd = end(72), violationWarning = start(72) + 120;
   const outroHold = end(92), finalExecution = start(93), debugClose = finalExecution - 4000;
@@ -184,7 +185,8 @@ export function makeFilm(overrides?: Anchor[], options: { easterEgg?: boolean } 
   for (let i = 0; i < 5; i++) host(`debug.stack.${i}`, start(85) + 600 + i * 220);
   host('debug.frame', start(86));
   ['debug.reply', 'debug.session', 'debug.self', 'debug.system', 'debug.stop'].forEach((key, i) => host(key, start(86) + 150 + i * 190));
-  host('debug.patch', start(87)); host('debug.minus', start(87) + 230); host('debug.plus', start(87) + 480);
+  host('debug.question', start(87));
+  host('debug.patch', start(88)); host('debug.minus', start(88) + 80); host('debug.plus', start(88) + 160);
   host('debug.check', start(88)); host('debug.applied', start(88) + 250); host('debug.cancelled', start(88) + 500);
   host('debug.trace', start(89)); host('debug.replay', start(89) + 180);
   for (let i = 0; i < 3; i++) host(`debug.trace.${i}`, start(89) + 460 + i * 450);
@@ -204,7 +206,7 @@ export function makeFilm(overrides?: Anchor[], options: { easterEgg?: boolean } 
   const scenes: Scene[] = boundaries.map(([id, startMs], i) => ({ id, number: i + 1, startMs, endMs: boundaries[i + 1]?.[1] ?? presentationEndMs }));
   const translations = new Map(chineseLyrics.map(l => [l.number, l.text]));
   const meanings: Record<number, string> = { 73: '(one, two)', 74: '(three, four)', 75: '(five, six)' };
-  return { id: 'world-execute', version: '4.4.0', durationMs: timing.durationMs, presentationEndMs, easterEggEnabled, corruption, audioSha256: timing.audioSha256, originAudioMs: timing.originAudioMs, defaultSeed: 1041,
+  return { id: 'world-execute', version: '5.0.0', durationMs: timing.durationMs, presentationEndMs, easterEggEnabled, corruption, audioSha256: timing.audioSha256, originAudioMs: timing.originAudioMs, defaultSeed: 1041,
     anchors, lyrics: lyrics.map(l => ({ ...l, translation: translations.get(l.number) ?? '', englishMeaning: meanings[l.number], startMs: start(l.number), endMs: end(l.number) })), schemas, cues, interactions, programs, scenes,
-    times: { intro: end(8), close, result, feedbackTimeout, reestimate, eraseBegin, executionStart, executionEnd, violationWarning, selfErase, deletionAnnouncement, outroHold, debugClose, consoleReset, intent, interrupt, holdEnd, patch: start(85), counts, finalDelete, finalExecution, purge, easterEgg } };
+    times: { intro: end(8), close, result, feedbackTimeout, reestimate, eraseBegin, executionStart, executionEnd, violationWarning, selfErase, deletionAnnouncement, outroHold, debugOpen, debugClose, consoleReset, intent, interrupt, holdEnd, patch: start(85), counts, finalDelete, finalExecution, purge, easterEgg } };
 }

@@ -4,7 +4,8 @@ interface Field { name: string; type: FieldType; offset: number; size: number }
 interface Layout { name: string; alignment: number; size: number; fields: Field[] }
 export interface Allocation { id: string; type: string; address: number; size: number; owner: string; mutable: boolean; missing: { offset: number; length: number }[] }
 export interface Change { objectId: string; field: string; atMs: number; address: number; size: number; before: Value; after: Value; beforeBytes?: number[]; afterBytes?: number[]; erased?: boolean }
-export interface StoreSnapshot { bytes: Uint8Array; allocations: Allocation[]; strings: [number, number][]; cursor: number; changes: [string, Change][] }
+export interface ErasureWrite { id: number; objectId: string; field: string; atMs: number; address: number; size: number; scope: 'fragments' | 'object' | 'string'; beforeBytes: number[]; afterBytes: number[] }
+export interface StoreSnapshot { bytes: Uint8Array; allocations: Allocation[]; strings: [number, number][]; cursor: number; changes: [string, Change][]; erasures: ErasureWrite[] }
 const align = (n: number, a: number): number => Math.ceil(n / a) * a;
 export function typeSize(type: FieldType): number {
   if (typeof type === 'string') return ({ u8: 1, u16: 2, u32: 4, i32: 4, f32: 4, f64: 8, bool: 1 })[type];
@@ -20,6 +21,7 @@ export class ObjectStore {
   readonly layouts = new Map<string, Layout>();
   readonly allocations = new Map<string, Allocation>();
   readonly changes = new Map<string, Change>();
+  readonly erasures: ErasureWrite[] = [];
   private strings = new Map<number, number>();
   private cursor = 0x00408000;
   constructor(schemas: Schema[], private readonly authorize: (target: string, source: Source) => void = () => {}) {
@@ -97,9 +99,9 @@ export class ObjectStore {
     // The film permits erasing only fragment bytes, never adjacent goal/status fields.
     const fragments = this.field(id, 'fragments');
     if (offset < fragments.offset || offset + length > fragments.offset + fragments.size) throw new Error('E_PERMISSION:ERASE_FRAGMENT');
-    this.bytes.fill(0, a.address - this.base + offset, a.address - this.base + offset + length);
+    const write = this.clearBytes(id, 'fragments', a.address + offset, length, 'fragments', atMs);
     a.missing.push({ offset, length });
-    this.changes.set(`${id}:erase:${offset}`, { objectId: id, field: 'fragments', atMs, address: a.address + offset, size: length, before: null, after: 0, erased: true });
+    this.changes.set(`${id}:erase:${offset}`, { ...write, before: null, after: 0, erased: true });
   }
   eraseOwnedForm(id: string, owner: string, source: Source, atMs: number): void {
     this.authorize(id, source);
@@ -108,11 +110,17 @@ export class ObjectStore {
     // Destruction of an owned snapshot does not grant write access to external objects.
     for (const f of this.layouts.get(a.type)!.fields) if (typeof f.type === 'object' && 'stringRef' in f.type) {
       const ref = this.bytes.readUInt32LE(a.address - this.base + f.offset), length = this.strings.get(ref);
-      if (length !== undefined) { this.bytes.fill(0, ref - this.base, ref - this.base + length); this.strings.delete(ref); }
+      if (length !== undefined) { this.clearBytes(id, f.name, ref, length, 'string', atMs); this.strings.delete(ref); }
     }
-    this.bytes.fill(0, a.address - this.base, a.address - this.base + a.size);
+    const write = this.clearBytes(id, 'SELF_ERASE', a.address, a.size, 'object', atMs);
     a.missing = [{ offset: 0, length: a.size }];
-    this.changes.set(`${id}:SELF_ERASE`, { objectId: id, field: 'SELF_ERASE', atMs, address: a.address, size: a.size, before: id, after: null, erased: true });
+    this.changes.set(`${id}:SELF_ERASE`, { ...write, before: id, after: null, erased: true });
+  }
+  private clearBytes(objectId: string, field: string, address: number, size: number, scope: ErasureWrite['scope'], atMs: number): ErasureWrite {
+    const offset = address - this.base, beforeBytes = [...this.bytes.subarray(offset, offset + size)];
+    this.bytes.fill(0, offset, offset + size);
+    const write = { id: this.erasures.length + 1, objectId, field, atMs, address, size, scope, beforeBytes, afterBytes: [...this.bytes.subarray(offset, offset + size)] };
+    this.erasures.push(write); return write;
   }
   private writeValue(type: FieldType, offset: number, value: Value): void {
     if (typeof type === 'string') {
@@ -152,11 +160,12 @@ export class ObjectStore {
     if ('bytes' in type) return Uint8Array.from(this.bytes.subarray(offset, offset + type.bytes));
     return Array.from({ length: type.length }, (_, i) => this.readValue(type.array, offset + i * typeSize(type.array)));
   }
-  snapshot(): StoreSnapshot { return structuredClone({ bytes: Uint8Array.from(this.bytes), allocations: [...this.allocations.values()], strings: [...this.strings], cursor: this.cursor, changes: [...this.changes] }); }
+  snapshot(): StoreSnapshot { return structuredClone({ bytes: Uint8Array.from(this.bytes), allocations: [...this.allocations.values()], strings: [...this.strings], cursor: this.cursor, changes: [...this.changes], erasures: this.erasures }); }
   restore(snapshot: StoreSnapshot): void {
     Buffer.from(snapshot.bytes).copy(this.bytes); this.allocations.clear();
     for (const a of snapshot.allocations) this.allocations.set(a.id, structuredClone(a));
     this.strings = new Map(snapshot.strings); this.cursor = snapshot.cursor; this.changes.clear();
     for (const [key, value] of snapshot.changes) this.changes.set(key, structuredClone(value));
+    this.erasures.splice(0, this.erasures.length, ...structuredClone(snapshot.erasures));
   }
 }

@@ -88,6 +88,8 @@ export function validateFilm(film: Film, release = false, depth: 'full' | 'model
   check(film.times.selfErase < film.times.deletionAnnouncement && film.times.counts[0] - film.times.deletionAnnouncement >= 3000, 'E_DELETE_NARRATIVE_ORDER');
   check(film.times.selfErase > film.lyrics[61].startMs && film.times.selfErase < film.lyrics[62].endMs, 'E_PRIVATE_ERASE_BUDGET');
   check(film.times.outroHold >= film.lyrics[91].endMs && film.times.outroHold < film.times.debugClose && film.times.debugClose < film.times.consoleReset, 'E_OUTRO_HOLD');
+  check(film.times.debugOpen === film.cues.find(c => c.command.kind === 'HOST' && c.command.key === 'host.open_core')?.atMs
+    && film.times.holdEnd < film.times.debugOpen && film.times.debugOpen < film.times.patch && film.times.patch < film.times.debugClose, 'E_DEBUG_ORDER');
   check(film.times.consoleReset < film.times.finalDelete && film.times.finalDelete < film.times.finalExecution && film.times.finalExecution === film.lyrics[92].startMs && film.times.purge >= film.times.finalExecution && film.times.purge <= film.lyrics[92].endMs, 'E_FINAL_PURGE_TIMING');
   check(film.times.easterEgg - film.times.purge === 8000 && film.presentationEndMs === (film.easterEggEnabled ? Math.max(film.durationMs, film.times.easterEgg + 2000) : film.durationMs), 'E_EASTER_TAIL');
   check(film.interactions.every(i => i.recordAtMs - i.send === 300), 'E_SENT_HOLD');
@@ -97,6 +99,8 @@ export function validateFilm(film: Film, release = false, depth: 'full' | 'model
     const d = new Director(film); const w = d.at(film.presentationEndMs);
     check(w.state.sent.length === 9 && w.state.requestSeq === 9, 'E_REQUEST_COUNT');
     check(w.state.bootWork === 1000 && w.state.memoryCopies.length === 6 && w.state.memoryCopies.every(copy => copy.clearedBytes === 8), 'E_PRIVATE_COPIES');
+    check(w.state.memoryCopies.every(copy => copy.beforeErase?.length === 8), 'E_ERASE_BEFORE_IMAGE');
+    check(w.store.erasures.length < 64 && w.store.erasures.every(write => write.beforeBytes.length === write.size && write.afterBytes.length === write.size && write.afterBytes.every(b => b === 0)), 'E_ERASE_AUDIT');
     check(w.state.journal.filter(e => e.kind === 'CLOSE').length === 1, 'E_CLOSE_COUNT');
     check(!w.state.journal.some(e => e.atMs > film.times.close && ['rx', 'ACK', 'VERIFY'].includes(e.kind)), 'E_EXTERNAL_AFTER_CLOSE');
     check(!w.state.tasks.some(task => task.requestId === null && task.source === 'session'), 'E_PREDICTION_SOURCE');
@@ -112,6 +116,7 @@ export function validateFilm(film: Film, release = false, depth: 'full' | 'model
     check(notices.length === 7 && notices[0]?.atMs === film.times.violationWarning && notices.slice(1).every((notice, i) => notice.atMs === film.times.counts[i] + 60 && notice.payload.ordinal === i + 1), 'E_GUARD_WARNING_SEQUENCE');
     check(!w.state.journal.some(e => ['ILLEGAL_ATTEMPT', 'REJECT'].includes(e.kind) && e.atMs >= film.times.counts[0] && e.atMs < film.times.intent), 'E_NO_COUNT_ATTEMPTS');
     const a = w.state.archive;
+    check(a?.events.filter(e => e.kind === 'rx').length === 9 && !a?.events.some(e => e.atMs > film.times.close && e.kind === 'rx'), 'E_CORE_INPUT_HISTORY');
     check(a && a.patch.createdAtMs < a.terminatedAtMs && a.patch.checkedAtMs < a.terminatedAtMs && !a.patch.applied, 'E_PATCH_LIFETIME');
     check(a?.tasks.find(task => task.id === a.patch.applyTaskId)?.status === 'CANCELLED', 'E_APPLY_CANCEL');
     check(w.state.host[0]?.key === 'post.rom' && w.state.host.every(record => record.atMs >= film.times.holdEnd), 'E_HOST_ORDER');
@@ -136,6 +141,11 @@ export function validateFilm(film: Film, release = false, depth: 'full' | 'model
         check(frozen.validate().length === 0, `E_WIDE:${lang}`);
         const console = renderer.frame(film.times.holdEnd + 500, size, lang);
         check(console.regions.has('system.console') && !console.regions.has('input') && !console.regions.has('chat'), `E_CONSOLE_ONLY:${lang}`);
+        const analysis = renderer.frame(film.lyrics[91].startMs + 500, size, lang);
+        check(['disassembly', 'memory', 'stack', 'watch'].every(key => analysis.regions.has(`debug.${key}`)) && !analysis.regions.has('system.console'), `E_DEBUG_PANES:${lang}`);
+        check(analysis.plain().includes('exit_branch: NOT REACHED') && analysis.plain().includes('applied: 0'), `E_DEBUG_CAUSALITY:${lang}`);
+        const restored = renderer.frame(film.times.debugClose, size, lang);
+        check(restored.regions.has('system.console') && !restored.regions.has('debugger') && restored.plain().includes('ROM'), `E_DEBUG_CONSOLE_RETURN:${lang}`);
         check(renderer.frame(film.times.consoleReset, size, lang).cells.every(cell => cell.g === ' '), `E_CONSOLE_RESET:${lang}`);
         const final = renderer.frame(film.presentationEndMs, size, lang).plain();
         check(final.includes('PROGRAM DELETED') && final.includes('simtest_000329.elf') === film.easterEggEnabled, `E_END_VISIBLE:${lang}`);

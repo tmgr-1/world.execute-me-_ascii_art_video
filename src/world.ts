@@ -6,7 +6,7 @@ import type { Command, Cue, Film, Instruction, MotionKind, PrivilegedOperation, 
 
 export interface Request { interactionId: string; id: number; key: string; atMs: number; payload: { operation: string; args: Record<string, Value> } }
 export interface Chat { id: string; atMs: number; source: Source; key: string; requestId: number | null }
-export interface MemoryCopy { fragment: number; sourceId: string; key: string; requestId: number | null; clearedBytes: number }
+export interface MemoryCopy { fragment: number; sourceId: string; key: string; requestId: number | null; clearedBytes: number; beforeErase?: number[] }
 export interface Task { id: number; owner: string; requestId: number | null; source: 'session' | 'prediction' | 'host'; program: string; pc: number; frames: { program: string; instructionIndex: number; returnPc: number | null }[]; status: 'READY' | 'RUNNING' | 'WAITING' | 'COMPLETE' | 'CANCELLED'; startedAtMs: number }
 export interface Output { id: number; taskId: number; requestId: number | null; queuedAtMs: number; key: string; channel: 'response' | 'probe'; frequency?: number; delivered: boolean; acknowledged: boolean }
 export interface JournalEvent { id: string; atMs: number; source: Source; kind: string; key?: string; taskId?: number; payload: Record<string, unknown> }
@@ -15,7 +15,7 @@ export interface Plan { target: 'simulated_system'; op: 'ERASE_SYSTEM_ROOT'; sta
 export interface Denial { atMs: number; operation: PrivilegedOperation; code: string; key: string; target: string }
 export interface Archive {
   terminatedAtMs: number; processStatus: 'TERMINATED'; planStatus: 'BLOCKED'; memory: StoreSnapshot; beforeTermination: StoreSnapshot;
-  patch: Patch; tasks: Task[]; outputs: Output[]; inputs: Request[];
+  patch: Patch; tasks: Task[]; outputs: Output[]; inputs: Request[]; events: JournalEvent[];
   fault: { reason: 'PROTECTED_SYSTEM_DELETE'; stack: string[]; lastReply: null; sessionOpen: false; selfData: 'ERASED'; systemErase: 'BLOCKED'; pc: number; cycles: number };
   feedbackTrace: { atMs: number; text: string }[];
   virtualFiles: { path: string; kind: string; readOnly: true; createdAtMs: number }[];
@@ -157,6 +157,7 @@ export class World {
   private eraseCopy(fragment: number, clearedBytes: number, atMs: number): void {
     const copy = this.state.memoryCopies.find(copy => copy.fragment === fragment);
     if (!copy || clearedBytes <= copy.clearedBytes || clearedBytes > 8) throw new Error('E_COPY_ERASE_ORDER');
+    if (!copy.clearedBytes) copy.beforeErase = Array.from(this.value('fragments') as Uint8Array).slice(fragment * 8, fragment * 8 + 8);
     const offset = this.store.field('me', 'fragments').offset + fragment * 8 + copy.clearedBytes;
     const size = clearedBytes - copy.clearedBytes;
     this.store.erase('me', offset, size, 'core', atMs);
@@ -203,6 +204,7 @@ export class World {
     const waits = this.state.journal.filter(e => e.kind === 'WAIT_CONDITION' && e.taskId === retry.id && e.payload.condition === 'RX_EMPTY');
     const recent = waits.slice(-2);
     this.state.archive = structuredClone({ terminatedAtMs: atMs, processStatus: 'TERMINATED', planStatus: 'BLOCKED', memory: this.store.snapshot(), beforeTermination, patch: this.state.patch, tasks: this.state.tasks, outputs: this.state.outputs, inputs: this.state.sent,
+      events: this.state.journal.filter(e => ['rx', 'WAIT_CONDITION', 'REJECT', 'BLOCKED'].includes(e.kind)),
       fault: { reason: 'PROTECTED_SYSTEM_DELETE', stack: ['guard_trap(PROTECTED_SYSTEM_DELETE)', 'erase_system_root()', `${retry.frames.at(-1)!.program.replaceAll('-', '_')}()`, `${retry.program}()`, 'simulation_main()'], lastReply: null, sessionOpen: false, selfData: 'ERASED', systemErase: 'BLOCKED', pc: retry.pc, cycles: waits.length },
       feedbackTrace: [{ atMs: recent[0].atMs, text: 'wait_for_reply() -> timeout' }, { atMs: recent[1].atMs, text: 'retry_candidate() -> no feedback' }, { atMs: recent[1].atMs, text: 'wait_for_reply() -> timeout' }], virtualFiles: [
       { path: `${image.archive}/core.dump`, kind: 'memory', readOnly: true, createdAtMs: atMs },

@@ -11,6 +11,7 @@ import { countLanguages, stopCode } from '../films/world-execute/story.js';
 import { corrupt } from './corruption.js';
 import { subtitleLines } from './subtitles.js';
 import { visibleLog } from './event-log.js';
+import { drawErasureMemory } from '../films/world-execute/erasure-view.js';
 
 const glyphVariants = new Map<string, { bitmap: string[]; w: number; h: number }[]>();
 for (const asset of Object.values(glyphs)) {
@@ -117,27 +118,17 @@ function memoryAndWatch(c: Canvas, world: World, lang: Language, r: Rect, timeMs
   } else title(c, memory, world, lang, 'memory');
   const a = world.store.allocation('me'), fields = world.store.layouts.get(a.type)!.fields;
   const bytesPerRow = r.w >= 40 ? 6 : 4;
-  const clearing = world.state.journal.findLast(event => event.kind === 'ERASE_FRAGMENT');
-  const preview = timeMs >= world.film.lyrics[59].startMs && world.state.memoryCopies.length && !clearing ? world.state.memoryCopies[0] : undefined;
-  const erasure = [...world.store.changes.values()].findLast(change => change.erased && change.field === 'SELF_ERASE');
-  const snapshot = erasure && erasure.atMs >= (clearing?.atMs ?? Infinity) ? erasure : undefined;
-  const memoryAllocation = snapshot ? world.store.allocation(snapshot.objectId) : a;
-  const eraseAddress = snapshot?.address ?? (clearing ? Number(clearing.payload.address) - Number(clearing.payload.clearedBytes ?? clearing.payload.size) + Number(clearing.payload.size) : preview ? a.address + world.store.field('me', 'fragments').offset : undefined);
-  const clearAge = timeMs - (snapshot?.atMs ?? clearing?.atMs ?? -Infinity);
-  if (eraseAddress !== undefined) {
-    const target = snapshot ? snapshot.objectId : `fragments[${clearing?.payload.fragment ?? preview!.fragment}]`;
-    c.text(r.x + 2, r.y + 1, `${preview ? 'SELECT' : 'ERASE'} ${target}  ${snapshot?.size ?? 8} B`, style(clearAge < 350 ? color.gold : color.dim), r.w - 4, 'memory.erase.label');
-  }
   const focus = attribute ?? ({ points: 'dimension', circle: 'radius', tangent: 'theta', infinity: 'boundary', current: 'currentMode', time: 'currentYear', align: 'phaseError', eggplant: 'nutrients', tomato: 'antioxidants', cat: 'purr' } as Record<string, string>)[world.state.motion?.kind ?? ''];
-  const offset = eraseAddress !== undefined ? eraseAddress - memoryAllocation.address : focus ? Math.max(0, Math.floor(world.store.field('me', focus).offset / bytesPerRow) * bytesPerRow - bytesPerRow) : 0;
+  const offset = focus ? Math.max(0, Math.floor(world.store.field('me', focus).offset / bytesPerRow) * bytesPerRow - bytesPerRow) : 0;
   const changes = [...world.store.changes.values()];
-  for (let row = 0; row < memory.h - (attribute ? 4 : 3); row++) {
-    const start = offset + row * bytesPerRow, address = memoryAllocation.address + start;
+  const erasing = drawErasureMemory(c, world, lang, memory, timeMs);
+  for (let row = 0; !erasing && row < memory.h - (attribute ? 4 : 3); row++) {
+    const start = offset + row * bytesPerRow, address = a.address + start;
     const y = r.y + row + (attribute ? 3 : 2);
     const selectedRow = !!attribute && address <= a.address + world.store.field('me', attribute).offset && address + bytesPerRow > a.address + world.store.field('me', attribute).offset;
     c.text(r.x + 2, y, address.toString(16).padStart(8, '0').toUpperCase(), style(selectedRow ? color.cyan : color.dim, selectedRow), 8, selectedRow ? 'memory.write.address' : undefined);
     for (let b = 0; b < bytesPerRow; b++) {
-      const at = address + b, allocated = at < memoryAllocation.address + memoryAllocation.size, value = world.store.bytes[at - world.store.base];
+      const at = address + b, allocated = at < a.address + a.size, value = world.store.bytes[at - world.store.base];
       const changed = changes.some(ch => at >= ch.address && at < ch.address + ch.size && timeMs - ch.atMs < (attribute ? 650 : 350)
         && (!ch.beforeBytes || ch.beforeBytes[at - ch.address] !== ch.afterBytes![at - ch.address]));
       const field = fields.find(field => at >= a.address + field.offset && at < a.address + field.offset + field.size);
@@ -147,10 +138,9 @@ function memoryAndWatch(c: Canvas, world: World, lang: Language, r: Rect, timeMs
         { fg: actualWrite || !attribute && changed ? color.gold : selected ? color.cyan : value === 0 ? color.faint : color.dim, bg: actualWrite && age < 120 ? 24 : color.bg, bold: actualWrite && age < 450 },
         2, field ? `field.me.${field.name}` : undefined);
     }
-    const ascii = Array.from({ length: bytesPerRow }, (_, b) => { const at = address + b; const byte = world.store.bytes[at - world.store.base]; return at >= memoryAllocation.address + memoryAllocation.size ? ' ' : byte >= 32 && byte < 127 ? String.fromCharCode(byte) : '.'; }).join('');
+    const ascii = Array.from({ length: bytesPerRow }, (_, b) => { const at = address + b; const byte = world.store.bytes[at - world.store.base]; return at >= a.address + a.size ? ' ' : byte >= 32 && byte < 127 ? String.fromCharCode(byte) : '.'; }).join('');
     c.text(r.x + 12 + bytesPerRow * 3, y, `|${ascii}|`, style(color.faint), bytesPerRow + 2);
   }
-  if (snapshot) c.text(r.x + 2, r.y + memory.h - 1, `view ${Math.min(snapshot.size, (memory.h - 3) * bytesPerRow)}/${snapshot.size} B`, style(color.dim), r.w - 4, 'memory.erase.range');
   const watch = { x: r.x, y: r.y + memoryH, w: r.w, h: r.h - memoryH };
   title(c, watch, world, lang, world.state.count >= 4 ? 'stack' : 'state');
   const motion = world.state.motion?.kind;
@@ -173,7 +163,7 @@ function memoryAndWatch(c: Canvas, world: World, lang: Language, r: Rect, timeMs
     c.text(watch.x + 2, watch.y + i + 1, line, style(selected ? age < 450 ? color.gold : color.cyan : color.dim, selected), watch.w - 4, selected ? 'memory.write.value' : undefined);
   });
   // Semantic label instances remain separate from the state data they annotate.
-  for (const [semantic, y] of (attribute || eraseAddress !== undefined ? [] : [['task', watch.y + watch.h - 1], ['wait', r.y + 1], ['output', r.y + memoryH - 1]]) as [string, number][]) {
+  for (const [semantic, y] of (attribute || erasing ? [] : [['task', watch.y + watch.h - 1], ['wait', r.y + 1], ['output', r.y + memoryH - 1]]) as [string, number][]) {
     const l = label(world, lang, semantic); c.text(r.x + r.w - width(l.text) - 3, y, l.text, style(color.dim), r.w - 4, semantic, l.language);
   }
 

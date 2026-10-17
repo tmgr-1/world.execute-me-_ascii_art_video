@@ -7,6 +7,7 @@ import type { World } from '../../src/world.js';
 import type { Language, Rect } from '../../src/types.js';
 import type { Layout } from '../../src/render.js';
 import { image } from './story.js';
+import { debuggerView } from './debugger.js';
 
 class Plot {
   readonly r: Rect;
@@ -357,39 +358,20 @@ export function graphic(c: Canvas, world: World, lang: Language, r: Rect, t: num
 
 export function hostView(c: Canvas, world: World, lang: Language, _layout: Layout, t: number): void {
   const archive = world.state.archive; if (!archive) throw new Error('E_ARCHIVE_MISSING');
+  if (t >= world.film.times.debugOpen && t < world.film.times.debugClose) { debuggerView(c, world, lang, t); return; }
   c.regions.set('system.console', { x: 0, y: 0, w: c.columns, h: c.rows });
   if (t >= world.film.times.consoleReset && t < world.film.times.finalDelete) return;
-  const fault = archive.fault;
-  const format = (key: string): string => {
-    if (key.startsWith('debug.stack.')) { const index = Number(key.split('.').at(-1)); return `#${index}  ${fault.stack[index]}`; }
-    if (key.startsWith('debug.trace.')) { const record = archive.feedbackTrace[Number(key.split('.').at(-1))]; return `[saved ${timeCode(record.atMs)}] ${record.text}`; }
-    switch (key) {
-      case 'debug.reply': return `last_reply = ${fault.lastReply}`;
-      case 'debug.session': return `session.open = ${fault.sessionOpen}`;
-      case 'debug.self': return `self.data = ${fault.selfData}`;
-      case 'debug.system': return `system.erase = ${fault.systemErase}`;
-      case 'debug.stop': return `stop_reason = ${fault.reason}`;
-      case 'debug.minus': return `- ${archive.patch.before[1].trim()}`;
-      case 'debug.plus': return `+ ${archive.patch.after[1].trim()}`;
-      case 'debug.check': return `check: ${archive.patch.check}`;
-      case 'debug.applied': return `applied: ${Number(archive.patch.applied)}`;
-      case 'debug.cancelled': return `apply_task: ${archive.tasks.find(task => task.id === archive.patch.applyTaskId)?.status}`;
-      case 'debug.frozen': return `saved_pc=${fault.pc}  cycles=${fault.cycles}  [FROZEN]`;
-      default: return tr(lang, key, { image: image.name, path: image.path, archive: image.archive });
-    }
-  };
   const final = t >= world.film.times.finalDelete;
-  const records = t >= world.film.times.finalDelete ? world.state.host.filter(record => record.atMs >= world.film.times.finalDelete) : world.state.host;
+  const records = t >= world.film.times.finalDelete ? world.state.host.filter(record => record.atMs >= world.film.times.finalDelete)
+    : world.state.host.filter(record => !record.key.startsWith('debug.'));
   const rows = records.flatMap(record => {
-    const text = format(record.key) + (record.key === 'host.delete' && world.state.lifecycle === 'PURGED' ? ' OK' : '');
+    const text = tr(lang, record.key, { image: image.name, path: image.path, archive: image.archive }) + (record.key === 'host.delete' && world.state.lifecycle === 'PURGED' ? ' OK' : '');
     const lines = wrap(text, c.columns - 4).map(text => ({ text, key: record.key }));
     return record.key === 'host.next_test' ? [{ text: '', key: 'host.next_gap' }, ...lines] : lines;
   }).slice(-(c.rows - 3));
   rows.forEach((row, i) => {
-    const error = ['debug.stack.0', 'debug.stop', 'debug.system', 'debug.minus'].includes(row.key);
-    const emphasis = ['debug.heading', 'debug.self', 'debug.exit', 'host.delete', 'host.deleted', 'host.next_test'].includes(row.key);
-    const fg = error ? color.red : row.key === 'debug.plus' ? color.green : emphasis ? color.text : color.dim;
-    c.text(2, 1 + i, row.text, style(fg, error || emphasis), c.columns - 4, `console.${row.key}`);
+    const emphasis = ['host.delete', 'host.deleted', 'host.next_test'].includes(row.key);
+    c.text(2, 1 + i, row.text, style(emphasis ? color.text : color.dim, emphasis), c.columns - 4, `console.${row.key}`);
   });
   if (!final && t < world.film.times.outroHold && Math.floor(t / 500) % 2 === 0) c.text(2, rows.length + 2, '_', style(color.dim), 1, 'console.cursor');
 }
