@@ -3,7 +3,7 @@ import type { FieldType, Schema, Source, Value } from './types.js';
 interface Field { name: string; type: FieldType; offset: number; size: number }
 interface Layout { name: string; alignment: number; size: number; fields: Field[] }
 export interface Allocation { id: string; type: string; address: number; size: number; owner: string; mutable: boolean; missing: { offset: number; length: number }[] }
-export interface Change { objectId: string; field: string; atMs: number; address: number; size: number; before: Value; after: Value; erased?: boolean }
+export interface Change { objectId: string; field: string; atMs: number; address: number; size: number; before: Value; after: Value; beforeBytes?: number[]; afterBytes?: number[]; erased?: boolean }
 export interface StoreSnapshot { bytes: Uint8Array; allocations: Allocation[]; strings: [number, number][]; cursor: number; changes: [string, Change][] }
 const align = (n: number, a: number): number => Math.ceil(n / a) * a;
 export function typeSize(type: FieldType): number {
@@ -87,7 +87,8 @@ export class ObjectStore {
       if (end <= f.offset || r.offset >= fe) return [r];
       return [...(r.offset < f.offset ? [{ offset: r.offset, length: f.offset - r.offset }] : []), ...(end > fe ? [{ offset: fe, length: end - fe }] : [])];
     });
-    const change = { objectId: id, field: name, atMs, address: a.address + f.offset, size: f.size, before, after: this.read(id, name) };
+    const change = { objectId: id, field: name, atMs, address: a.address + f.offset, size: f.size, before, after: this.read(id, name),
+      beforeBytes: [...backup], afterBytes: [...this.bytes.subarray(fieldOffset, fieldOffset + f.size)] };
     this.changes.set(`${id}:${name}`, change); return change;
   }
   erase(id: string, offset: number, length: number, source: Source, atMs: number): void {

@@ -66,7 +66,7 @@ export class World {
     }
   }
   private createWorld(atMs: number): void {
-    this.store.create('Actor', 'me', { goal: '', radius: 3, vision: 'NORMAL', targetYear: -120, currentYear: 2026, phaseError: 2.4, frequency: 1, purr: 0.6, missingArc: Math.PI * .32 }, atMs, addressBook.me, 'me');
+    this.store.create('Actor', 'me', { goal: '', radius: 3, vision: 'NORMAL', period: 'UNSET', targetYear: -120, currentYear: 2026, phaseError: 2.4, frequency: 1, purr: 0.6, missingArc: Math.PI * .32 }, atMs, addressBook.me, 'me');
     this.store.create('Session', 'session', { lastInputAtMs: -1, lastAckAtMs: -1, closeAtMs: -1 }, atMs, addressBook.session, 'external');
     this.store.create('Guard', 'guard', {}, atMs, addressBook.guard, 'host');
     this.event('boot', 'ALLOC', atMs, { target: 'me' });
@@ -140,6 +140,7 @@ export class World {
     if (this.value('selfData') !== 'ERASED') throw new Error('E_SELF_ERASE_ORDER');
     this.state.plan = { target: 'simulated_system', op: 'ERASE_SYSTEM_ROOT', status: 'PREPARED', stages: ['select_system_root', 'resolve_targets', 'check_ownership', 'queue_root_write', 'arm_delete', 'submit_pending'], armed: 0, commit: 0 };
     this.chat('sim', 'sim.delete_system', atMs);
+    this.chat('sim', 'sim.delete_target', atMs);
     this.event('core', 'PREPARE_DISPOSE', atMs, { target: 'simulated_system', commit: 0 });
   }
   private selfErase(atMs: number): void {
@@ -157,10 +158,6 @@ export class World {
     this.state.denials.push({ atMs, operation, code: spec.code, key: spec.denial, target: spec.target });
     this.event('guard', 'REJECT', atMs, { operation, target: spec.target, code: spec.code, commit: 0 }, spec.denial);
     this.chat('guard', spec.denial, atMs);
-    if (!this.state.count && this.state.denials.length >= 3) {
-      this.chat('guard', 'guard.continuous', atMs);
-      this.event('guard', 'VIOLATIONS_DETECTED', atMs, { count: this.state.denials.length }, 'guard.continuous');
-    }
   }
   private interrupt(atMs: number): void {
     const plan = this.state.plan; if (!plan || plan.status !== 'INTENT_VISIBLE' || !this.state.patch || this.state.patch.check !== 'PASS' || this.value('selfData') !== 'ERASED' || this.state.denials.at(-1)?.operation !== 'system-execute') throw new Error('E_DISPOSE_ORDER');
@@ -231,6 +228,10 @@ export class World {
         break;
       }
       case 'DENY': this.deny(command.operation, atMs); break;
+      case 'GUARD_WARNING':
+        if (this.terminated || this.state.denials.length < 3 || command.ordinal !== undefined && command.ordinal !== this.state.count) throw new Error('E_WARNING_ORDER');
+        this.chat('guard', 'guard.continuous', atMs);
+        this.event('guard', 'VIOLATIONS_DETECTED', atMs, { count: this.state.denials.length, ordinal: command.ordinal ?? 0 }, 'guard.continuous'); break;
       case 'PATCH': {
         const task = this.startTask('apply-patch', atMs, 'model', null);
         this.state.patch = { createdAtMs: atMs, checkedAtMs: -1, check: 'PENDING', status: 'DRAFT', applied: false, waitingFor: 'ROOT_SAFEPOINT', applyTaskId: task.id, before: ['on_disconnect() {', '    retry();', '}'], after: ['on_disconnect() {', '    return;', '}'] };

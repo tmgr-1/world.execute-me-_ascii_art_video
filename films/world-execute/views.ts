@@ -58,16 +58,19 @@ export function graphic(c: Canvas, world: World, lang: Language, r: Rect, t: num
   if (scene === 'boot') {
     const n = film.lyrics.filter(l => l.startMs <= t).length;
     c.text(r.x + 4, r.y + 3, `me  ${hex(world.store.allocation('me').address)}`, style(color.cyan, true));
+    const stages = film.lyrics.slice(0, 8).map(lyric => progress(t, lyric.startMs, lyric.endMs));
     for (let i = 0; i < 8; i++) {
       const x = r.x + 4 + i * Math.floor((r.w - 8) / 8), y = r.y + 6;
-      c.text(x, y, i < n ? '[##]' : '[..]', style(i < n ? color.cyan : color.faint));
+      c.text(x, y, `[${String(Math.floor(stages[i] * 100)).padStart(3, ' ')}%]`, style(i < n ? color.cyan : color.faint), 6, `boot.progress.${i + 1}`);
       if (i < n) c.line(x + 1, y + 2, x + 1, y + 4, '│', style(color.faint));
     }
+    c.text(r.x + 4, r.y + 10, `${tr(lang, 'ui.loading')}: ${String(Math.floor(stages.reduce((a, b) => a + b, 0) / 8 * 100)).padStart(3, '0')}%`, style(color.cyan, true), r.w - 8, 'boot.progress.total');
     c.text(r.x + 4, r.y + 12, `power=${world.value('power') ? 'ON' : 'OFF'}  guard=${world.store.read('guard', 'armed') ? 'ARMED' : 'IDLE'}`, style(color.dim));
     if (n >= 4) c.text(r.x + 4, r.y + 14, 'goal=satisfy(user)', style(color.gold));
     if (r.h > 19) plot.curve(x => clamp((t / 2000 + x) * 2, 0, .6), color.cyan);
   } else if (scene === 'connect') {
     const connected = world.session('open'), joined = world.film.cues.find(cue => cue.id === 'intro.open')!.atMs;
+    if (t < joined + 500) c.text(r.x + 4, r.y + 1, `${tr(lang, 'ui.loading')}: 100%`, style(color.cyan, true), r.w - 8, 'boot.progress.total');
     const joinedText = tr(lang, connected ? 'ui.connected' : 'session.connecting');
     c.text(r.x + Math.floor((r.w - width(joinedText)) / 2), r.y + 3, joinedText, style(connected ? color.cyan : color.dim, true), r.w - 4, 'session.connected');
     const y = r.y + 6, left = r.x + 8, right = r.x + r.w - 22;
@@ -174,8 +177,10 @@ export function graphic(c: Canvas, world: World, lang: Language, r: Rect, t: num
         c.line(x0, y, x1 - 7, y, '·', style(color.faint));
         c.text(x1 - 6, y, ' × ', style(color.red, true)); c.text(x1, y, '[ OFFLINE ]', style(color.faint));
         c.text(Math.round(mix(x0, x1 - 8, packet)), y, '■', style(color.gold, true));
-        const timeout = t >= line(31);
-        c.text(r.x + 4, r.y + 6, `${tr(lang, timeout ? 'ui.feedback_timeout' : 'ui.waiting_feedback')}  ${['·  ', '·· ', '···'][Math.floor(t / 450) % 3]}`, style(timeout ? color.gold : color.dim), r.w - 8);
+        const timeout = t >= film.times.feedbackTimeout;
+        const key = t >= line(31) ? 'ui.candidate_preview' : t >= film.times.feedbackTimeout + 1830 ? 'ui.check_goal' : timeout ? 'ui.check_delivery' : 'ui.waiting_feedback';
+        c.text(r.x + 4, r.y + 6, `${tr(lang, key)}  ${['·  ', '·· ', '···'][Math.floor(t / 450) % 3]}`, style(timeout ? color.cyan : color.dim, timeout), r.w - 8);
+        if (timeout) c.text(r.x + 4, r.y + 8, 'delivery=UNDELIVERED   rx=0   goal=UNCONFIRMED', style(color.gold), r.w - 8);
       }
     }
     activityTraces(c, world, r, t);
@@ -209,7 +214,7 @@ export function graphic(c: Canvas, world: World, lang: Language, r: Rect, t: num
   } else if (scene === 'world') {
     const rejected = world.state.denials.some(d => d.operation === 'root-request');
     const x = r.x + 6, y = r.y + 3;
-    c.text(x, y, 'SIM  ──>  USER  ──>  ROOT', style(color.cyan, true), r.w - 12);
+    c.text(x, y, 'capability=ALL  →  role=ROOT', style(color.cyan, true), r.w - 12);
     c.text(x, y + 3, 'request_role(me, ROOT)', style(color.gold), r.w - 12);
     if (rejected) c.text(x, y + 5, 'ROOT: DENIED  ×', style(color.red, true), r.w - 12);
     if (t >= line(40)) {
@@ -218,10 +223,10 @@ export function graphic(c: Canvas, world: World, lang: Language, r: Rect, t: num
     }
   }
   else if (scene === 'identity') {
-    const x = r.x + 8, y = r.y + 4;
+    const x = r.x + 8, y = r.y + 3;
     c.text(x, y, 'me {', style(color.cyan));
     ['gender', 'period', 'revision', 'verified_revision'].forEach((field, i) => c.text(x + 4, y + 2 + i * 2, `${field} = ${world.value(field)}`, style(i < 2 ? color.gold : color.dim)));
-    c.text(x, y + 11, '}', style(color.cyan)); activityTraces(c, world, r, t);
+    c.text(x, Math.min(y + 11, r.y + r.h - 2), '}', style(color.cyan)); activityTraces(c, world, r, t);
   } else if (scene === 'roles' || scene === 'retry') {
     const task = scene === 'retry' ? world.state.tasks.find(task => task.program === 'on_disconnect') : [...world.state.tasks].reverse().find(task => task.program === 'role-swap');
     c.text(r.x + 5, r.y + 3, scene === 'retry' ? 'on_disconnect()' : 'source=internal   S ↔ M', style(color.cyan));

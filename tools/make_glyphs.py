@@ -34,6 +34,8 @@ for word in ('Ein','dos','trois','Fem','PROGRAM','PROCESS','TERMINATED'):
  bitmap=[''.join('##' if p=='1' else '  ' for p in row) for row in rows]
  if word in ('PROGRAM', 'PROCESS', 'TERMINATED'): bitmap = [row for row in bitmap for _ in range(2)]
  result[word]={'sourceText':word,'bitmap':bitmap,'sourceFont':'Original 5x7 bitmap','license':'CC0-1.0'}
+ if word in ('PROCESS', 'TERMINATED'):
+  result[word+'.compact']={'sourceText':word,'bitmap':bitmap[::2],'sourceFont':'Original 5x7 bitmap, native seven-row title','license':'CC0-1.0'}
 font_path='/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc'
 font=ImageFont.truetype(font_path,18,index=2)
 for word in ('네','六','终止','程序','已被终止'):

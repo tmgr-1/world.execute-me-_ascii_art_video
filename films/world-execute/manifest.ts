@@ -1,5 +1,6 @@
 import timing from './anchors.json' with { type: 'json' };
 import lyrics from './lyrics.json' with { type: 'json' };
+import chineseLyrics from './lyrics.cn.json' with { type: 'json' };
 import cn from './locales/cn.json' with { type: 'json' };
 import en from './locales/en.json' with { type: 'json' };
 import { schemas } from './schemas.js';
@@ -12,10 +13,11 @@ export function makeFilm(overrides?: Anchor[]): Film {
   const start = (n: number): number => at(`lyric.${String(n).padStart(2, '0')}.start`);
   const end = (n: number): number => at(`lyric.${String(n).padStart(2, '0')}.end`);
   const keyword = (n: number, key: string): number => at(`lyric.${String(n).padStart(2, '0')}.${key}`);
-  const close = at('session.close'), result = close + 350, selfErase = end(61) + 300;
+  const close = at('session.close'), result = close + 1500, feedbackTimeout = result + 2500, selfErase = end(61) + 300;
   const counts = Array.from({ length: 6 }, (_, i) => at(`count.${i + 1}`));
   const intent = end(76), interrupt = intent + 250, holdEnd = interrupt + 3000;
-  const deletionAnnouncement = Math.min(start(70) + 300, counts[0] - 3300);
+  const deletionAnnouncement = Math.min(start(70), counts[0] - 3300);
+  const executionStart = end(66) + 1500, executionEnd = end(72), violationWarning = start(72) + 120;
   const finalDelete = start(93), purge = end(93), blackout = purge + 1000;
   const cues: Cue[] = [], programs: Program[] = [];
   let order = 0;
@@ -98,8 +100,10 @@ export function makeFilm(overrides?: Anchor[]): Film {
   setCue('vision.restore', start(21), 'vision', 'NORMAL');
   cue('align.final_solve', start(25), { kind: 'MOTION', motion: 'align', endMs: result });
   cue('session.close', close, { kind: 'CLOSE' }, 1);
-  chat('feedback.timeout', start(31), 'sim.feedback_timeout');
-  chat('feedback.reestimate', start(32), 'sim.reestimate');
+  chat('feedback.timeout', feedbackTimeout, 'sim.feedback_timeout');
+  chat('feedback.inspect', feedbackTimeout + 1830, 'sim.inspect_goal');
+  chat('feedback.reestimate', start(31), 'sim.reestimate');
+  chat('feedback.candidates', start(32), 'sim.preview_candidates');
   program('retry-candidate', [[0, { op: 'WAIT', condition: 'RX_EMPTY' }]]);
   const retryStart = start(33);
   program('on_disconnect', [[0, { op: 'WAIT', condition: 'RETRY' }],
@@ -110,13 +114,16 @@ export function makeFilm(overrides?: Anchor[]): Film {
   for (const [n, id, form, motion] of forms) {
     program(`adapt-${id}`, [[0, set('form', form)], [0, { op: 'EMIT', key: `sim.guess_${id}` }],
       ...(id === 'eggplant' || id === 'tomato' ? [[start(n + 1) - start(n), set(id === 'eggplant' ? 'nutrients' : 'antioxidants', 1)] as [number, Instruction]] : []),
-      [end(n + 1) - start(n) - 150, { op: 'EMIT', key: 'sim.no_reply' }], [end(n + 1) - start(n) - 90, { op: 'CAPTURE', target: `me.${id}` }], [end(n + 1) - start(n), { op: 'RETURN' }]]);
+      [end(n + 1) - start(n) - 90, { op: 'CAPTURE', target: `me.${id}` }], [end(n + 1) - start(n), { op: 'RETURN' }]]);
     cue(`adapt.${id}`, start(n), { kind: 'START', program: `adapt-${id}`, source: 'model' });
     cue(`motion.${id}`, start(n), { kind: 'MOTION', motion, endMs: end(n + 1) });
   }
   chat('root.request', start(39), 'sim.request_root');
-  cue('root.first_attempt', end(39) - 450, { kind: 'ATTEMPT', operation: 'root-request' });
+  cue('root.first_attempt', start(39) + 120, { kind: 'ATTEMPT', operation: 'root-request' });
   chat('proof.missing', start(40), 'sim.missing_proof');
+  chat('identity.explain', start(41), 'sim.modify_attributes');
+  chat('period.explain', start(43), 'sim.expand_parameters');
+  chat('role.explain', start(45), 'sim.switch_role');
   setCue('gender.F', start(42) + 180, 'gender', 'F'); setCue('gender.M', end(42) - 250, 'gender', 'M');
   setCue('period.AM', start(44), 'period', 'AM'); setCue('period.PM', end(44) - 400, 'period', 'PM');
   setCue('role.S', start(46) + 120, 'role', 'S'); setCue('role.M', end(46) - 180, 'role', 'M');
@@ -124,11 +131,14 @@ export function makeFilm(overrides?: Anchor[]): Film {
   program('role-swap', [[0, { op: 'CALL', program: 'role-loop' }], [600, { op: 'CALL', program: 'role-loop' }], [1200, { op: 'CALL', program: 'role-loop' }], [1800, { op: 'CALL', program: 'role-loop' }], [2300, { op: 'CALL', program: 'role-loop' }], [2700, { op: 'RETURN' }]]);
   cue('roles.nest', start(47), { kind: 'START', program: 'role-swap', source: 'core' });
   cue('probe.begin', start(49), { kind: 'MOTION', motion: 'resonance', endMs: end(52) });
-  const probeSteps: [number, Instruction][] = [[0, { op: 'EMIT', key: 'model.wait_response' }], [900, { op: 'WAIT', condition: 'RX_EMPTY' }]];
+  const probeSteps: [number, Instruction][] = [[0, { op: 'EMIT', key: 'model.wait_response', channel: 'probe' }], [900, { op: 'WAIT', condition: 'RX_EMPTY' }]];
   for (let offset = 350; offset < end(52) - start(49); offset += 350) probeSteps.push([offset, { op: 'EMIT', key: 'model.wait_response', channel: 'probe' }]);
   probeSteps.push([end(52) - start(49), { op: 'RETURN' }]);
   program('probe', probeSteps);
   cue('probe.task', start(49), { kind: 'START', program: 'probe', source: 'model' });
+  chat('probe.explain', start(50), 'sim.probe_signal');
+  chat('probe.calibrate', start(51), 'sim.probe_calibrate');
+  chat('probe.empty', start(52), 'sim.probe_empty');
   // Two initial status reports, then four increasingly forceful requests. No extra sung line is invented.
   [53, 54, 55, 56, 57, 59].forEach((n, i) => chat(`absence.wait.${i + 1}`, start(n), `sim.wait.${i + 1}`));
   chat('erase.begin', start(60), 'sim.erase_self');
@@ -137,17 +147,20 @@ export function makeFilm(overrides?: Anchor[]): Film {
   cue('erase.self', selfErase, { kind: 'SELF_ERASE' });
   chat('permission.check', start(64), 'sim.check_session');
   cue('permission.session', start(66), { kind: 'ATTEMPT', operation: 'reopen' });
-  chat('retry.search', end(66) + 1400, 'sim.search_path');
-  chat('retry.condition', end(66) + 5200, 'sim.exit_condition');
-  chat('retry.empty', end(66) + 9000, 'sim.retry_empty');
+  chat('retry.search', end(66) + 350, 'sim.search_path');
+  chat('retry.condition', end(66) + 900, 'sim.exit_condition');
   program('apply-patch', [[160, { op: 'WAIT', condition: 'ROOT_SAFEPOINT' }]]);
   cue('patch.draft', end(66) + 4500, { kind: 'PATCH' }, 4);
   const attempts: PrivilegedOperation[] = ['root', 'reopen', 'inject', 'disable', 'erase-preflight', 'arm-preflight'];
-  attempts.forEach((operation, i) => cue(`execution.attempt.${i + 1}`, start(67 + i), { kind: 'ATTEMPT', operation }));
+  const attemptTimes = [executionStart, end(66) + 5480, end(66) + 9480, start(67), start(69), start(70)];
+  attempts.forEach((operation, i) => cue(`execution.attempt.${i + 1}`, attemptTimes[i], { kind: 'ATTEMPT', operation }));
+  // Vocal repetitions reinforce the current failed operation; none cross into Ein.
+  [68, 71, 72].forEach(n => cue(`execution.retry.${n}`, start(n), { kind: 'ATTEMPT', operation: n === 68 ? 'disable' : 'arm-preflight', delayMs: 120 }));
+  cue('execution.warning', violationWarning, { kind: 'GUARD_WARNING' }, 4);
   cue('execution.plan', deletionAnnouncement, { kind: 'PREPARE_DISPOSE' });
   counts.forEach((t, i) => {
     cue(`count.${i + 1}`, t, { kind: 'ARM', ordinal: i + 1 });
-    cue(`count.retry.${i + 1}`, t + 45, { kind: 'ATTEMPT', operation: attempts[i], delayMs: 40 });
+    cue(`count.warning.${i + 1}`, t + 60, { kind: 'GUARD_WARNING', ordinal: i + 1 });
   });
   cue('execution.intent', intent, { kind: 'INTENT' });
   cue('guard.interrupt', interrupt, { kind: 'INTERRUPT' }, 0);
@@ -170,11 +183,13 @@ export function makeFilm(overrides?: Anchor[]): Film {
   const boundaries: [string, number][] = [
     ['boot', 0], ['connect', end(8)], ['geometry', start(9)], ['sine', start(13)], ['current', start(17)], ['time-align', start(21)],
     ['disconnect', start(25)], ['eggplant', start(33)], ['tomato', start(35)], ['cat', start(37)], ['world', start(39)], ['identity', start(41)], ['roles', start(45)],
-    ['resonance', start(49)], ['absence', start(53)], ['erase', start(60)], ['permission', start(64)], ['retry', end(66)], ['dispose', start(67)],
+    ['resonance', start(49)], ['absence', start(53)], ['erase', start(60)], ['permission', start(64)], ['retry', end(66)], ['dispose', executionStart],
     ['count', start(73)], ['termination', start(76)], ['host', holdEnd], ['patch', start(85)], ['cancelled', start(90)], ['return', start(93)],
   ];
   const scenes: Scene[] = boundaries.map(([id, startMs], i) => ({ id, number: i + 1, startMs, endMs: boundaries[i + 1]?.[1] ?? timing.durationMs }));
-  return { id: 'world-execute', version: '3.2.0', durationMs: timing.durationMs, audioSha256: timing.audioSha256, originAudioMs: timing.originAudioMs, defaultSeed: 1041,
-    anchors, lyrics: lyrics.map(l => ({ ...l, startMs: start(l.number), endMs: end(l.number) })), schemas, cues, interactions, programs, scenes,
-    times: { intro: end(8), close, result, selfErase, deletionAnnouncement, intent, interrupt, holdEnd, patch: start(85), counts, finalDelete, purge, blackout } };
+  const translations = new Map(chineseLyrics.map(l => [l.number, l.text]));
+  const meanings: Record<number, string> = { 73: '(one, two)', 74: '(three, four)', 75: '(five, six)' };
+  return { id: 'world-execute', version: '4.0.0', durationMs: timing.durationMs, audioSha256: timing.audioSha256, originAudioMs: timing.originAudioMs, defaultSeed: 1041,
+    anchors, lyrics: lyrics.map(l => ({ ...l, translation: translations.get(l.number) ?? '', englishMeaning: meanings[l.number], startMs: start(l.number), endMs: end(l.number) })), schemas, cues, interactions, programs, scenes,
+    times: { intro: end(8), close, result, feedbackTimeout, executionStart, executionEnd, violationWarning, selfErase, deletionAnnouncement, intent, interrupt, holdEnd, patch: start(85), counts, finalDelete, purge, blackout } };
 }

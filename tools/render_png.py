@@ -12,6 +12,8 @@ w,h=frame['size']['columns'],frame['size']['rows']
 image=Image.new('RGB',(w*10+40,h*20+40),'#101112');draw=ImageDraw.Draw(image)
 latin=ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf',16)
 cjk=ImageFont.truetype('/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc',18,index=2)
+latin_bold=ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf',16)
+cjk_bold=ImageFont.truetype('/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc',18,index=2)
 def palette(n):
  if n>=232:return (8+(n-232)*10,)*3
  if n>=16:
@@ -25,6 +27,8 @@ for i,cell in enumerate(frame['cells']):
  if cell['continuation'] or cell['g']==' ':continue
  x,y=20+i%w*10,20+i//w*20
  if cell['g']=='█':draw.rectangle((x,y,x+9,y+19),fill=palette(cell['fg']))
- else:draw.text((x,y+17),cell['g'],font=cjk if cell['width']==2 else latin,fill=palette(cell['fg']),anchor='ls')
+ else:
+  font=(cjk_bold if cell['bold'] else cjk) if cell['width']==2 else (latin_bold if cell['bold'] else latin)
+  draw.text((x,y+17),cell['g'],font=font,fill=palette(cell['fg']),anchor='ls')
 args.output.parent.mkdir(parents=True,exist_ok=True)
 image.save(args.output)

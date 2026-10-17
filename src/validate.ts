@@ -1,6 +1,6 @@
 import { ObjectStore } from './store.js';
 import { locales } from './locale.js';
-import { graphemes, wrap } from './canvas.js';
+import { graphemes, width, wrap } from './canvas.js';
 import { Director } from './world.js';
 import { layout, modalRect, Renderer } from './render.js';
 import type { Film, Language } from './types.js';
@@ -18,6 +18,8 @@ export function validateFilm(film: Film, release = false, depth: 'full' | 'model
   if (unreviewed.length) (release ? errors : warnings).push(`E_ANCHOR_ROUGH:${unreviewed.length}`);
   film.lyrics.forEach((lyric, i) => {
     check(lyric.number === i + 1 && lyric.startMs < lyric.endMs, `E_LYRIC_RANGE:${lyric.number}`);
+    check(!!lyric.translation?.trim() && width(lyric.translation) <= 126 && width(lyric.text) <= 126, `E_SUBTITLE:${lyric.number}`);
+    if (lyric.number >= 73 && lyric.number <= 75) check(/^\(.+\)$/.test(lyric.englishMeaning ?? ''), `E_COUNT_TRANSLATION:${lyric.number}`);
     if (i) check(lyric.startMs >= film.lyrics[i - 1].endMs, `E_LYRIC_ORDER:${lyric.number}`);
   });
   for (const anchor of film.anchors) {
@@ -70,7 +72,11 @@ export function validateFilm(film: Film, release = false, depth: 'full' | 'model
   check(film.times.intent >= film.lyrics[75].endMs && film.times.interrupt > film.times.intent && film.times.holdEnd - film.times.interrupt === 3000, 'E_TERMINATION_TIMING');
   check(film.times.close < film.lyrics[32].startMs && film.times.close > film.interactions.at(-1)!.send, 'E_CLOSE_TIMING');
   check(film.times.counts.every((t, i) => !i || t > film.times.counts[i - 1]), 'E_COUNT_ORDER');
-  check(film.times.result > film.times.close && film.times.result - film.times.close <= 500, 'E_RESULT_AFTER_CLOSE');
+  check(film.times.result - film.times.close >= 1000 && film.times.result - film.times.close <= 2000, 'E_RESULT_AFTER_CLOSE');
+  check(film.times.feedbackTimeout - film.times.result >= 2000 && film.times.feedbackTimeout - film.times.result <= 3000, 'E_FEEDBACK_WAIT');
+  check(film.times.executionStart - film.lyrics[65].endMs >= 1000 && film.times.executionStart - film.lyrics[65].endMs <= 2000, 'E_EXECUTION_START');
+  check(film.times.executionEnd < film.times.counts[0] && film.times.violationWarning >= film.lyrics[71].startMs && film.times.violationWarning < film.times.executionEnd, 'E_EXECUTION_END');
+  check(film.cues.filter(cue => cue.command.kind === 'ATTEMPT').every(cue => cue.atMs < film.times.executionEnd), 'E_ATTEMPT_BEFORE_EIN');
   check(film.times.selfErase < film.times.deletionAnnouncement && film.times.counts[0] - film.times.deletionAnnouncement >= 3000, 'E_DELETE_NARRATIVE_ORDER');
   check(film.times.finalDelete < film.times.purge && film.times.purge < film.times.blackout && film.times.blackout < film.durationMs, 'E_FINAL_PURGE_TIMING');
   if (errors.length || depth === 'content') return { errors, warnings };
@@ -87,6 +93,9 @@ export function validateFilm(film: Film, release = false, depth: 'full' | 'model
     check(result?.queuedAtMs === film.times.result && !result.delivered && !result.acknowledged, 'E_UNDELIVERED_RESULT');
     check(w.state.journal.filter(e => e.kind === 'SELF_ERASE').length === 1 && w.state.journal.find(e => e.kind === 'SELF_ERASE')?.payload.runtime === 'RUNNING', 'E_SELF_ERASE');
     check(w.state.journal.filter(e => e.kind === 'BLOCKED').length === 1 && w.state.journal.find(e => e.kind === 'BLOCKED')?.payload.reason === 'PROTECTED_SYSTEM_DELETE', 'E_FATAL_BOUNDARY');
+    const notices = w.state.journal.filter(e => e.kind === 'VIOLATIONS_DETECTED');
+    check(notices.length === 7 && notices[0]?.atMs === film.times.violationWarning && notices.slice(1).every((notice, i) => notice.atMs === film.times.counts[i] + 60 && notice.payload.ordinal === i + 1), 'E_GUARD_WARNING_SEQUENCE');
+    check(!w.state.journal.some(e => ['ILLEGAL_ATTEMPT', 'REJECT'].includes(e.kind) && e.atMs >= film.times.counts[0] && e.atMs < film.times.intent), 'E_NO_COUNT_ATTEMPTS');
     const a = w.state.archive;
     check(a && a.patch.createdAtMs < a.terminatedAtMs && a.patch.checkedAtMs < a.terminatedAtMs && !a.patch.applied, 'E_PATCH_LIFETIME');
     check(a?.tasks.find(task => task.id === a.patch.applyTaskId)?.status === 'CANCELLED', 'E_APPLY_CANCEL');
@@ -95,16 +104,20 @@ export function validateFilm(film: Film, release = false, depth: 'full' | 'model
     check(a?.fault.selfData === 'ERASED' && a.fault.systemErase === 'BLOCKED' && a.fault.reason === 'PROTECTED_SYSTEM_DELETE', 'E_CORE_CAUSALITY');
     check(!w.state.journal.some(e => e.atMs > film.times.interrupt && ['sim', 'core', 'model', 'session'].includes(e.source)), 'E_ACTOR_AFTER_TERMINATION');
     if (depth === 'full') for (const size of [{ columns: 160, rows: 45 }, { columns: 130, rows: 35 }]) {
-      const l = layout(size), rect = modalRect(size);
+      const l = layout(size);
       check([6, 7].includes(l.inputRows) && l.input.h - 2 === l.inputRows, 'E_INPUT_ROWS');
-      const ratio = rect.w * rect.h / (size.columns * size.rows); check(ratio >= .76 && ratio <= .84, 'E_MODAL_AREA');
-      check(rect.x === 1 && rect.w === size.columns - 2, 'E_MODAL_SIDE_BORDERS');
+      check(l.story.h === size.rows - 2 && l.subtitles.y === l.story.h && l.subtitles.h === 2, 'E_SUBTITLE_VIEWPORT');
       for (const lang of ['cn', 'en'] as const) {
+        const rect = modalRect(size, lang);
+        check(rect.x === 1 && rect.w === size.columns - 2, 'E_MODAL_SIDE_BORDERS');
+        check(rect.y > l.chat.y + l.chat.h && rect.y + rect.h < l.subtitles.y, 'E_MODAL_CLEARANCE');
         const renderer = new Renderer(new Director(film));
         const before = renderer.frame(film.times.interrupt - 1, size, lang);
         const frozen = renderer.frame(film.times.interrupt + 1, size, lang);
-        check(frozen.hash() === renderer.frame(film.times.holdEnd - 1, size, lang).hash(), `E_FREEZE:${lang}`);
-        for (let y = 0; y < size.rows; y++) for (let x = 0; x < size.columns; x++) if (x < rect.x || x >= rect.x + rect.w || y < rect.y || y >= rect.y + rect.h) check(JSON.stringify(frozen.get(x, y)) === JSON.stringify(before.get(x, y)), `E_MODAL_OUTSIDE:${x},${y}`);
+        const endHold = renderer.frame(film.times.holdEnd - 1, size, lang), storyCells = size.columns * l.story.h;
+        check(JSON.stringify(frozen.cells.slice(0, storyCells)) === JSON.stringify(endHold.cells.slice(0, storyCells)), `E_FREEZE_STORY:${lang}`);
+        check(frozen.cells.some(cell => cell.semantic === 'subtitle.original' && cell.fg === 15 && cell.bold), `E_SUBTITLE_VISIBLE:${lang}`);
+        for (let y = 0; y < l.story.h; y++) for (let x = 0; x < size.columns; x++) if (x < rect.x || x >= rect.x + rect.w || y < rect.y || y >= rect.y + rect.h) check(JSON.stringify(frozen.get(x, y)) === JSON.stringify(before.get(x, y)), `E_MODAL_OUTSIDE:${x},${y}`);
         check(frozen.validate().length === 0, `E_WIDE:${lang}`);
         const console = renderer.frame(film.times.holdEnd + 500, size, lang);
         check(console.regions.has('system.console') && !console.regions.has('input') && !console.regions.has('chat'), `E_CONSOLE_ONLY:${lang}`);

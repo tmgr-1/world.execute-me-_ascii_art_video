@@ -22,12 +22,16 @@ for (const size of [{ columns: 130, rows: 35 }, { columns: 160, rows: 45 }]) for
     const draftRow = frame.cells.slice((l.input.y + l.input.h - 2) * size.columns, (l.input.y + l.input.h - 1) * size.columns);
     assert.ok(draftRow.slice(1, -1).every(c => c.g === ' '));
   });
-  test(`${size.columns}x${size.rows} ${lang}: frozen modal keeps every outside cell and all styles for 3000ms`, () => {
-    const renderer = new Renderer(new Director(film)), rect = modalRect(size);
+  test(`${size.columns}x${size.rows} ${lang}: story freezes for 3000ms while captions follow the music`, () => {
+    const renderer = new Renderer(new Director(film)), rect = modalRect(size, lang), storyH = layout(size).story.h;
+    const story = (c: Canvas): string => JSON.stringify(c.cells.slice(0, size.columns * storyH));
     const before = renderer.frame(film.times.interrupt - 1, size, lang), first = renderer.frame(film.times.interrupt, size, lang);
-    for (let y = 0; y < size.rows; y++) for (let x = 0; x < size.columns; x++) if (x < rect.x || x >= rect.x + rect.w || y < rect.y || y >= rect.y + rect.h) assert.deepEqual(first.get(x, y), before.get(x, y));
-    for (const dt of [1, 250, 1500, 2999]) assert.equal(renderer.frame(film.times.interrupt + dt, size, lang).hash(), first.hash());
-    assert.equal(new Renderer(new Director(film)).frame(film.times.interrupt + 1500, size, lang).hash(), first.hash());
+    assert.ok(rect.y > layout(size).chat.y + layout(size).chat.h);
+    assert.ok(rect.y + rect.h < storyH);
+    for (let y = 0; y < storyH; y++) for (let x = 0; x < size.columns; x++) if (x < rect.x || x >= rect.x + rect.w || y < rect.y || y >= rect.y + rect.h) assert.deepEqual(first.get(x, y), before.get(x, y));
+    for (const dt of [1, 250, 1500, 2999]) assert.equal(story(renderer.frame(film.times.interrupt + dt, size, lang)), story(first));
+    assert.equal(story(new Renderer(new Director(film)).frame(film.times.interrupt + 1500, size, lang)), story(first));
+    assert.notDeepEqual(renderer.frame(film.times.interrupt + 1500, size, lang).cells.slice(storyH * size.columns), first.cells.slice(storyH * size.columns));
     assert.notEqual(renderer.frame(film.times.holdEnd, size, lang).hash(), first.hash());
     assert.ok(renderer.frame(film.durationMs, size, lang).cells.every(cell => cell.g === ' '));
   });

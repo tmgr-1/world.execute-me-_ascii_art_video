@@ -3,7 +3,7 @@ export type Source = 'boot' | 'session' | 'sim' | 'core' | 'model' | 'guard' | '
 export interface Size { columns: number; rows: number }
 export interface Rect { x: number; y: number; w: number; h: number }
 export interface Anchor { id: string; atMs: number; status: 'rough' | 'calibrated' }
-export interface Lyric { number: number; text: string; startMs: number; endMs: number }
+export interface Lyric { number: number; text: string; translation: string; englishMeaning?: string; startMs: number; endMs: number }
 export interface Interaction {
   id: string; key: string; program: string; send: number; response: number; holdUntil: number;
   semanticRequest: { operation: string; args: Record<string, Value> };
@@ -43,6 +43,7 @@ export type Command =
   | { kind: 'SELF_ERASE' }
   | { kind: 'ATTEMPT'; operation: PrivilegedOperation; delayMs?: number }
   | { kind: 'DENY'; operation: PrivilegedOperation }
+  | { kind: 'GUARD_WARNING'; ordinal?: number }
   | { kind: 'PATCH' } | { kind: 'PATCH_CHECK' } | { kind: 'PREPARE_DISPOSE' }
   | { kind: 'ARM'; ordinal: number } | { kind: 'INTENT' } | { kind: 'INTERRUPT' }
   | { kind: 'HOST'; key: string } | { kind: 'PURGE' };
@@ -53,5 +54,6 @@ export interface Film {
   defaultSeed: number; anchors: Anchor[]; lyrics: Lyric[]; interactions: Interaction[];
   programs: Program[]; cues: Cue[]; scenes: Scene[]; schemas: Schema[];
   times: { intro: number; close: number; intent: number; interrupt: number; holdEnd: number; patch: number; counts: number[];
-    result: number; selfErase: number; deletionAnnouncement: number; finalDelete: number; purge: number; blackout: number };
+    result: number; feedbackTimeout: number; executionStart: number; executionEnd: number; violationWarning: number;
+    selfErase: number; deletionAnnouncement: number; finalDelete: number; purge: number; blackout: number };
 }

@@ -38,11 +38,12 @@ test('vision is a linked request with degraded model state, ghosted panes and su
   assert.equal(d.world.value('vision'), 'NORMAL'); assert.ok(!restored.cells.some(cell => cell.semantic === 'vision.ghost'));
 });
 
-test('departure is prominent and the computed result is undelivered immediately after it', () => {
+test('departure is readable before the result, followed by a short feedback timeout', () => {
   const d = new Director(film), r = new Renderer(d);
   assert.ok(!d.at(film.times.close).state.outputs.some(output => output.key === 'sim.complete'));
   const w = d.at(film.times.result), result = w.state.outputs.find(output => output.key === 'sim.complete')!;
-  assert.ok(result.queuedAtMs > film.times.close && result.queuedAtMs - film.times.close <= 500);
+  assert.ok(result.queuedAtMs - film.times.close >= 1000 && result.queuedAtMs - film.times.close <= 2000);
+  assert.equal(film.times.feedbackTimeout - film.times.result, 2500);
   assert.equal(result.delivered, false); assert.equal(result.acknowledged, false); assert.equal(w.value('phaseError'), 0);
   for (const t of [film.times.close + 1, film.times.result + 300, film.times.close + 2100]) {
     const frame = r.frame(t, size, 'cn');
@@ -102,12 +103,16 @@ test('every count adds viewport damage; guard wins briefly, is overwritten, and 
   let previous = 0;
   for (let i = 0; i < 6; i++) {
     const t = film.times.counts[i], fresh = renderer.frame(t + 1, size, 'cn');
-    assert.ok(!fresh.regions.has('guard.denial'), `previous guard survived count ${i + 1}`);
+    assert.ok(!fresh.regions.has('guard.warning'), `previous guard remained protected at count ${i + 1}`);
     const a = renderer.frame(t + 100, size, 'cn'), b = renderer.frame(t + 180, size, 'cn');
     const damaged = a.cells.filter(cell => cell.semantic === 'corruption' || cell.semantic?.startsWith('spill.')).length;
     assert.ok(damaged > previous, `damage failed to increase at count ${i + 1}`); previous = damaged;
-    const denial = a.cells.filter(cell => cell.semantic === 'guard.denial' && cell.g.trim());
+    const denial = a.cells.filter(cell => cell.semantic === 'chat.guard.continuous' && cell.g.trim());
     assert.ok(denial.length && denial.every(cell => cell.fg === color.red && cell.bold));
+    const region = a.regions.get('guard.warning')!, chat = layout(size).chat;
+    assert.ok(region.x > chat.x && region.x + region.w < chat.x + chat.w);
+    assert.equal(region.y, chat.y + 1 + Math.min(i, chat.h - 3));
+    assert.ok(!a.regions.has('guard.denial'));
     assert.ok(a.cells.some((cell, index) => cell.semantic === 'corruption' && (cell.g !== b.cells[index].g || cell.fg !== b.cells[index].fg)));
     if (i === 4) {
       const l = layout(size);
@@ -116,7 +121,7 @@ test('every count adds viewport damage; guard wins briefly, is overwritten, and 
     }
     if (i === 5) {
       assert.ok(!/world\.execute|session=|request_id|RUNNABLE/.test(a.plain()));
-      assert.ok(a.cells.filter(cell => cell.g.trim()).every(cell => cell.semantic === 'corruption' || cell.semantic?.startsWith('word-art.') || cell.semantic === 'guard.denial'));
+      assert.ok(a.cells.filter(cell => cell.g.trim()).every(cell => cell.semantic === 'corruption' || cell.semantic?.startsWith('word-art.') || cell.semantic === 'chat.guard.continuous' || cell.semantic?.startsWith('subtitle.')));
     }
   }
 });

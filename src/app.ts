@@ -6,7 +6,7 @@ import { emitKeypressEvents, type Key } from 'node:readline';
 import { MpvTransport } from './audio.js';
 import { TerminalAdapter } from './terminal.js';
 import { Director } from './world.js';
-import { Renderer } from './render.js';
+import { layout, Renderer } from './render.js';
 import { tr } from './locale.js';
 import { clamp, timeCode } from './math.js';
 import type { Film, Language, Size } from './types.js';
@@ -55,12 +55,12 @@ export async function play(film: Film, options: PlayOptions): Promise<void> {
       else if (state === 'READY') frame = renderer.slate(dimensions, lang, 'app.ready', options.rehearsal ? tr(lang, 'app.rough') : '');
       else {
         frame = renderer.frame(t, dimensions, lang);
-        // Rehearsal annotations must not restore a clean row during corruption
-        // or reintroduce the film UI after the host has taken over.
         if (options.rehearsal && t < film.times.counts[0]) {
-          const lyric = [...film.lyrics].reverse().find(l => l.startMs <= t);
-          frame.fill({ x: 0, y: dimensions.rows - 1, w: dimensions.columns, h: 1 });
-          frame.text(2, dimensions.rows - 1, `${timeCode(t)}  offset=${offset}ms  lyric.${String(lyric?.number ?? 1).padStart(2, '0')}  ${lyric?.text ?? ''}`, { fg: 244 }, dimensions.columns - 4);
+          // Calibration diagnostics stay inside the story status bar, away from captions.
+          const y = layout(dimensions).status.y + 1, w = dimensions.columns - 42;
+          const lyric = film.lyrics.findLast(line => line.startMs <= t);
+          frame.fill({ x: 0, y, w, h: 1 });
+          frame.text(2, y, `${timeCode(t)}  offset=${offset}ms  lyric.${String(lyric?.number ?? 1).padStart(2, '0')}`, { fg: 244 }, w - 4);
         }
       }
       terminal.submit(frame, force, t); force = false; renderTimes.push(performance.now() - started);

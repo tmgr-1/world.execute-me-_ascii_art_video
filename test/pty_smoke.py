@@ -34,6 +34,7 @@ try:
  os.write(master,b'\r');drain(1.1)
  assert b'simtest_000328.elf' in output and b'GUARD' in output,'Termination foreground not submitted.'
  assert b'lyric.76' not in output,'Rehearsal annotation restored readable text during full-screen corruption.'
+ assert b'Execution' in output and '如果能够'.encode() in output,'Viewer captions did not advance during story termination.'
  os.write(master,b' ');drain(.1)
  resize(100,30);os.kill(process.pid,signal.SIGWINCH);drain(.2)
  assert '终端至少需要'.encode() in output,'Small terminal slate not submitted.'

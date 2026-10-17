@@ -1,0 +1,46 @@
+v4.0 validation summary — 2026-10-17
+Film: world-execute 4.0.0
+This file records observed command results and review scope, not raw test stdout.
+
+npm run check: PASS
+  TypeScript and content/model/frame contracts passed.
+  Expected retained warning: E_ANCHOR_ROUGH:209
+  No timing anchors were marked as calibrated.
+
+npm test: PASS
+  tests=50 pass=50 fail=0 cancelled=0 skipped=0
+  Covers deterministic playback, byte store, request boundaries, termination,
+  viewer captions, actual-byte highlights, execution cutoff before Ein,
+  explicit guard notices, cumulative warning damage and native title sizes.
+
+npm run test:e2e: PASS
+  PTY fixture: ready/start, termination, live captions, pause, resize, seek,
+    quit, terminal restoration, no duplicate requests.
+  PTY player failure: full-screen panels at 220x60 / 240x64, ERROR,
+    no story termination, raw input and alternate screen restored.
+  PTY loop: repeated exact media seeks, deterministic rebuild,
+    no duplicate requests, terminal restored.
+  Transport uses the explicit fake-mpv JSON protocol fixture, not audible audio.
+
+npm run build: PASS
+
+python3 tools/make_glyphs.py: PASS
+  Native compact English assets: PROCESS 82x7, TERMINATED 114x7.
+  Chinese six-character assets retained without resampling.
+
+Frame review:
+  Exported 46 JSON/PNG samples under .cache/v4-review/ (local, ignored).
+  Inspected cn boot, God/proof, gender write, count 3, termination and POST;
+    en count 4 with parenthesized meaning and English termination.
+  Caption style in PNG respects bold font selection.
+  No overlap observed among chat warnings, the termination panel and captions.
+
+Full-track frame-composition benchmarks with project Node memory flags:
+  160x45 cn, step=33ms, samples=6423:
+    mean=2.050ms p95=4.908ms max=70.517ms peakRSS=127.70MiB
+  130x35 en, step=42ms, samples=5047:
+    mean=1.437ms p95=3.325ms max=54.918ms peakRSS=129.45MiB
+  Reports: performance-v4.0-cn.json, performance-v4.0-en.json
+  Scope excludes terminal encoding/transport, mpv and audio-device latency.
+
+Real-terminal full viewing and audible synchronization: NOT MEASURED this run.
