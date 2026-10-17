@@ -122,7 +122,7 @@
   "error.duration": "音轨时长与影片锚点不匹配。",
   "error.failed": "运行失败：{detail}",
   "help.commands": "命令：play / check / render / benchmark / calibrate",
-  "help.music_file": "通过 --music-file 指定本地MP3文件。",
+  "help.music_file": "通过 --music-file 指定歌曲的本地 MP3 路径（文件名不限）。",
   "check.rough": "内容结构通过；发布检查仍需精校锚点。",
   "check.release": "发布检查通过",
   "calibrate.marked": "已保存待复核标记",

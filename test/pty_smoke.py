@@ -10,23 +10,30 @@ import struct
 import subprocess
 import termios
 import time
+from tempfile import TemporaryDirectory
 
 root=Path(__file__).resolve().parents[1]
 music=next(root.glob('*.mp3'))
+music_directory=TemporaryDirectory(prefix='ascii-film-mp3-')
+renamed_music=Path(music_directory.name)/'任意 文件名 renamed-track.MP3'
+renamed_music.symlink_to(music.resolve())
 def cli(*args):
  return subprocess.run(['node','--import','tsx','src/cli.ts',*args],cwd=root,capture_output=True,text=True,check=True).stdout
 assert '--easter-egg    显示片尾彩蛋' in cli('--help')
 assert '--easter-egg    Show the post-credits Easter egg' in cli('-h','--lang','en')
-assert '--easter-egg' not in (root/'README.md').read_text()
+for readme in ('README.md','README.zh-CN.md'):
+ assert '--easter-egg' not in (root/readme).read_text()
+cli('check','--music-file',str(renamed_music))
+cli('check','--music-file',os.path.relpath(renamed_music,root))
 assert 'simtest_000329.elf' not in cli('render','--time','03:34.020','--lang','en')
 assert 'simtest_000329.elf' in cli('render','--time','03:34.020','--lang','en','--easter-egg')
-print('CLI cases passed: localized help, no README hint, default and opt-in frame exports.')
+print('CLI cases passed: localized help, no README hint, arbitrary MP3 filenames and paths, default and opt-in frame exports.')
 master,slave=pty.openpty()
 before=termios.tcgetattr(slave)
 def resize(columns,rows):fcntl.ioctl(slave,termios.TIOCSWINSZ,struct.pack('HHHH',rows,columns,0,0))
 resize(160,45)
 destination=root/'.cache/pty-smoke'
-command=['node','--max-old-space-size=64','--max-semi-space-size=4','--import','tsx','src/cli.ts','play','--music-file',str(music),'--rehearsal','--seek','02:41.9','--mpv-path',str(root/'test/fixtures/fake-mpv.mjs'),'--export-dir',str(destination)]
+command=['node','--max-old-space-size=64','--max-semi-space-size=4','--import','tsx','src/cli.ts','play','--music-file',str(renamed_music),'--rehearsal','--seek','02:41.9','--mpv-path',str(root/'test/fixtures/fake-mpv.mjs'),'--export-dir',str(destination)]
 process=subprocess.Popen(command,cwd=root,stdin=slave,stdout=slave,stderr=slave,start_new_session=True)
 output=bytearray()
 def drain(seconds):
@@ -191,3 +198,4 @@ finally:
   try:process.wait(timeout=2)
   except subprocess.TimeoutExpired:process.kill();process.wait()
  os.close(master);os.close(slave)
+ music_directory.cleanup()

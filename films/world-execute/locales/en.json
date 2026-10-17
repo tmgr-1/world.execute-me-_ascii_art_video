@@ -122,7 +122,7 @@
   "error.duration": "Audio duration does not match the film anchors.",
   "error.failed": "Run failed: {detail}",
   "help.commands": "Commands: play / check / render / benchmark / calibrate",
-  "help.music_file": "Supply a local MP3 with --music-file.",
+  "help.music_file": "Supply the song's local MP3 path with --music-file; any filename is accepted.",
   "check.rough": "Content structure passed; release checks still require calibrated anchors.",
   "check.release": "Release checks passed",
   "calibrate.marked": "Review marker saved",

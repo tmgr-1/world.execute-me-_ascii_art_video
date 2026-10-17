@@ -1,23 +1,25 @@
-# world.execute(me); — 终端字符影片
+# world.execute(me); — ASCII terminal film
 
-在终端中演出的音乐字符影片，以 Mili 的 **world.execute(me);** 为内容。音乐播放时，聊天、输入、几何图形、波形、虚拟内存和任务状态随节奏变化，组成一段程序与用户之间的故事。
+[简体中文](README.zh-CN.md)
 
-画面由 Node.js / TypeScript 实时绘制，使用 mpv 播放本地音乐。支持中文和英文界面、六语言大字、暂停、定位与片段循环。
+A music-driven ASCII film for your terminal, set to Mili's **world.execute(me);**. Messages, geometric graphics, waveforms, virtual memory, and task activity follow the song in real time.
 
-## 环境要求
+Built with Node.js and TypeScript, with mpv playing your local music file. Supports English and Chinese interfaces, six-language lettering, pause, seeking, and section loops.
 
-- Node.js 24 与 npm。
-- mpv，且能在终端中执行 `mpv`。
-- 至少 **130 列 × 35 行** 的终端，推荐全屏使用 **160 列 × 45 行** 或更大的画布。
-- 支持中文、韩文的等宽字体，例如 DejaVu Sans Mono 搭配 Noto CJK 字体。
+## Requirements
 
-Ubuntu／Debian 可安装播放器和参考字体：
+- Node.js 24 and npm.
+- mpv, available as `mpv` in your terminal.
+- A terminal with at least **130 columns × 35 rows**. A full-screen terminal with **160 columns × 45 rows** or more is recommended.
+- A monospace font setup with Chinese and Korean coverage, such as DejaVu Sans Mono with Noto CJK fallback.
+
+On Ubuntu or Debian, install the player and fonts with:
 
 ```bash
 sudo apt install mpv fonts-dejavu-core fonts-noto-cjk
 ```
 
-## 安装
+## Installation
 
 ```bash
 git clone https://github.com/tmgr-1/world.execute-me-_ascii_art_video.git
@@ -25,53 +27,55 @@ cd world.execute-me-_ascii_art_video
 npm ci
 ```
 
-## 播放
+## Playback
 
-自行准备歌曲的本地音乐文件，通过 `--music-file` 指定路径：
+Provide a local MP3 of **world.execute(me);** through `--music-file`. The filename can be anything, including a renamed copy:
 
 ```bash
-npm run play -- --music-file "./world.execute (me) ; - Mili.mp3" --lang cn --rehearsal
+npm run play -- --music-file "./song.mp3" --lang en --rehearsal
 ```
 
-看到就绪画面后按 **Enter** 开始。将 `--lang cn` 改为 `--lang en` 可使用英文界面。路径中含空格时保留引号。
+Replace `./song.mp3` with the actual path to your file. Relative and absolute paths both work; keep the quotes if the path contains spaces.
 
-程序按终端实际行列铺满画面。窗口缩小到最低尺寸以下时会暂停播放，调整窗口后按空格继续。
+Press **Enter** at the ready screen to begin. Use `--lang cn` for the Chinese interface. The examples use `--rehearsal` to enable the navigation and offset controls below.
 
-| 按键 | 操作 |
+The film fills the terminal's current dimensions. Shrinking the window below the minimum size pauses playback; resize it and press Space to resume.
+
+| Key | Action |
 |---|---|
-| Enter | 开始播放 |
-| Space | 暂停／继续 |
-| q、Esc、Ctrl+C | 退出并恢复终端 |
-| ← / → | 前后定位 5 秒 |
-| ↑ / ↓ | 调整画面偏移 20 ms |
-| [ / ] | 前后跳转一个歌词节点 |
+| Enter | Start playback |
+| Space | Pause or resume |
+| q, Esc, Ctrl+C | Quit and restore the terminal |
+| ← / → | Seek backward or forward by 5 seconds |
+| ↑ / ↓ | Adjust the visual offset by 20 ms |
+| [ / ] | Jump to the previous or next lyric cue |
 
-从指定位置开始：
-
-```bash
-npm run play -- --music-file "./world.execute (me) ; - Mili.mp3" --rehearsal --seek 01:14
-```
-
-循环播放一个片段：
+Start at a specific point:
 
 ```bash
-npm run play -- --music-file "./world.execute (me) ; - Mili.mp3" --rehearsal --loop 02:38..02:46
+npm run play -- --music-file "./song.mp3" --lang en --rehearsal --seek 01:14
 ```
 
-其他常用选项：
+Loop a section:
 
-| 参数 | 用途 |
+```bash
+npm run play -- --music-file "./song.mp3" --lang en --rehearsal --loop 02:38..02:46
+```
+
+Other common options:
+
+| Option | Purpose |
 |---|---|
-| `--offset-ms 80` | 让画面提前 80 ms；负值使画面延后 |
-| `--speed 0.5` | 调整播放速度，范围为 0.25–2 |
-| `--no-color` | 使用无彩色显示 |
-| `--mpv-path /path/to/mpv` | 指定播放器路径 |
-| `--hold-end` | 影片结束后保留画面，按 q 退出 |
+| `--offset-ms 80` | Advance the visuals by 80 ms; negative values delay them |
+| `--speed 0.5` | Set playback speed, from 0.25 to 2 |
+| `--no-color` | Disable colored output |
+| `--mpv-path /path/to/mpv` | Use a specific player executable |
+| `--hold-end` | Keep the final frame visible until you press q |
 
-运行时不需要 Python、PyTorch、Whisper 或网络连接。
+Playback requires no Python, PyTorch, Whisper, or network connection.
 
-## 许可证
+## License
 
-项目源码与原创文档采用 **GNU GPL v3**（`GPL-3.0-only`）。完整许可证见 [LICENSE](LICENSE)，相关声明见 [NOTICE](NOTICE)。
+The source code and original documentation are licensed under **GNU GPL v3** (`GPL-3.0-only`). See [LICENSE](LICENSE) and [NOTICE](NOTICE).
 
-歌曲及歌词属于 Mili，项目不提供音乐文件。第三方依赖和字模保留各自许可，字模来源见[资产说明](films/world-execute/assets/README.md)。
+The song and lyrics belong to Mili. This repository does not include the music recording. Third-party dependencies and lettering assets retain their respective licenses; see the [asset notes](films/world-execute/assets/README.md).
