@@ -63,7 +63,6 @@ function memoryCopies(c: Canvas, world: World, lang: Language, r: Rect, t: numbe
     if (copy.clearedBytes < 8) {
       c.text(x + dx, y, remaining, style(copy.requestId ? color.green : color.cyan), Math.max(0, w - dx), `copy.${copy.fragment}`, lang);
       // Only uncleared index bytes can still resolve the displayed suffix.
-      c.regions.set(`copy.protected.${copy.fragment}`, { x: x + dx, y, w: Math.max(0, w - dx), h: 1 });
       if (copy.clearedBytes) c.text(x + Math.max(0, dx - 1), y, '▏', style(color.gold), 1, 'copies.cursor');
     }
     const address = world.store.allocation('me').address + world.store.field('me', 'fragments').offset + copy.fragment * 8;
@@ -71,13 +70,11 @@ function memoryCopies(c: Canvas, world: World, lang: Language, r: Rect, t: numbe
       style(copy.clearedBytes ? color.faint : color.dim), w, `copy.address.${copy.fragment}`);
   });
   c.text(r.x + 4, r.y + r.h - 2, 'goal=satisfy(user)   wait=reply!=null', style(color.dim), r.w - 8, 'copies.goal');
-  c.regions.set('copy.protected.goal', { x: r.x + 4, y: r.y + r.h - 2, w: r.w - 8, h: 1 });
 }
 
 function permissionDraft(c: Canvas, world: World, lang: Language, r: Rect, t: number): void {
   const film = world.film, line65 = film.lyrics[64].startMs, line66 = film.lyrics[65].startMs;
   const x = r.x + 5, y = r.y + 2, w = r.w - 10;
-  c.regions.set('permission.protected', { x, y, w, h: r.h - 4 });
   if (t < line65) {
     const step = Math.min(3, Math.floor(progress(t, film.lyrics[63].startMs, film.lyrics[63].endMs) * 4));
     c.text(x, y, 'AUTHORITY TRACE / READ ONLY', style(color.dim), w, 'permission.mode');
@@ -318,11 +315,17 @@ export function graphic(c: Canvas, world: World, lang: Language, r: Rect, t: num
     if (preview) {
       c.text(r.x + 4, r.y + 1, tr(lang, 'sim.delete_system'), style(color.cyan), r.w - 8, 'plan.declaration');
       c.fill({ x: r.x + 3, y: r.y + 2, w: r.w - 6, h: 1 }, ' ');
-      c.text(r.x + 4, r.y + 2, 'erase_system_root()   [PROTECTED]', style(color.cyan), r.w - 8, 'api.delete');
+      const submitted = world.state.plan?.status === 'INTENT_VISIBLE';
+      c.text(r.x + 4, r.y + 2, submitted ? 'erase_system_root()' : 'target=simulated_system    plan=DRAFT    commit=0',
+        style(color.cyan), r.w - 8, submitted ? 'api.delete' : 'plan.draft');
       c.text(r.x + 4, r.y + r.h - 4, tr(lang, 'sim.delete_target'), style(color.cyan), r.w - 8, 'plan.target');
       c.text(r.x + 4, r.y + r.h - 3, `commit=0   ${tr(lang, 'ui.plan_pending')}`, style(color.gold), r.w - 8);
     }
-    if (world.state.plan && r.h >= 22) c.text(r.x + 4, r.y + r.h - 5, `ARMED ${world.state.plan.armed}/6  ${world.state.plan.stages[world.state.plan.armed - 1] ?? 'QUEUED'}`, style(color.dim));
+    if (world.state.plan && r.h >= 22) c.text(r.x + 4, r.y + r.h - 6, `ARMED ${world.state.plan.armed}/6  ${world.state.plan.stages[world.state.plan.armed - 1] ?? 'QUEUED'}`, style(color.dim));
+    const readback = t >= line(72) ? `commit=${world.state.plan?.commit ?? 0}`
+      : t >= line(71) ? `plan.arm=${world.state.denials.some(d => d.operation === 'arm-preflight') ? 'DENIED' : 'PENDING'}`
+      : t >= line(68) ? `guard.armed=${Number(world.store.read('guard', 'armed'))}` : '';
+    if (readback) c.text(r.x + 4, r.y + r.h - 5, readback, style(color.dim), r.w - 8, 'retry.status');
   }
   if (['eggplant', 'tomato', 'cat'].includes(scene)) c.text(r.x + 3, r.y + 1, tr(lang, 'ui.autonomous'), style(color.purple, true), r.w - 6, 'autonomous', lang);
 }

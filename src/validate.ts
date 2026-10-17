@@ -79,11 +79,16 @@ export function validateFilm(film: Film, release = false, depth: 'full' | 'model
   check(film.times.executionEnd < film.times.counts[0] && film.times.violationWarning >= film.lyrics[71].startMs && film.times.violationWarning < film.times.executionEnd, 'E_EXECUTION_END');
   check(film.cues.filter(cue => cue.command.kind === 'ATTEMPT').every(cue => cue.atMs < film.times.executionEnd), 'E_ATTEMPT_BEFORE_EIN');
   check(film.cues.filter(cue => cue.command.kind === 'ATTEMPT' && cue.command.operation !== 'root-request').every(cue => cue.atMs >= film.times.executionStart), 'E_NO_PREMATURE_SUBMISSION');
+  const probes = film.cues.flatMap(cue => cue.command.kind === 'ATTEMPT' && cue.command.operation !== 'root-request' ? [cue.command.operation] : []);
+  check(probes.length === 6 && new Set(probes).size === 6, 'E_UNIQUE_PROBES');
+  check(film.corruption.length === 5 && film.corruption.every((stage, i) => stage.density === .01 * 2 ** i && stage.density <= .16
+    && stage.atMs >= 0 && stage.atMs < film.times.interrupt && (!i || stage.atMs > film.corruption[i - 1].atMs)), 'E_CORRUPTION_STAGES');
+  check(film.corruption[0]?.atMs === film.cues.find(cue => cue.id === 'erase.copy.0.0')?.atMs, 'E_CORRUPTION_START');
   check(film.times.selfErase < film.times.deletionAnnouncement && film.times.counts[0] - film.times.deletionAnnouncement >= 3000, 'E_DELETE_NARRATIVE_ORDER');
   check(film.times.selfErase > film.lyrics[61].startMs && film.times.selfErase < film.lyrics[62].endMs, 'E_PRIVATE_ERASE_BUDGET');
   check(film.times.outroHold >= film.lyrics[91].endMs && film.times.outroHold < film.times.debugClose && film.times.debugClose < film.times.consoleReset, 'E_OUTRO_HOLD');
   check(film.times.consoleReset < film.times.finalDelete && film.times.finalDelete < film.times.finalExecution && film.times.finalExecution === film.lyrics[92].startMs && film.times.purge >= film.times.finalExecution && film.times.purge <= film.lyrics[92].endMs, 'E_FINAL_PURGE_TIMING');
-  check(film.times.easterEgg - film.times.purge === 8000 && film.presentationEndMs >= film.times.easterEgg + 2000 && film.presentationEndMs > film.durationMs, 'E_EASTER_TAIL');
+  check(film.times.easterEgg - film.times.purge === 8000 && film.presentationEndMs === (film.easterEggEnabled ? Math.max(film.durationMs, film.times.easterEgg + 2000) : film.durationMs), 'E_EASTER_TAIL');
   check(film.interactions.every(i => i.recordAtMs - i.send === 300), 'E_SENT_HOLD');
   check(film.times.eraseBegin - film.lyrics[58].endMs >= 500 && film.times.eraseBegin - film.lyrics[58].endMs <= 1000, 'E_ALTERNATIVE_SEARCH');
   if (errors.length || depth === 'content') return { errors, warnings };
@@ -97,7 +102,7 @@ export function validateFilm(film: Film, release = false, depth: 'full' | 'model
     check(w.state.plan?.status === 'BLOCKED' && w.state.plan.target === 'simulated_system' && w.state.plan.commit === 0 && w.state.plan.armed === 6, 'E_PLAN');
     check(w.value('status') === 'TERMINATED' && w.value('goal') === 'satisfy(user)' && w.value('selfData') === 'ERASED', 'E_ROOT_STATE');
     check(w.state.lifecycle === 'PURGED' && w.state.journal.filter(e => e.kind === 'PURGE').length === 1, 'E_FINAL_PURGE');
-    check(w.state.host.filter(record => record.key === 'host.next_test').length === 1, 'E_NEXT_TEST_ONCE');
+    check(w.state.host.filter(record => record.key === 'host.next_test').length === Number(film.easterEggEnabled), 'E_NEXT_TEST_ONCE');
     const result = w.state.outputs.find(output => output.key === 'sim.complete');
     check(result?.queuedAtMs === film.times.result && !result.delivered && !result.acknowledged, 'E_UNDELIVERED_RESULT');
     check(w.state.journal.filter(e => e.kind === 'SELF_ERASE').length === 1 && w.state.journal.find(e => e.kind === 'SELF_ERASE')?.payload.runtime === 'RUNNING', 'E_SELF_ERASE');
@@ -131,7 +136,8 @@ export function validateFilm(film: Film, release = false, depth: 'full' | 'model
         const console = renderer.frame(film.times.holdEnd + 500, size, lang);
         check(console.regions.has('system.console') && !console.regions.has('input') && !console.regions.has('chat'), `E_CONSOLE_ONLY:${lang}`);
         check(renderer.frame(film.times.consoleReset, size, lang).cells.every(cell => cell.g === ' '), `E_CONSOLE_RESET:${lang}`);
-        check(renderer.frame(film.presentationEndMs, size, lang).plain().includes('simtest_000329.elf'), `E_EASTER_VISIBLE:${lang}`);
+        const final = renderer.frame(film.presentationEndMs, size, lang).plain();
+        check(final.includes('PROGRAM DELETED') && final.includes('simtest_000329.elf') === film.easterEggEnabled, `E_END_VISIBLE:${lang}`);
       }
     }
   } catch (error) { errors.push(`E_SIMULATION:${String(error)}`); }

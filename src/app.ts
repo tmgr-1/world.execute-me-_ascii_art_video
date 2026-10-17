@@ -61,8 +61,8 @@ export async function play(film: Film, options: PlayOptions): Promise<void> {
       else if (state === 'READY') frame = renderer.slate(dimensions, lang, 'app.ready', options.rehearsal ? tr(lang, 'app.rough') : '');
       else {
         frame = renderer.frame(t, dimensions, lang);
-        if (options.rehearsal && t < film.times.counts[0]) {
-          // Calibration diagnostics stay inside the story status bar, away from captions.
+        if (options.rehearsal && t < film.corruption[0].atMs) {
+          // Stop diagnostics before corruption, so they cannot repaint a clean strip.
           const y = layout(dimensions).status.y + 1, w = dimensions.columns - 42;
           const lyric = film.lyrics.findLast(line => line.startMs <= t);
           frame.fill({ x: 0, y, w, h: 1 });

@@ -78,18 +78,18 @@ test('the execution sequence ends before Ein; guard warning refreshes never issu
   assert.ok(!w.state.journal.some(e => ['ILLEGAL_ATTEMPT', 'REJECT'].includes(e.kind) && e.atMs >= film.times.counts[0] && e.atMs < film.times.intent));
 });
 
-test('count warnings append to the full log and scroll its tail; old lines acquire persistent scars while new warnings remain legible', () => {
-  const size = { columns: 160, rows: 45 }, r = new Renderer(new Director(film));
+test('count warnings append and scroll normally while both old and new lines accept transient noise', () => {
+  const size = { columns: 160, rows: 45 }, r = new Renderer(new Director(film)), chat = layout(size).chat;
   for (let i = 1; i < 6; i++) {
-    const frame = r.frame(film.times.counts[i] + 100, size, 'cn'), region = frame.regions.get('guard.warning')!;
-    assert.equal(region.y, layout(size).chat.y + layout(size).chat.h - 2);
-    const previous = frame.regions.get(`guard.warning.${i}`)!;
-    const cells = frame.cells.slice(previous.y * size.columns + previous.x, previous.y * size.columns + previous.x + previous.w);
-    assert.ok(cells.some(c => c.semantic === 'corruption'));
-    const current = frame.cells.slice(region.y * size.columns + region.x, region.y * size.columns + region.x + region.w);
-    assert.ok(current.filter(c => c.g.trim()).every(c => c.semantic === 'chat.guard.continuous' && c.bold && c.fg === color.red));
-    const direct = new Renderer(new Director(film)).frame(film.times.counts[i] + 100, size, 'cn');
-    assert.equal(frame.hash(), direct.hash());
+    const t = film.times.counts[i] + 100, frame = r.frame(t, size, 'cn');
+    assert.equal(r.director.world.state.chat.filter(item => item.key === 'guard.continuous').length, i + 2);
+    for (const y of [chat.y + chat.h - 3, chat.y + chat.h - 2]) {
+      const row = frame.cells.slice(y * size.columns + chat.x + 2, y * size.columns + chat.x + chat.w - 2);
+      assert.ok(row.some(c => c.semantic === 'corruption'));
+      const surviving = row.filter(c => c.semantic === 'chat.guard.continuous' && c.g.trim());
+      assert.ok(surviving.length > 10 && surviving.every(c => c.bold && c.fg === color.red));
+    }
+    assert.equal(frame.hash(), new Renderer(new Director(film)).frame(t, size, 'cn').hash());
   }
 });
 

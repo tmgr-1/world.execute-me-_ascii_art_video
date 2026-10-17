@@ -1,0 +1,180 @@
+v4.3 implementation checks
+Node v24.19.0; 160x45 reference canvas; 64 MiB old-space / 4 MiB semi-space.
+
+$ npm run check
+
+> world-execute-terminal-film@1.0.0 check
+> tsc --noEmit && node --import tsx src/cli.ts check
+
+内容结构通过；发布检查仍需精校锚点。
+E_ANCHOR_ROUGH:209
+
+$ node --import tsx src/cli.ts check --easter-egg
+内容结构通过；发布检查仍需精校锚点。
+E_ANCHOR_ROUGH:209
+
+$ npm run build
+
+> world-execute-terminal-film@1.0.0 build
+> tsc
+
+
+$ npm test
+
+> world-execute-terminal-film@1.0.0 test
+> node --import tsx --test --test-isolation=none test/*.test.ts
+
+✔ rehearsal loop ranges use media milliseconds and reject empty, reversed or tiny intervals (1.516634ms)
+✔ all content contracts pass; unreviewed machine anchors fail release validation (601.732764ms)
+✔ keyword and count syllable anchors cannot drift outside their lyric spans (1.857824ms)
+✔ typed values, UTF-8 references, byte order, alignment, and invalid-write rollback share one store (0.458146ms)
+✔ draft does not create a request or task; one send links history, transcript, task and rx (6.489052ms)
+✔ disconnect freezes external facts; predictions never become rx, ack or verification (37.174911ms)
+✔ erasure changes bytes and validity while protected session writes are rejected (37.181157ms)
+✔ a request allocates its typed boundary from semantic parameters without handwritten addresses (8.209619ms)
+✔ six stages arm without committing; the word end precedes intent and the write barrier (77.269399ms)
+✔ the patch is a draft before the check event and cannot acquire PASS from a later render (37.699489ms)
+✔ fixed ticks and checkpoints reproduce exact state across frame rates, dropped frames and reverse seeks (259.23702ms)
+✔ providers preserve circumference, tangent contact, current stages and era direction (0.19819ms)
+✔ AC/DC and AD/BC states land on their keyword anchors (11.919981ms)
+✔ media clock pause, speed and epochs are independent of render cadence (0.156362ms)
+✔ wide graphemes erase and clip as complete glyphs (0.131275ms)
+✔ 130x35 cn: all scene and count boundaries preserve valid glyphs (145.467952ms)
+✔ 130x35 cn: story freezes for 3000ms while captions follow the music (214.111771ms)
+✔ 130x35 en: all scene and count boundaries preserve valid glyphs (147.045662ms)
+✔ 130x35 en: story freezes for 3000ms while captions follow the music (211.10907ms)
+✔ 160x45 cn: all scene and count boundaries preserve valid glyphs (162.822101ms)
+✔ 160x45 cn: story freezes for 3000ms while captions follow the music (220.146567ms)
+✔ 160x45 en: all scene and count boundaries preserve valid glyphs (163.58805ms)
+✔ 160x45 en: story freezes for 3000ms while captions follow the music (218.225145ms)
+✔ the six words have independent assets and retain all six language sources (47.555224ms)
+✔ the complete Chinese title stays on one line at native size with both background borders intact (463.296739ms)
+✔ the simulation retains a draft target while its declaration scrolls, without prematurely displaying execution (44.970211ms)
+✔ damage frames reproduce after forward and reverse seeks (233.377363ms)
+✔ the opening uses quick drafts and real connection / selection events before the first simulation (8.751912ms)
+✔ vision is a linked request with degraded model state, ghosted panes and subsequent recovery (13.905959ms)
+✔ departure is readable before the result, followed by a short feedback timeout (25.237666ms)
+✔ waiting moves from status to demand; the first sim first-person line is the final demand (82.369035ms)
+✔ own data really disappears while runtime and external objects survive; only system execution is fatal (43.341886ms)
+✔ all six counts share the 16% viewport budget, keep red log warnings and continue flickering (61.359704ms)
+✔ 130x35 cn: full title, plain console, frozen analysis and final purge (131.017182ms)
+✔ 130x35 en: full title, plain console, frozen analysis and final purge (129.796368ms)
+✔ 160x45 cn: full title, plain console, frozen analysis and final purge (140.140745ms)
+✔ 160x45 en: full title, plain console, frozen analysis and final purge (133.01294ms)
+✔ JSON protocol fixture: load paused, exact seek, speed, frozen pause, EOF and own-child cleanup (542.844215ms)
+✔ invalid files and missing players fail and clean up rather than becoming story termination (43.350675ms)
+✔ single output adapter uses terminal-kit, emits whole glyphs and restores terminal modes (12.447857ms)
+✔ terminal output includes the side panels and bottom edge beyond the reference viewport after resizing (26.587635ms)
+✔ backpressure bounds pending work and only encodes the latest dropped-frame replacement (11.738513ms)
+✔ boot percentages are monotonic and complete at simulation readiness (30.827952ms)
+✔ the closed session remains alone for 1.5 seconds; timeout starts inspection, not another long wait (21.071038ms)
+✔ each autonomous candidate has one combined cyan hypothesis; God needs ROOT and user proof (49.475447ms)
+✔ attribute write focus follows the actual field, address and changed bytes without delaying lyrics (38.95218ms)
+✔ the execution sequence ends before Ein; guard warning refreshes never issue new operations (43.927262ms)
+✔ count warnings append and scroll normally while both old and new lines accept transient noise (304.535684ms)
+✔ all 93 translations fit; English count meanings occupy only the second caption row (0.328026ms)
+✔ captions survive corruption, frozen termination, POST, core analysis and final deletion at every supported size (663.095045ms)
+✔ continuous playback renders the actual wrapped tail of one event log through every scene transition (9479.983225ms)
+✔ message styles belong to the record; past gray messages survive the cyan transition and APIs follow ordinary cyan output (48.002806ms)
+✔ user drafts, sent history and log requests are green; departure emphasis stays in User Input (69.418825ms)
+✔ weighted boot work advances in deterministic batches with plateaus and one ASCII percentage bar (47.960498ms)
+✔ attribute writes stay stable; real fragment deletion starts global noise without altering source inputs (499.751293ms)
+✔ six source-bound private copies wipe top-to-bottom; real bytes, validity, memory focus and originals agree (172.727156ms)
+✔ Challenging your God traces a read-only authority chain and checks a draft before any new submission (44.623499ms)
+✔ outro holds until debug closes; deletion is prepared on a fresh console before the last lyric (487.58764ms)
+✔ the greeting is one second later; only display recording waits 300 ms, while lyric-bound requests keep their times (95.63117ms)
+✔ the connected input always has a prompt and a deterministic ASCII cursor, including idle periods (301.270779ms)
+✔ API calls share the cyan style of ordinary sim output in both logs and graphics (53.573951ms)
+✔ timeout and re-estimation are separated once; the final vocal leaves a 750 ms alternative-search pause (38.343451ms)
+✔ the final host closes debug, clears, prepares deletion, holds DELETED and leaves one blank row before test 329 (595.601373ms)
+✔ the post-EOF clock continues silently, freezes for pause, respects speed and returns to the media epoch (0.204035ms)
+✔ the five corruption stages follow approved story anchors and preserve the global 16% ceiling (521.126898ms)
+✔ random addresses move across the entire canvas, recover next tick, and preserve complete glyphs and untouched data (23.765417ms)
+✔ six distinct probes are submitted once; status-only beats do not resubmit or fabricate guard denials (49.718539ms)
+✔ the deletion draft is distinct from the one final system call, and the termination panel uses a stop code (322.454356ms)
+✔ the pending deletion is 300ms later while the last lyric and actual purge stay fixed (67.454923ms)
+✔ the optional Easter egg gates both authored events and playback length, even after backwards seeks (1260.860822ms)
+ℹ tests 70
+ℹ suites 0
+ℹ pass 70
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 20252.245501
+
+$ npm run test:e2e
+
+> world-execute-terminal-film@1.0.0 test:e2e
+> python3 test/pty_smoke.py
+
+CLI cases passed: localized help, no README hint, default and opt-in frame exports.
+PTY fixture passed: ready/start, termination, pause, resize, seek, quit, terminal restore, no duplicate requests.
+PTY player-failure case passed: full-screen panels at 220x60 / 240x64, real ERROR, no story termination, terminal restored.
+PTY loop case passed: repeated exact media seeks, deterministic rebuild, no duplicate requests, terminal restored.
+PTY default EOF case passed: immediate finish, one deletion, no Easter-egg event, terminal restored.
+PTY default hold case passed: DELETED retained until explicit quit, no implicit Easter egg.
+PTY EOF case passed: no early exit, silent pause/resize/resume, one Easter egg, no music replay, automatic finish.
+PTY tail-entry case passed: direct post-EOF start, rewind to media, deterministic history, hold final frame, explicit quit.
+
+Frame inspection: 10 deterministic HTML/cell exports; inspected PNG renders of erasure, permission draft, system draft, count six, Chinese and English termination, and default final deletion.
+
+Benchmark cn (250ms step, 160x45, no terminal transport or audio latency):
+{
+  "environment": {
+    "os": "linux",
+    "arch": "x64",
+    "cpu": "Intel(R) Core(TM) i5-14600K",
+    "node": "v24.19.0",
+    "size": {
+      "columns": 160,
+      "rows": 45
+    },
+    "language": "cn"
+  },
+  "samples": 848,
+  "meanMs": 2.160035735849053,
+  "p95Ms": 4.7720630000001165,
+  "maxMs": 58.77966900000001,
+  "peakRssMiB": 137.06640625,
+  "memory": {
+    "rss": 143724544,
+    "heapTotal": 47939584,
+    "heapUsed": 35547192,
+    "external": 17737980,
+    "arrayBuffers": 15293887
+  },
+  "scope": "Deterministic model and frame composition; excludes terminal transport, mpv and audible synchronization.",
+  "anchors": "machine estimates, unreviewed"
+}
+
+Benchmark en (250ms step, 160x45, no terminal transport or audio latency):
+{
+  "environment": {
+    "os": "linux",
+    "arch": "x64",
+    "cpu": "Intel(R) Core(TM) i5-14600K",
+    "node": "v24.19.0",
+    "size": {
+      "columns": 160,
+      "rows": 45
+    },
+    "language": "en"
+  },
+  "samples": 848,
+  "meanMs": 2.2264987688679234,
+  "p95Ms": 4.7400800000000345,
+  "maxMs": 56.37480100000016,
+  "peakRssMiB": 131.09765625,
+  "memory": {
+    "rss": 137465856,
+    "heapTotal": 47677440,
+    "heapUsed": 41758656,
+    "external": 18000252,
+    "arrayBuffers": 15556159
+  },
+  "scope": "Deterministic model and frame composition; excludes terminal transport, mpv and audible synchronization.",
+  "anchors": "machine estimates, unreviewed"
+}
+
+Limits: 209 anchors retain their existing rough status. PTY checks use the explicit fake-mpv protocol fixture; audible synchronization has not been remeasured. Music and the original root lyric file remain excluded from Git.

@@ -282,6 +282,7 @@ export class World {
         this.event('core', 'ARM', atMs, { ordinal: command.ordinal, stage: this.state.plan.stages[command.ordinal - 1], commit: 0 }); break;
       case 'INTENT':
         if (!this.state.plan || this.state.plan.armed !== 6) throw new Error('E_INTENT_ORDER');
+        this.chat('sim', 'attempt.system-execute', atMs);
         this.state.plan.status = 'INTENT_VISIBLE'; this.event('core', 'DISPOSE_INTENT', atMs, { target: this.state.plan.target, op: this.state.plan.op, commit: 0 });
         this.deny('system-execute', atMs); break;
       case 'INTERRUPT': this.interrupt(atMs); break;

@@ -1,6 +1,7 @@
 import type { PrivilegedOperation } from '../../src/types.js';
 
 export const image = { name: 'simtest_000328.elf', path: '/opt/sim/tests/simtest_000328.elf', archive: 'archive/000328', id: '000328' } as const;
+export const stopCode = '0xE0000001  PROCESS_TERMINATED';
 
 // These describe simulated operations. They are never passed to a shell or OS API.
 export const operations: Record<PrivilegedOperation, { code: string; target: string; command: string; denial: string }> = {

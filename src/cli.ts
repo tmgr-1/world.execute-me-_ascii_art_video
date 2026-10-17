@@ -22,6 +22,7 @@ const optionSpec = {
   'offset-ms': { type: 'string', default: '0' }, 'origin-audio-ms': { type: 'string' }, seed: { type: 'string' },
   'mpv-path': { type: 'string', default: 'mpv' }, 'no-color': { type: 'boolean', default: false },
   'null-audio': { type: 'boolean', default: false }, 'hold-end': { type: 'boolean', default: false },
+  'easter-egg': { type: 'boolean', default: false },
   fps: { type: 'string', default: '30' }, 'export-dir': { type: 'string' }, anchors: { type: 'string' },
   release: { type: 'boolean', default: false }, size: { type: 'string', default: '160x45' },
   time: { type: 'string', default: '0' }, output: { type: 'string' }, format: { type: 'string', default: 'text' },
@@ -64,12 +65,13 @@ async function main(): Promise<void> {
       'npm run play -- --music-file "./song.mp3" --lang cn --rehearsal\n' +
       'npm run check\n--loop mm:ss..mm:ss (rehearsal)\n' +
       'npm run render -- --time 02:39 --size 160x45 --format html --output .cache/frame.html\n\n' +
-      '--film world-execute --lang cn|en --seek mm:ss --speed 0.25..2\n--offset-ms N --origin-audio-ms N --seed N --mpv-path PATH\n--rehearsal --no-color --hold-end --fps 24|30 --anchors FILE\n--export-dir DIR --null-audio\n' + tr(lang, 'app.rehearsal_controls') + '\n'); return;
+      '--film world-execute --lang cn|en --seek mm:ss --speed 0.25..2\n--offset-ms N --origin-audio-ms N --seed N --mpv-path PATH\n--rehearsal --no-color --hold-end --fps 24|30 --anchors FILE\n--export-dir DIR --null-audio\n' +
+      '--easter-egg    ' + tr(lang, 'help.easter_egg') + '\n' + tr(lang, 'app.rehearsal_controls') + '\n'); return;
   }
   if (positionals.length > 1 || values.film !== 'world-execute') throw new Error('E_FILM_OR_COMMAND');
   let timing = structuredClone(sourceTiming) as typeof sourceTiming & { reviewNote?: string };
   if (values.anchors) timing = JSON.parse(await readFile(values.anchors, 'utf8')) as typeof timing;
-  const film: Film = makeFilm(timing.anchors as Anchor[]);
+  const film: Film = makeFilm(timing.anchors as Anchor[], { easterEgg: values['easter-egg'] });
   film.audioSha256 = timing.audioSha256; film.originAudioMs = timing.originAudioMs;
   if (command === 'calibrate') {
     if (!values.output) throw new Error('E_OUTPUT_REQUIRED');
@@ -82,7 +84,7 @@ async function main(): Promise<void> {
       anchor.atMs = finite(values['at-ms'], 0, 'E_TIME'); anchor.status = values.reviewed ? 'calibrated' : 'rough';
       timing.reviewed = timing.anchors.every(a => a.status === 'calibrated');
     }
-    const check = validateFilm(makeFilm(timing.anchors as Anchor[])); if (check.errors.length) throw new Error(check.errors.join('\n'));
+    const check = validateFilm(makeFilm(timing.anchors as Anchor[], { easterEgg: values['easter-egg'] })); if (check.errors.length) throw new Error(check.errors.join('\n'));
     await save(values.output, JSON.stringify(timing, null, 2) + '\n'); process.stdout.write(tr(lang, 'calibrate.marked') + '\n'); return;
   }
   const validation = validateFilm(film, values.release || command === 'play' && !values.rehearsal, command === 'check' ? 'full' : command === 'play' ? 'model' : 'content');

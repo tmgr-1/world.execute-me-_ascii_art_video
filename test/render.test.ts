@@ -33,7 +33,8 @@ for (const size of [{ columns: 130, rows: 35 }, { columns: 160, rows: 45 }]) for
     assert.equal(story(new Renderer(new Director(film)).frame(film.times.interrupt + 1500, size, lang)), story(first));
     assert.notDeepEqual(renderer.frame(film.times.interrupt + 1500, size, lang).cells.slice(storyH * size.columns), first.cells.slice(storyH * size.columns));
     assert.notEqual(renderer.frame(film.times.holdEnd, size, lang).hash(), first.hash());
-    assert.ok(renderer.frame(film.presentationEndMs, size, lang).plain().includes('simtest_000329.elf'));
+    const final = renderer.frame(film.presentationEndMs, size, lang).plain();
+    assert.ok(final.includes('PROGRAM DELETED') && !final.includes('simtest_000329.elf'));
   });
 }
 test('the six words have independent assets and retain all six language sources', () => {
@@ -64,16 +65,17 @@ test('the complete Chinese title stays on one line at native size with both back
     assert.deepEqual(frame.validate(), []);
   }
 });
-test('the simulation keeps the deletion target readable while its log declaration scrolls', () => {
+test('the simulation retains a draft target while its declaration scrolls, without prematurely displaying execution', () => {
   const r = new Renderer(new Director(film));
   assert.ok(film.times.counts[0] - film.times.deletionAnnouncement >= 3000);
   for (const t of [film.times.deletionAnnouncement + 1, film.times.counts[0] - 1000]) {
-    const frame = r.frame(t, { columns: 130, rows: 35 }, 'cn').plain();
-    assert.ok(frame.includes('正在删除系统')); assert.ok(frame.includes('整个模拟系统，包括我自己'));
-    assert.ok(frame.includes('erase_system_root()')); assert.ok(frame.includes('simulated_system / [PROTECTED]'));
+    const frame = r.frame(t, { columns: 130, rows: 35 }, 'cn');
+    for (const semantic of ['plan.declaration', 'plan.target', 'plan.draft']) assert.ok(frame.cells.some(c => c.semantic === semantic && c.g.trim()));
+    assert.ok(!frame.plain().includes('erase_system_root()'));
+    assert.ok(frame.regions.has('target.tree'));
   }
 });
-test('damage and canonical flashback frames reproduce after forward and reverse seeks', () => {
+test('damage frames reproduce after forward and reverse seeks', () => {
   const r = new Renderer(new Director(film));
   for (const t of [101520, 109620, 124560, film.times.counts[4] + 40]) {
     const direct = new Renderer(new Director(film)).frame(t, { columns: 160, rows: 45 }, 'cn').hash();

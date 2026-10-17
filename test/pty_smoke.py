@@ -13,6 +13,14 @@ import time
 
 root=Path(__file__).resolve().parents[1]
 music=next(root.glob('*.mp3'))
+def cli(*args):
+ return subprocess.run(['node','--import','tsx','src/cli.ts',*args],cwd=root,capture_output=True,text=True,check=True).stdout
+assert '--easter-egg    显示片尾彩蛋' in cli('--help')
+assert '--easter-egg    Show the post-credits Easter egg' in cli('-h','--lang','en')
+assert '--easter-egg' not in (root/'README.md').read_text()
+assert 'simtest_000329.elf' not in cli('render','--time','03:34.020','--lang','en')
+assert 'simtest_000329.elf' in cli('render','--time','03:34.020','--lang','en','--easter-egg')
+print('CLI cases passed: localized help, no README hint, default and opt-in frame exports.')
 master,slave=pty.openpty()
 before=termios.tcgetattr(slave)
 def resize(columns,rows):fcntl.ioctl(slave,termios.TIOCSWINSZ,struct.pack('HHHH',rows,columns,0,0))
@@ -32,8 +40,8 @@ try:
  while '按回车开始'.encode() not in output and time.monotonic()<deadline and process.poll() is None:drain(.1)
  assert '按回车开始'.encode() in output,output.decode(errors='replace')[-1500:]
  os.write(master,b'\r');drain(1.1)
- assert b'simtest_000328.elf' in output and b'GUARD' in output,'Termination foreground not submitted.'
- assert b'lyric.76' not in output,'Rehearsal annotation restored readable text during full-screen corruption.'
+ assert b'0xE0000001' in output and b'PROCESS_TERMINATED' in output,'Termination foreground not submitted.'
+ assert b'lyric.76' not in output,'Rehearsal annotation bypassed the viewport corruption.'
  assert b'Execution' in output and '如果能够'.encode() in output,'Viewer captions did not advance during story termination.'
  os.write(master,b' ');drain(.1)
  resize(100,30);os.kill(process.pid,signal.SIGWINCH);drain(.2)
@@ -86,14 +94,49 @@ try:
  assert termios.tcgetattr(slave)==before
  assert b'\x1b[?1049l' in output
  print('PTY loop case passed: repeated exact media seeks, deterministic rebuild, no duplicate requests, terminal restored.')
+ # Default playback ends at the real EOF, with no hidden Easter-egg wait.
+ destination=root/'.cache/pty-v43-default-eof';destination.mkdir(parents=True,exist_ok=True)
+ command[command.index('--export-dir')+1]=str(destination)
+ command[command.index('--seek')+1]='03:31.8'
+ output=bytearray();resize(130,35)
+ process=subprocess.Popen(command+['--speed','2'],cwd=root,stdin=slave,stdout=slave,stderr=slave,start_new_session=True)
+ deadline=time.monotonic()+5
+ while '按回车开始'.encode() not in output and time.monotonic()<deadline and process.poll() is None:drain(.1)
+ assert '按回车开始'.encode() in output
+ started=time.monotonic();os.write(master,b'\r')
+ while process.poll() is None and time.monotonic()-started<2:drain(.05)
+ assert process.poll() is not None,'Default EOF retained the silent Easter-egg tail.'
+ process.wait(timeout=2)
+ assert process.returncode==0,output.decode(errors='replace')[-1500:]
+ assert b'PROGRAM DELETED' in output and b'simtest_000329.elf' not in output
+ assert b'\x1b[?1049l' in output and termios.tcgetattr(slave)==before
+ events=json.loads((destination/'events.json').read_text())
+ assert not any(event.get('key')=='host.next_test' for event in events)
+ assert sum(event['kind']=='PURGE' for event in events)==1
+ print('PTY default EOF case passed: immediate finish, one deletion, no Easter-egg event, terminal restored.')
+ # Holding the default end must not implicitly enable test 329.
+ destination=root/'.cache/pty-v43-default-hold';destination.mkdir(parents=True,exist_ok=True)
+ command[command.index('--export-dir')+1]=str(destination)
+ output=bytearray()
+ process=subprocess.Popen(command+['--speed','2','--hold-end'],cwd=root,stdin=slave,stdout=slave,stderr=slave,start_new_session=True)
+ deadline=time.monotonic()+5
+ while '按回车开始'.encode() not in output and time.monotonic()<deadline and process.poll() is None:drain(.1)
+ assert '按回车开始'.encode() in output
+ os.write(master,b'\r');drain(2.6)
+ assert process.poll() is None and b'PROGRAM DELETED' in output and b'simtest_000329.elf' not in output
+ os.write(master,b'q');drain(.3);process.wait(timeout=5)
+ assert process.returncode==0 and termios.tcgetattr(slave)==before
+ events=json.loads((destination/'events.json').read_text())
+ assert not any(event.get('key')=='host.next_test' for event in events)
+ print('PTY default hold case passed: DELETED retained until explicit quit, no implicit Easter egg.')
  # Audio EOF must leave the silent visual tail alive. Pausing/resizing freezes
  # its clock; test 329 appears only after the retained DELETED interval.
- destination=root/'.cache/pty-v42-eof';destination.mkdir(parents=True,exist_ok=True)
+ destination=root/'.cache/pty-v43-eof';destination.mkdir(parents=True,exist_ok=True)
  trace=destination/'commands.jsonl';trace.unlink(missing_ok=True)
  command[command.index('--export-dir')+1]=str(destination)
  command[command.index('--seek')+1]='03:31.8'
  output=bytearray();resize(130,35)
- process=subprocess.Popen(command+['--speed','2'],cwd=root,stdin=slave,stdout=slave,stderr=slave,start_new_session=True,
+ process=subprocess.Popen(command+['--speed','2','--easter-egg'],cwd=root,stdin=slave,stdout=slave,stderr=slave,start_new_session=True,
                           env={**os.environ,'FAKE_MPV_COMMAND_LOG':str(trace)})
  deadline=time.monotonic()+5
  while '按回车开始'.encode() not in output and time.monotonic()<deadline and process.poll() is None:drain(.1)
@@ -120,12 +163,12 @@ try:
  print('PTY EOF case passed: no early exit, silent pause/resize/resume, one Easter egg, no music replay, automatic finish.')
  # Direct rehearsal entry into the visual tail supports rewinding into audio;
  # --hold-end then preserves the final Easter-egg frame until explicit quit.
- destination=root/'.cache/pty-v42-tail-seek';destination.mkdir(parents=True,exist_ok=True)
+ destination=root/'.cache/pty-v43-tail-seek';destination.mkdir(parents=True,exist_ok=True)
  trace=destination/'commands.jsonl';trace.unlink(missing_ok=True)
  command[command.index('--export-dir')+1]=str(destination)
  command[command.index('--seek')+1]='03:33.4'
  output=bytearray()
- process=subprocess.Popen(command+['--speed','2','--hold-end'],cwd=root,stdin=slave,stdout=slave,stderr=slave,start_new_session=True,
+ process=subprocess.Popen(command+['--speed','2','--hold-end','--easter-egg'],cwd=root,stdin=slave,stdout=slave,stderr=slave,start_new_session=True,
                           env={**os.environ,'FAKE_MPV_COMMAND_LOG':str(trace)})
  deadline=time.monotonic()+5
  while '按回车开始'.encode() not in output and time.monotonic()<deadline and process.poll() is None:drain(.1)

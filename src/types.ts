@@ -52,7 +52,8 @@ export type Command =
 export interface Cue { id: string; atMs: number; priority: number; order?: number; command: Command }
 export interface Scene { id: string; number: number; startMs: number; endMs: number }
 export interface Film {
-  id: string; version: string; durationMs: number; presentationEndMs: number; audioSha256: string; originAudioMs: number;
+  id: string; version: string; durationMs: number; presentationEndMs: number; easterEggEnabled: boolean; audioSha256: string; originAudioMs: number;
+  corruption: { atMs: number; density: number }[];
   defaultSeed: number; anchors: Anchor[]; lyrics: Lyric[]; interactions: Interaction[];
   programs: Program[]; cues: Cue[]; scenes: Scene[]; schemas: Schema[];
   times: { intro: number; close: number; intent: number; interrupt: number; holdEnd: number; patch: number; counts: number[];

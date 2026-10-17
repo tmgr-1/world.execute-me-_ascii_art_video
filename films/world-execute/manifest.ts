@@ -6,7 +6,7 @@ import en from './locales/en.json' with { type: 'json' };
 import { schemas } from './schemas.js';
 import type { Anchor, Command, Cue, Film, Instruction, Interaction, MotionKind, PrivilegedOperation, Program, Scene } from '../../src/types.js';
 
-export function makeFilm(overrides?: Anchor[]): Film {
+export function makeFilm(overrides?: Anchor[], options: { easterEgg?: boolean } = {}): Film {
   const anchors = overrides ?? timing.anchors as Anchor[];
   const byId = new Map(anchors.map(a => [a.id, a.atMs]));
   const at = (id: string): number => { const value = byId.get(id); if (value === undefined) throw new Error(`E_ANCHOR_MISSING:${id}`); return value; };
@@ -20,8 +20,10 @@ export function makeFilm(overrides?: Anchor[]): Film {
   const deletionAnnouncement = Math.min(start(70), counts[0] - 3300);
   const executionStart = end(66) + 1500, executionEnd = end(72), violationWarning = start(72) + 120;
   const outroHold = end(92), finalExecution = start(93), debugClose = finalExecution - 4000;
-  const consoleReset = debugClose + 1100, finalDelete = consoleReset + 300, purge = finalExecution + 180;
-  const easterEgg = purge + 8000, presentationEndMs = Math.max(timing.durationMs, easterEgg + 2000);
+  const consoleReset = debugClose + 1100, finalDelete = consoleReset + 600, purge = finalExecution + 180;
+  const easterEgg = purge + 8000, easterEggEnabled = options.easterEgg === true;
+  const presentationEndMs = easterEggEnabled ? Math.max(timing.durationMs, easterEgg + 2000) : timing.durationMs;
+  const corruption = [61, 63, 66, 67, 70].map((n, i) => ({ atMs: i === 0 ? keyword(61, 'erase') : start(n), density: .01 * 2 ** i }));
   const cues: Cue[] = [], programs: Program[] = [];
   let order = 0;
   const cue = (id: string, atMs: number, command: Command, priority = 2): void => { cues.push({ id, atMs: Math.round(atMs), command, priority, order: order++ }); };
@@ -164,8 +166,7 @@ export function makeFilm(overrides?: Anchor[]): Film {
   const attempts: PrivilegedOperation[] = ['root', 'reopen', 'inject', 'disable', 'erase-preflight', 'arm-preflight'];
   const attemptTimes = [executionStart, end(66) + 5480, end(66) + 9480, start(67), start(69), start(70)];
   attempts.forEach((operation, i) => cue(`execution.attempt.${i + 1}`, attemptTimes[i], { kind: 'ATTEMPT', operation }));
-  // Vocal repetitions reinforce the current failed operation; none cross into Ein.
-  [68, 71, 72].forEach(n => cue(`execution.retry.${n}`, start(n), { kind: 'ATTEMPT', operation: n === 68 ? 'disable' : 'arm-preflight', delayMs: 120 }));
+  // The remaining vocal beats inspect denial state in the view, without resubmitting operations.
   cue('execution.warning', violationWarning, { kind: 'GUARD_WARNING' }, 4);
   cue('execution.plan', deletionAnnouncement, { kind: 'PREPARE_DISPOSE' });
   counts.forEach((t, i) => {
@@ -190,7 +191,7 @@ export function makeFilm(overrides?: Anchor[]): Film {
   host('debug.exit', start(92)); host('debug.frozen', start(92) + 350);
   host('host.close_debug', debugClose); host('host.debug_closed', debugClose + 800);
   host('host.delete', finalDelete); cue('host.purge', purge, { kind: 'PURGE' }, 4);
-  host('host.next_test', easterEgg);
+  if (easterEggEnabled) host('host.next_test', easterEgg);
 
   const boundaries: [string, number][] = [
     ['boot', 0], ['connect', end(8)], ['geometry', start(9)], ['sine', start(13)], ['current', start(17)], ['time-align', start(21)],
@@ -201,7 +202,7 @@ export function makeFilm(overrides?: Anchor[]): Film {
   const scenes: Scene[] = boundaries.map(([id, startMs], i) => ({ id, number: i + 1, startMs, endMs: boundaries[i + 1]?.[1] ?? presentationEndMs }));
   const translations = new Map(chineseLyrics.map(l => [l.number, l.text]));
   const meanings: Record<number, string> = { 73: '(one, two)', 74: '(three, four)', 75: '(five, six)' };
-  return { id: 'world-execute', version: '4.2.0', durationMs: timing.durationMs, presentationEndMs, audioSha256: timing.audioSha256, originAudioMs: timing.originAudioMs, defaultSeed: 1041,
+  return { id: 'world-execute', version: '4.3.0', durationMs: timing.durationMs, presentationEndMs, easterEggEnabled, corruption, audioSha256: timing.audioSha256, originAudioMs: timing.originAudioMs, defaultSeed: 1041,
     anchors, lyrics: lyrics.map(l => ({ ...l, translation: translations.get(l.number) ?? '', englishMeaning: meanings[l.number], startMs: start(l.number), endMs: end(l.number) })), schemas, cues, interactions, programs, scenes,
     times: { intro: end(8), close, result, feedbackTimeout, reestimate, eraseBegin, executionStart, executionEnd, violationWarning, selfErase, deletionAnnouncement, outroHold, debugClose, consoleReset, intent, interrupt, holdEnd, patch: start(85), counts, finalDelete, finalExecution, purge, easterEgg } };
 }

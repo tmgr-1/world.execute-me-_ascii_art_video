@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { makeFilm } from '../films/world-execute/manifest.js';
-import { image, operations } from '../films/world-execute/story.js';
+import { image, operations, stopCode } from '../films/world-execute/story.js';
 import { Director } from '../src/world.js';
 import { Renderer, layout } from '../src/render.js';
 import { color } from '../src/canvas.js';
@@ -86,7 +86,7 @@ test('own data really disappears while runtime and external objects survive; onl
   assert.throws(() => w.store.eraseOwnedForm('guard', 'me', 'core', w.state.timeMs));
   assert.throws(() => w.store.eraseOwnedForm('user.boundary', 'me', 'core', w.state.timeMs));
   const count = d.at(film.times.counts[5] + 100);
-  assert.ok(count.state.denials.length >= 10); assert.equal(count.state.lifecycle, 'RUNNING');
+  assert.equal(count.state.denials.length, 7); assert.equal(count.state.lifecycle, 'RUNNING');
   assert.equal(count.session('open'), false); assert.equal(count.store.read('guard', 'armed'), true);
   assert.equal(d.at(film.times.interrupt - 1).state.lifecycle, 'RUNNING');
   const stopped = d.at(film.times.interrupt);
@@ -98,31 +98,21 @@ test('own data really disappears while runtime and external objects survive; onl
   assert.ok(!stopped.state.sent.some(request => request.atMs > film.times.close));
 });
 
-test('every count adds viewport damage; guard wins briefly, is overwritten, and never freezes the background', () => {
+test('all six counts share the 16% viewport budget, keep red log warnings and continue flickering', () => {
   const renderer = new Renderer(new Director(film));
-  let previous = 0;
+  const budget = Math.floor(size.columns * layout(size).story.h * .16);
   for (let i = 0; i < 6; i++) {
-    const t = film.times.counts[i], fresh = renderer.frame(t + 1, size, 'cn');
-    assert.ok(!fresh.regions.has('guard.warning'), `previous guard remained protected at count ${i + 1}`);
-    const a = renderer.frame(t + 100, size, 'cn'), b = renderer.frame(t + 180, size, 'cn');
-    const damaged = a.cells.filter(cell => cell.semantic === 'corruption' || cell.semantic?.startsWith('spill.')).length;
-    assert.ok(damaged > previous, `damage failed to increase at count ${i + 1}`); previous = damaged;
+    const t = film.times.counts[i], a = renderer.frame(t + 100, size, 'cn'), b = renderer.frame(t + 280, size, 'cn');
+    assert.equal(a.cells.filter(cell => cell.semantic === 'corruption').length, budget);
+    assert.ok(!a.regions.has('guard.warning') && !a.regions.has('guard.denial'));
     const denial = a.cells.filter(cell => cell.semantic === 'chat.guard.continuous' && cell.g.trim());
     assert.ok(denial.length && denial.every(cell => cell.fg === color.red && cell.bold));
-    const region = a.regions.get('guard.warning')!, chat = layout(size).chat;
-    assert.ok(region.x > chat.x && region.x + region.w < chat.x + chat.w);
-    assert.equal(region.y, chat.y + chat.h - 2);
-    assert.ok(!a.regions.has('guard.denial'));
-    assert.ok(a.cells.some((cell, index) => cell.semantic === 'corruption' && (cell.g !== b.cells[index].g || cell.fg !== b.cells[index].fg)));
-    if (i === 4) {
-      const l = layout(size);
-      assert.ok(a.cells.some((cell, n) => cell.semantic?.startsWith('spill.') && Math.floor(n / size.columns) >= l.input.y));
-      assert.ok(a.cells.some((cell, n) => cell.semantic?.startsWith('spill.') && n % size.columns === l.side.x));
+    assert.ok(a.cells.some((cell, index) => cell.semantic === 'corruption' && b.cells[index].semantic !== 'corruption'));
+    for (const language of ['de', 'es', 'fr', 'ko', 'sv', 'zh'].slice(0, i + 1)) {
+      assert.ok(a.cells.some(cell => cell.semantic === 'corruption' && cell.language === language && cell.g.trim()), language);
     }
-    if (i === 5) {
-      assert.ok(!/world\.execute|session=|request_id|RUNNABLE/.test(a.plain()));
-      assert.ok(a.cells.filter(cell => cell.g.trim()).every(cell => cell.semantic === 'corruption' || cell.semantic?.startsWith('word-art.') || cell.semantic === 'chat.guard.continuous' || cell.semantic?.startsWith('subtitle.')));
-    }
+    assert.ok(a.cells.some(cell => cell.semantic?.startsWith('word-art.') && cell.g.trim()));
+    assert.deepEqual(a.validate(), []);
   }
 });
 
@@ -136,7 +126,7 @@ for (const dimensions of [size, { columns: 160, rows: 45 }]) for (const lang of 
       assert.ok(first.y + first.h < second.y, 'English title must use two separate lines');
       for (const row of [first, second]) { assert.ok(row.h >= 7); assert.ok(Math.abs(row.x + row.w / 2 - dimensions.columns / 2) <= 1); }
     }
-    assert.ok(terminated.plain().includes(image.name));
+    assert.ok(terminated.plain().includes(stopCode));
     const console = renderer.frame(film.times.holdEnd + 700, dimensions, lang);
     assert.ok(console.plain().includes('ROM')); assert.ok(!/[┌┐└┘│─]/.test(console.plain()));
     for (const region of ['chat', 'input', 'memory', 'main']) assert.ok(!console.regions.has(region));

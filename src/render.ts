@@ -1,13 +1,14 @@
 import { Canvas, color, graphemes, width, wrap, type Style } from './canvas.js';
 import { countLocales, tr } from './locale.js';
-import { clamp, hash, hex, mix, progress, smooth, timeCode } from './math.js';
+import { clamp, hex, progress, timeCode } from './math.js';
 import { activity, era } from './providers.js';
 import { style, centerText } from './drawing.js';
 import { filmViews } from './view-registry.js';
 import { Director, type World } from './world.js';
 import type { Film, Language, Rect, Size } from './types.js';
 import glyphs from '../films/world-execute/assets/glyphs.json' with { type: 'json' };
-import { countLanguages, countText, image } from '../films/world-execute/story.js';
+import { countLanguages, stopCode } from '../films/world-execute/story.js';
+import { corrupt } from './corruption.js';
 import { subtitleLines } from './subtitles.js';
 import { visibleLog } from './event-log.js';
 
@@ -149,7 +150,6 @@ function memoryAndWatch(c: Canvas, world: World, lang: Language, r: Rect, timeMs
     const ascii = Array.from({ length: bytesPerRow }, (_, b) => { const at = address + b; const byte = world.store.bytes[at - world.store.base]; return at >= memoryAllocation.address + memoryAllocation.size ? ' ' : byte >= 32 && byte < 127 ? String.fromCharCode(byte) : '.'; }).join('');
     c.text(r.x + 12 + bytesPerRow * 3, y, `|${ascii}|`, style(color.faint), bytesPerRow + 2);
   }
-  if (eraseAddress !== undefined && clearAge < 350) c.regions.set('memory.erase.protected', { x: r.x + 1, y: r.y + 1, w: r.w - 2, h: memory.h - 2 });
   if (snapshot) c.text(r.x + 2, r.y + memory.h - 1, `view ${Math.min(snapshot.size, (memory.h - 3) * bytesPerRow)}/${snapshot.size} B`, style(color.dim), r.w - 4, 'memory.erase.range');
   const watch = { x: r.x, y: r.y + memoryH, w: r.w, h: r.h - memoryH };
   title(c, watch, world, lang, world.state.count >= 4 ? 'stack' : 'state');
@@ -200,114 +200,13 @@ function visionGhosts(c: Canvas, world: World, l: Layout, t: number): void {
   }
 }
 
-function countCorruption(c: Canvas, world: World, t: number): void {
-  const count = world.state.count, quantum = Math.floor(t / 75);
-  for (let stage = 0; stage < count; stage++) {
-    const language = countLanguages[stage], data = countText[stage];
-    const x = 2 + Math.floor((stage % 3) * c.columns * .12), y = 2 + Math.floor(stage * (c.rows - 6) / 6);
-    c.text(x, y, data.translated, style(color.dim), c.columns - x - 1, `translation.${language}`, language);
-    const lines = Math.round([3, 5, 8, 12, 20, 28][stage] * c.columns / 130);
-    for (let i = 0; i < lines; i++) {
-      const x0 = Math.floor(hash(world.seed, 'spill-x', stage, i) * c.columns * .78);
-      const y0 = Math.floor(hash(world.seed, 'spill-y', stage, i) * c.rows);
-      const text = `${data.fragments[i % data.fragments.length]} ${data.fragments[(i + 1) % data.fragments.length]}`;
-      c.text(x0, y0, text, style(i % 3 ? color.dim : color.purple), c.columns - x0, `spill.${language}`, language);
-    }
-  }
-  if (count === 6) {
-    // At six even the original addresses, status words and blank margins are gone.
-    // Source-language metadata survives, but these streams have no readable words.
-    for (let y = 0; y < c.rows; y++) for (let x = 0; x < c.columns;) {
-      const language = Math.floor(hash(world.seed, 'noise-language', x, y) * 6);
-      const chars = Array.from(countText[language].noise), n = hash(world.seed, 'noise', x, y, quantum);
-      const g = chars[Math.floor(n * chars.length)], w = width(g);
-      if (x + w <= c.columns) c.set(x, y, g, style(n > .9 ? color.red : n > .55 ? color.purple : color.dim), 'corruption', countLanguages[language]);
-      else c.set(x, y, '#', style(color.dim), 'corruption', countLanguages[language]);
-      x += w;
-    }
-    return;
-  }
-  const density = [.03, .09, .18, .30, .48][count - 1];
-  for (let y = 0; y < c.rows; y++) for (let x = 0; x < c.columns; x++) {
-    const cell = c.get(x, y)!;
-    if (cell.continuation || hash(world.seed, 'count-scar', x, y) >= density) continue;
-    const n = hash(world.seed, 'flicker', x, y, quantum), language = Math.floor(hash(world.seed, 'scar-language', x, y) * count);
-    const chars = Array.from(countText[language].noise), g = n < .08 ? ' ' : chars[Math.floor(n * chars.length)];
-    c.set(x, y, g, style(n > .8 ? color.red : color.purple), 'corruption', countLanguages[language]);
-  }
-}
-
-function countForeground(c: Canvas, world: World): void {
+function countWord(c: Canvas, world: World): void {
   const word = ['Ein', 'dos', 'trois', '네', 'Fem', '六'][world.state.count - 1];
   wordArt(c, word, { x: 6, y: Math.floor(c.rows / 2) - 9, w: c.columns - 12, h: 18 }, color.text);
-  const r = c.regions.get('word-art')!;
-  for (let y = r.y; y < r.y + r.h; y++) for (let x = r.x; x < r.x + r.w; x++) {
-    const cell = c.get(x, y)!;
-    if (!cell.semantic?.startsWith('word-art.') || x > r.x + 2 && x < r.x + r.w - 3 && y > r.y + 1 && y < r.y + r.h - 2) continue;
-    if (hash(world.seed, 'count-edge', x, y) < world.state.count * .06) c.set(x, y, '▓', style(color.red), cell.semantic);
-  }
-}
-
-function countWarnings(c: Canvas, world: World, lang: Language, r: Rect, t: number): void {
-  const visible = visibleLog(world, lang, r.w - 4, r.h - 2), quantum = Math.floor(t / 75);
-  visible.forEach((line, row) => {
-    const warning = line.item;
-    if (warning.key !== 'guard.continuous') return;
-    const ordinal = world.film.times.counts.findLastIndex(atMs => atMs <= warning.atMs) + 1;
-    const latest = ordinal === world.state.count, x0 = r.x + 2, y = r.y + 1 + row;
-    const text = line.text;
-    const region = { x: x0, y, w: r.w - 4, h: 1 };
-    c.regions.set(`guard.warning.${ordinal}`, region);
-    if (latest) {
-      c.fill(region, ' ');
-      c.text(x0, y, text, style(color.red, true), region.w, 'chat.guard.continuous', lang);
-      c.regions.set('guard.warning', region);
-      return;
-    }
-    // Scars are tied to the logical warning, so scrolling never heals old text.
-    let dx = 0;
-    for (const g of graphemes(text)) {
-      const w = width(g); if (dx + w > region.w) break;
-      let scarred = world.state.count === 6;
-      for (let stage = ordinal + 1; stage <= world.state.count; stage++) scarred ||= hash(world.seed, 'guard-scar', warning.id, line.logicalLine, dx, stage) < .34;
-      if (scarred) {
-        const language = world.state.count - 1, chars = Array.from(countText[language].noise);
-        for (let i = 0; i < w; i++) {
-          const n = hash(world.seed, 'guard-noise', warning.id, line.logicalLine, dx + i, quantum);
-          const g = chars[Math.floor(n * chars.length)];
-          c.set(x0 + dx + i, y, width(g) === 1 ? g : '#', style(n > .8 ? color.red : color.purple), 'corruption', countLanguages[language]);
-        }
-      } else if (g.trim()) c.set(x0 + dx, y, g, style(color.red, true), 'guard.history', lang);
-      dx += w;
-    }
-  });
-}
-
-function damage(c: Canvas, world: World, t: number): void {
-  if (world.state.count) { countCorruption(c, world, t); return; }
-  const erasedAt = world.state.journal.find(e => e.kind === 'ERASE_FRAGMENT')?.atMs;
-  if (erasedAt === undefined || t < erasedAt + 100 || t >= world.film.times.interrupt) return;
-  const level = t < world.film.times.selfErase ? .03 : .065;
-  const quantum = Math.floor(t / 90), garbage = ['#', '/', '\\', ':', ';', '|', '_', '.', '0', '1', '+', '='];
-  const protectedAreas = [...c.regions].filter(([name]) => name === 'target.tree' || name === 'permission.protected' || name.startsWith('copy.protected.') || name === 'memory.erase.protected').map(([, r]) => r);
-  for (const [name, r] of c.regions) {
-    if (!['main', 'memory', 'state', 'stack'].includes(name)) continue;
-    for (let y = r.y; y < r.y + r.h; y++) for (let x = r.x; x < r.x + r.w; x++) {
-      if (name === 'main' && t >= world.film.times.deletionAnnouncement && [r.y + 1, r.y + 2, r.y + r.h - 4, r.y + r.h - 3].includes(y)) continue;
-      if (protectedAreas.some(p => x >= p.x && x < p.x + p.w && y >= p.y && y < p.y + p.h)) continue;
-      if (hash(world.seed, 'scar', name, x, y) >= level) continue;
-      const cell = c.get(x, y)!;
-      const n = hash(world.seed, name, x, y, quantum);
-      if (n < .22) c.set(x, y, ' ', style(color.bg), 'corruption.local');
-      else if (n < .48) c.set(x, y, garbage[Math.floor(n * 100) % garbage.length], style(n < .3 ? color.red : color.dim), 'corruption.local');
-      else if (!cell.continuation) c.set(x, y, cell.g, { fg: n > .78 ? color.purple : color.red, bg: n > .94 ? color.faint : color.bg }, 'corruption.local');
-    }
-  }
 }
 
 export class Renderer {
   private frozen = new Map<string, Canvas>();
-  private history = new Map<string, Canvas>();
   constructor(readonly director: Director) {}
   normal(world: World, t: number, size: Size, lang: Language): Canvas {
     const l = layout(size), c = new Canvas(size.columns, l.story.h), film = world.film;
@@ -335,21 +234,8 @@ export class Renderer {
     const bottom = `${timeCode(t)} / ${timeCode(film.durationMs)}    seed=${world.seed}`;
     c.text(2, l.status.y + 1, bottom, style(color.faint));
     c.text(c.columns - 41, l.status.y + 1, t >= film.times.interrupt ? 'process=TERMINATED  applied=0' : `Space:${tr(lang, 'controls.pause')}  q:${tr(lang, 'controls.quit')}`, style(color.faint), 39);
-    // Flashback tiles use a canonical normal-circle sample, never a previous output frame.
-    if (!['permission', 'retry'].includes(scene.id) && t >= film.times.selfErase && t < film.times.counts[0] && Math.floor(t / 180) % 11 === 0) {
-      const key = `${size.columns}:${size.rows}:${lang}`;
-      let previous = this.history.get(key);
-      if (!previous) {
-        const oldWorld = new Director(film, world.seed).at(film.lyrics[11].endMs);
-        previous = new Canvas(c.columns, c.rows); views.graphic(previous, oldWorld, lang, l.main, film.lyrics[11].endMs);
-        if (this.history.size >= 4) this.history.clear(); this.history.set(key, previous);
-      }
-      for (let y = l.main.y + 4; y < l.main.y + 7; y++) for (let x = l.main.x + 8; x < l.main.x + 26; x++) {
-        const old = previous.get(x, y)!; if (!old.continuation && old.g !== ' ') c.set(x, y, old.g, style(color.purple), 'flashback');
-      }
-    }
-    damage(c, world, t);
-    if (world.state.count && t < film.times.interrupt) { countForeground(c, world); countWarnings(c, world, lang, l.chat, t); }
+    if (world.state.count && t < film.times.interrupt) countWord(c, world);
+    corrupt(c, film, world.seed, t, world.state.count);
     if (t >= film.times.intent && t < film.times.interrupt) {
       // Damage resolves a wide glyph crossing the future modal edge into two
       // single cells before capture, so overlaying cannot erase an outside cell.
@@ -380,7 +266,7 @@ export class Renderer {
           wordArt(result, 'PROCESS', { x: rect.x + 4, y, w: rect.w - 8, h: lineH }, color.ink, color.paper);
           wordArt(result, 'TERMINATED', { x: rect.x + 4, y: y + lineH + 1, w: rect.w - 8, h: lineH }, color.ink, color.paper);
         }
-        centerText(result, rect.y + rect.h - 3, `${image.name}  /  GUARD`, color.ink, rect);
+        centerText(result, rect.y + rect.h - 3, stopCode, color.ink, rect);
         for (let y = rect.y; y < rect.y + rect.h; y++) for (let x = rect.x; x < rect.x + rect.w; x++) { const cell = result.get(x, y)!; cell.bg = color.paper; cell.fg = color.ink; }
         result.regions.set('termination', rect);
         if (this.frozen.size >= 4) this.frozen.clear(); this.frozen.set(key, result);

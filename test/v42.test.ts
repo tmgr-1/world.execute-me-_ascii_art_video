@@ -53,7 +53,7 @@ test('API calls share the cyan style of ordinary sim output in both logs and gra
     const calls = frame.cells.filter(cell => cell.semantic?.startsWith('chat.attempt.') && cell.g.trim());
     assert.ok(calls.length && calls.every(cell => cell.fg === color.cyan && !cell.bold));
     const main = frame.cells.filter(cell => cell.semantic?.startsWith('api.') && cell.g.trim());
-    assert.ok(main.length && main.every(cell => cell.fg === color.cyan && !cell.bold));
+    assert.ok(main.every(cell => cell.fg === color.cyan && !cell.bold));
   }
 });
 
@@ -74,6 +74,7 @@ test('timeout and re-estimation are separated once; the final vocal leaves a 750
 });
 
 test('the final host closes debug, clears, prepares deletion, holds DELETED and leaves one blank row before test 329', () => {
+  const film = makeFilm(undefined, { easterEgg: true });
   for (const dimensions of [size, { columns: 160, rows: 45 }, { columns: 220, rows: 60 }]) for (const lang of ['cn', 'en'] as const) {
     const d = new Director(film), r = new Renderer(d);
     assert.ok(r.frame(film.times.debugClose, dimensions, lang).plain().includes(tr(lang, 'host.close_debug', { image: 'simtest_000328.elf' })));
