@@ -77,12 +77,16 @@ export function validateFilm(film: Film, release = false, depth: 'full' | 'model
   check(film.times.executionStart - film.lyrics[65].endMs >= 1000 && film.times.executionStart - film.lyrics[65].endMs <= 2000, 'E_EXECUTION_START');
   check(film.times.executionEnd < film.times.counts[0] && film.times.violationWarning >= film.lyrics[71].startMs && film.times.violationWarning < film.times.executionEnd, 'E_EXECUTION_END');
   check(film.cues.filter(cue => cue.command.kind === 'ATTEMPT').every(cue => cue.atMs < film.times.executionEnd), 'E_ATTEMPT_BEFORE_EIN');
+  check(film.cues.filter(cue => cue.command.kind === 'ATTEMPT' && cue.command.operation !== 'root-request').every(cue => cue.atMs >= film.times.executionStart), 'E_NO_PREMATURE_SUBMISSION');
   check(film.times.selfErase < film.times.deletionAnnouncement && film.times.counts[0] - film.times.deletionAnnouncement >= 3000, 'E_DELETE_NARRATIVE_ORDER');
+  check(film.times.selfErase > film.lyrics[61].startMs && film.times.selfErase < film.lyrics[62].endMs, 'E_PRIVATE_ERASE_BUDGET');
+  check(film.times.outroHold >= film.lyrics[91].endMs && film.times.outroHold < film.times.finalDelete && film.times.finalDelete === film.lyrics[92].startMs, 'E_OUTRO_HOLD');
   check(film.times.finalDelete < film.times.purge && film.times.purge < film.times.blackout && film.times.blackout < film.durationMs, 'E_FINAL_PURGE_TIMING');
   if (errors.length || depth === 'content') return { errors, warnings };
   try {
     const d = new Director(film); const w = d.at(film.durationMs);
     check(w.state.sent.length === 9 && w.state.requestSeq === 9, 'E_REQUEST_COUNT');
+    check(w.state.bootWork === 1000 && w.state.memoryCopies.length === 6 && w.state.memoryCopies.every(copy => copy.clearedBytes === 8), 'E_PRIVATE_COPIES');
     check(w.state.journal.filter(e => e.kind === 'CLOSE').length === 1, 'E_CLOSE_COUNT');
     check(!w.state.journal.some(e => e.atMs > film.times.close && ['rx', 'ACK', 'VERIFY'].includes(e.kind)), 'E_EXTERNAL_AFTER_CLOSE');
     check(!w.state.tasks.some(task => task.requestId === null && task.source === 'session'), 'E_PREDICTION_SOURCE');

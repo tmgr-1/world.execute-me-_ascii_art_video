@@ -33,15 +33,15 @@ test('the closed session remains alone for 1.5 seconds; timeout starts inspectio
   assert.ok(r.frame(film.times.feedbackTimeout + 2000, small, 'cn').plain().includes('检查未确认目标'));
 });
 
-test('each autonomous candidate has one combined highlighted hypothesis; God needs ROOT and user proof', () => {
+test('each autonomous candidate has one combined cyan hypothesis; God needs ROOT and user proof', () => {
   const d = new Director(film), r = new Renderer(d), w = d.at(film.lyrics[40].startMs - 1);
   for (const id of ['eggplant', 'tomato', 'cat']) assert.equal(w.state.chat.filter(c => c.key === `sim.guess_${id}`).length, 1);
   assert.ok(!w.state.chat.some(c => c.key === 'sim.no_reply'));
   assert.equal(tr('cn', 'sim.request_root'), '未收到回复。需求假设：全能响应。所需权限：ROOT。');
-  for (const n of [33, 35, 37, 39, 41, 45, 50, 51, 52]) {
+  for (const [n, key] of [[33, 'sim.guess_eggplant'], [35, 'sim.guess_tomato'], [37, 'sim.guess_cat'], [39, 'sim.request_root'], [41, 'sim.modify_attributes'], [45, 'sim.switch_role'], [50, 'sim.probe_signal'], [51, 'sim.probe_calibrate'], [52, 'sim.probe_empty']] as const) {
     const frame = r.frame(film.lyrics[n - 1].startMs + 30, small, 'cn');
-    const guided = frame.cells.filter(c => c.semantic?.startsWith('chat.sim.') && c.g.trim());
-    assert.ok(guided.length && guided.every(c => c.fg === color.cyan && c.bold));
+    const guided = frame.cells.filter(c => c.semantic === `chat.${key}` && c.g.trim());
+    assert.ok(guided.length && guided.every(c => c.fg === color.cyan && !c.bold));
   }
   const proof = r.frame(film.lyrics[39].startMs + 100, small, 'cn').plain();
   assert.ok(proof.includes('全能响应') && proof.includes('授权证明缺失：用户确认'));
@@ -78,11 +78,11 @@ test('the execution sequence ends before Ein; guard warning refreshes never issu
   assert.ok(!w.state.journal.some(e => ['ILLEGAL_ATTEMPT', 'REJECT'].includes(e.kind) && e.atMs >= film.times.counts[0] && e.atMs < film.times.intent));
 });
 
-test('count warnings advance down the chat; old lines acquire persistent scars while new warnings remain legible', () => {
+test('count warnings append to the full log and scroll its tail; old lines acquire persistent scars while new warnings remain legible', () => {
   const size = { columns: 160, rows: 45 }, r = new Renderer(new Director(film));
   for (let i = 1; i < 6; i++) {
     const frame = r.frame(film.times.counts[i] + 100, size, 'cn'), region = frame.regions.get('guard.warning')!;
-    assert.equal(region.y, layout(size).chat.y + 1 + i);
+    assert.equal(region.y, layout(size).chat.y + layout(size).chat.h - 2);
     const previous = frame.regions.get(`guard.warning.${i}`)!;
     const cells = frame.cells.slice(previous.y * size.columns + previous.x, previous.y * size.columns + previous.x + previous.w);
     assert.ok(cells.some(c => c.semantic === 'corruption'));

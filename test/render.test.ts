@@ -64,7 +64,7 @@ test('the complete Chinese title stays on one line at native size with both back
     assert.deepEqual(frame.validate(), []);
   }
 });
-test('the system deletion target and declaration stay readable for over three seconds before counting', () => {
+test('the simulation keeps the deletion target readable while its log declaration scrolls', () => {
   const r = new Renderer(new Director(film));
   assert.ok(film.times.counts[0] - film.times.deletionAnnouncement >= 3000);
   for (const t of [film.times.deletionAnnouncement + 1, film.times.counts[0] - 1000]) {

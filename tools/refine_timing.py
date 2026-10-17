@@ -9,6 +9,7 @@ import argparse
 import copy
 import hashlib
 import json
+import math
 from pathlib import Path
 
 
@@ -21,7 +22,16 @@ def main() -> None:
     parser.add_argument('--groups', default='76,73-75,67-72,9-10,11-12,13-14,15-16,17-18,21-22,23-24,85,93')
     parser.add_argument('--threads', type=int, default=8)
     parser.add_argument('--refine', action='store_true')
+    parser.add_argument('--window', metavar='START:END', help='Explicit audio window in seconds; requires a single group. Useful when the old anchor misses an instrumental gap.')
     args = parser.parse_args()
+    explicit_window = None
+    if args.window:
+        try:
+            explicit_window = [float(value) for value in args.window.split(':')]
+        except ValueError:
+            parser.error('--window must contain START:END seconds.')
+        if len(explicit_window) != 2 or not all(math.isfinite(n) for n in explicit_window) or not 0 <= explicit_window[0] < explicit_window[1] or ',' in args.groups:
+            parser.error('--window requires 0 <= START < END and a single --groups value.')
     checkpoint = args.model_dir / 'small.pt'
     if not checkpoint.is_file() or not args.music_file.is_file():
         parser.error('A local audio file and small.pt are required; downloads are disabled.')
@@ -64,6 +74,10 @@ def main() -> None:
             start = max(start, source['lines'][first - 2]['end'] - .10)
         if last < len(source['lines']):
             end = min(end, source['lines'][last]['start'] + .10)
+        if explicit_window is not None:
+            start, end = explicit_window[0], min(explicit_window[1], len(audio) / 16000)
+            if start >= end:
+                parser.error('--window is outside the decoded audio.')
         sample = audio[round(start * 16000):round(end * 16000)]
         text = '\n'.join(line['text'] for line in lines)
         # Correct unambiguous spelling only; the original reference is preserved.

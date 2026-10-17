@@ -6,6 +6,7 @@ import type { Command, Cue, Film, Instruction, MotionKind, PrivilegedOperation, 
 
 export interface Request { interactionId: string; id: number; key: string; atMs: number; payload: { operation: string; args: Record<string, Value> } }
 export interface Chat { id: string; atMs: number; source: Source; key: string; requestId: number | null }
+export interface MemoryCopy { fragment: number; sourceId: string; key: string; requestId: number | null; clearedBytes: number }
 export interface Task { id: number; owner: string; requestId: number | null; source: 'session' | 'prediction' | 'host'; program: string; pc: number; frames: { program: string; instructionIndex: number; returnPc: number | null }[]; status: 'READY' | 'RUNNING' | 'WAITING' | 'COMPLETE' | 'CANCELLED'; startedAtMs: number }
 export interface Output { id: number; taskId: number; requestId: number | null; queuedAtMs: number; key: string; channel: 'response' | 'probe'; frequency?: number; delivered: boolean; acknowledged: boolean }
 export interface JournalEvent { id: string; atMs: number; source: Source; kind: string; key?: string; taskId?: number; payload: Record<string, unknown> }
@@ -25,6 +26,7 @@ export interface State {
   motion: { kind: MotionKind; startMs: number; endMs: number } | null;
   plan: Plan | null; patch: Patch | null; archive: Archive | null; count: number;
   host: { atMs: number; key: string }[]; erased: number[];
+  bootWork: number; memoryCopies: MemoryCopy[];
   lifecycle: 'RUNNING' | 'TERMINATED' | 'PURGED'; denials: Denial[];
 }
 export interface WorldSnapshot { state: State; store: StoreSnapshot; queue: Cue[]; processed: string[] }
@@ -32,7 +34,7 @@ export const compareCues = (a: Cue, b: Cue): number => a.atMs - b.atMs || a.prio
 
 export class World {
   readonly store: ObjectStore;
-  state: State = { timeMs: -1, nextTick: 0, requestSeq: 0, taskSeq: 0, outputSeq: 0, sent: [], chat: [], tasks: [], outputs: [], journal: [], motion: null, plan: null, patch: null, archive: null, count: 0, host: [], erased: [], lifecycle: 'RUNNING', denials: [] };
+  state: State = { timeMs: -1, nextTick: 0, requestSeq: 0, taskSeq: 0, outputSeq: 0, sent: [], chat: [], tasks: [], outputs: [], journal: [], motion: null, plan: null, patch: null, archive: null, count: 0, host: [], erased: [], bootWork: 0, memoryCopies: [], lifecycle: 'RUNNING', denials: [] };
   private queue: Cue[];
   private readonly anchorTimes: Map<string, number>;
   private processed = new Set<string>();
@@ -52,7 +54,9 @@ export class World {
     this.state.journal.push({ id: `event.${this.state.journal.length + 1}`, atMs, source, kind, payload, key, taskId });
   }
   private chat(source: Source, key: string, atMs: number, requestId: number | null = null): void {
-    this.state.chat.push({ id: `chat.${this.state.chat.length + 1}`, source, key, atMs, requestId });
+    const item = { id: `chat.${this.state.chat.length + 1}`, source, key, atMs, requestId };
+    this.state.chat.push(item);
+    if (source === 'sim' || source === 'session') this.rememberCopy(key, requestId === null ? item.id : `request.${requestId}`, requestId, atMs);
   }
   write(target: string, field: string, value: Value, source: Source, atMs: number, sampled = false): boolean {
     try {
@@ -132,8 +136,33 @@ export class World {
       if (!Number.isInteger(fragment) || fragment < 0 || fragment >= 8) throw new Error('E_FRAGMENT');
       if (this.state.erased.includes(fragment)) continue;
       this.store.erase('me', field.offset + fragment * 8, 8, 'core', atMs); this.state.erased.push(fragment);
-      this.event('core', 'ERASE_FRAGMENT', atMs, { fragment, address: addressBook.me + field.offset + fragment * 8 });
+      const copy = this.state.memoryCopies.find(copy => copy.fragment === fragment);
+      if (copy) copy.clearedBytes = 8;
+      this.event('core', 'ERASE_FRAGMENT', atMs, { fragment, address: addressBook.me + field.offset + fragment * 8, size: 8 });
     }
+  }
+  private rememberCopy(key: string, sourceId: string, requestId: number | null, atMs: number): void {
+    const fragment = ['request.points', 'request.circle', 'request.tangent', 'sim.guess_eggplant', 'sim.guess_tomato', 'sim.guess_cat'].indexOf(key);
+    if (fragment < 0 || this.state.memoryCopies.some(copy => copy.fragment === fragment)) return;
+    // Private 8-byte source handles are retained when their source arrives,
+    // never reconstructed from the transcript during the deletion scene.
+    const copy: MemoryCopy = { fragment, sourceId, key, requestId, clearedBytes: 0 };
+    this.state.memoryCopies.push(copy);
+    const bytes = Buffer.from(this.value('fragments') as Uint8Array);
+    bytes.writeUInt32LE(Number(sourceId.split('.').at(-1)), fragment * 8);
+    bytes.writeUInt32LE(fragment + 1, fragment * 8 + 4);
+    this.write('me', 'fragments', bytes, 'core', atMs);
+    this.event('core', 'PRIVATE_COPY', atMs, { ...copy, bytesPerRecord: 8 });
+  }
+  private eraseCopy(fragment: number, clearedBytes: number, atMs: number): void {
+    const copy = this.state.memoryCopies.find(copy => copy.fragment === fragment);
+    if (!copy || clearedBytes <= copy.clearedBytes || clearedBytes > 8) throw new Error('E_COPY_ERASE_ORDER');
+    const offset = this.store.field('me', 'fragments').offset + fragment * 8 + copy.clearedBytes;
+    const size = clearedBytes - copy.clearedBytes;
+    this.store.erase('me', offset, size, 'core', atMs);
+    copy.clearedBytes = clearedBytes;
+    if (clearedBytes === 8) this.state.erased.push(fragment);
+    this.event('core', 'ERASE_FRAGMENT', atMs, { fragment, address: addressBook.me + offset, size, sourceId: copy.sourceId, clearedBytes });
   }
   private preparePlan(atMs: number): void {
     if (this.state.plan) return;
@@ -185,6 +214,10 @@ export class World {
   private dispatch(command: Command, atMs: number): void {
     switch (command.kind) {
       case 'CREATE_WORLD': this.createWorld(atMs); break;
+      case 'BOOT_WORK':
+        if (command.units < this.state.bootWork || command.units > 1000) throw new Error('E_BOOT_WORK');
+        this.state.bootWork = command.units; this.event('boot', 'WORK_COMPLETE', atMs, { units: command.units }); break;
+      case 'ERASE_COPY': this.eraseCopy(command.fragment, command.clearedBytes, atMs); break;
       case 'SET': this.write(command.target, command.field, command.value, command.source ?? 'boot', atMs); break;
       case 'CHAT': this.chat(command.source, command.key, atMs); this.event(command.source, 'MESSAGE', atMs, {}, command.key); break;
       case 'OPEN': this.write('session', 'open', true, 'session', atMs); this.chat('session', 'session.connected', atMs); break;

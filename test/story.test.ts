@@ -49,7 +49,7 @@ test('departure is readable before the result, followed by a short feedback time
     const frame = r.frame(t, size, 'cn');
     for (const semantic of ['chat.session.closed', 'session.closed']) {
       const ink = frame.cells.filter(cell => cell.semantic === semantic && cell.g.trim());
-      assert.ok(ink.length); assert.ok(ink.every(cell => cell.fg === color.red && cell.bold));
+      assert.ok(ink.length); assert.ok(ink.every(cell => cell.fg === color.red && cell.bold === (semantic === 'session.closed')));
     }
   }
   const later = d.at(film.lyrics[32].startMs + 1);
@@ -68,7 +68,7 @@ test('waiting moves from status to demand; the first sim first-person line is th
     const frame = renderer.frame(item.atMs + 10, size, 'cn');
     const ink = frame.cells.filter(cell => cell.semantic === `chat.${item.key}` && cell.g.trim());
     assert.ok(ink.length); assert.ok(ink.every(cell => cell.bold === (index >= 3)));
-    if (index >= 4) assert.ok(ink.every(cell => cell.fg === color.red));
+    assert.ok(ink.every(cell => cell.fg === [color.cyan, 51, color.gold, color.gold, color.red, 196][index]));
   }
 });
 
@@ -111,7 +111,7 @@ test('every count adds viewport damage; guard wins briefly, is overwritten, and 
     assert.ok(denial.length && denial.every(cell => cell.fg === color.red && cell.bold));
     const region = a.regions.get('guard.warning')!, chat = layout(size).chat;
     assert.ok(region.x > chat.x && region.x + region.w < chat.x + chat.w);
-    assert.equal(region.y, chat.y + 1 + Math.min(i, chat.h - 3));
+    assert.equal(region.y, chat.y + chat.h - 2);
     assert.ok(!a.regions.has('guard.denial'));
     assert.ok(a.cells.some((cell, index) => cell.semantic === 'corruption' && (cell.g !== b.cells[index].g || cell.fg !== b.cells[index].fg)));
     if (i === 4) {
@@ -146,7 +146,7 @@ for (const dimensions of [size, { columns: 160, rows: 45 }]) for (const lang of 
     assert.deepEqual(d.world.state.archive, snapshot);
     const final = renderer.frame(film.times.purge + 100, dimensions, lang).plain();
     assert.ok(final.includes(image.path) && final.includes('PROGRAM DELETED'));
-    assert.ok(!final.includes('wait_for_reply')); assert.equal(d.world.state.lifecycle, 'PURGED');
+    assert.ok(final.includes('wait_for_reply') && final.includes('exit_branch: NOT REACHED')); assert.equal(d.world.state.lifecycle, 'PURGED');
     assert.ok(renderer.frame(film.times.blackout, dimensions, lang).cells.every(cell => cell.g === ' '));
     d.at(1000); assert.equal(d.at(film.times.purge).state.lifecycle, 'PURGED');
   });

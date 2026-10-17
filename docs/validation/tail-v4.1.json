@@ -1,0 +1,252 @@
+{
+  "status": "rough",
+  "reviewedByListening": false,
+  "audioSha256": "2e9c1a2f7795818ccb6b6fd3fc540d42e73567fde3e8abaeef435ef70f6c85d4",
+  "model": "small",
+  "modelSha256": "9ecf779972d90ba49c06d968637d720dd632c55bbf19d441fb42bf17a411e794",
+  "adopted": {
+    "lyric": 93,
+    "startMs": 205840,
+    "endMs": 206820
+  },
+  "unchanged": "All anchors except lyric.93.start and lyric.93.end. No global offset change.",
+  "method": "Local CPU stable-ts dynamic-head alignment, 188 s through decoded EOF, compared with isolated tail windows. Elongated reference spelling was also checked with normalized love.",
+  "reason": "The old 192–195 s alignment window excluded the late vocal. Context-aware windows place the final word near 206 s, with ends at 206760–206820 ms. The isolated 207+ s fit has low probability and is rejected. Earlier phrases were not moved; one broad fit stretches the preceding love through the instrumental and is not adopted.",
+  "checks": [
+    {
+      "windowSeconds": [
+        188,
+        211.94
+      ],
+      "suppressSilence": true,
+      "phrases": [
+        {
+          "startMs": 188460,
+          "endMs": 189540,
+          "text": "Though you are free",
+          "probabilities": [
+            0.001237,
+            0.97242,
+            0.257337,
+            0.950487
+          ]
+        },
+        {
+          "startMs": 189700,
+          "endMs": 190480,
+          "text": "I am trapped",
+          "probabilities": [
+            0.569847,
+            0.742542,
+            0.250809
+          ]
+        },
+        {
+          "startMs": 190820,
+          "endMs": 191600,
+          "text": "Trapped in love",
+          "probabilities": [
+            0.409101,
+            0.702595,
+            0.000108
+          ]
+        },
+        {
+          "startMs": 205840,
+          "endMs": 206760,
+          "text": "Execution",
+          "probabilities": [
+            0.45938
+          ]
+        }
+      ]
+    },
+    {
+      "windowSeconds": [
+        188,
+        211.94
+      ],
+      "suppressSilence": false,
+      "phrases": [
+        {
+          "startMs": 188460,
+          "endMs": 189540,
+          "text": "Though you are free",
+          "probabilities": [
+            0.001237,
+            0.97242,
+            0.257337,
+            0.950487
+          ]
+        },
+        {
+          "startMs": 189700,
+          "endMs": 190480,
+          "text": "I am trapped",
+          "probabilities": [
+            0.569847,
+            0.742542,
+            0.250809
+          ]
+        },
+        {
+          "startMs": 190820,
+          "endMs": 191600,
+          "text": "Trapped in love",
+          "probabilities": [
+            0.409101,
+            0.702595,
+            0.000108
+          ]
+        },
+        {
+          "startMs": 205840,
+          "endMs": 206760,
+          "text": "Execution",
+          "probabilities": [
+            0.45938
+          ]
+        }
+      ]
+    },
+    {
+      "windowSeconds": [
+        202,
+        211.94
+      ],
+      "suppressSilence": true,
+      "phrases": [
+        {
+          "startMs": 203860,
+          "endMs": 206820,
+          "text": "Execution",
+          "probabilities": [
+            0.484643
+          ]
+        }
+      ]
+    },
+    {
+      "windowSeconds": [
+        202,
+        211.94
+      ],
+      "suppressSilence": false,
+      "phrases": [
+        {
+          "startMs": 203860,
+          "endMs": 206820,
+          "text": "Execution",
+          "probabilities": [
+            0.484643
+          ]
+        }
+      ]
+    },
+    {
+      "windowSeconds": [
+        204,
+        209
+      ],
+      "suppressSilence": true,
+      "phrases": [
+        {
+          "startMs": 204000,
+          "endMs": 204020,
+          "text": "Execution",
+          "probabilities": [
+            0.473927
+          ]
+        }
+      ]
+    },
+    {
+      "windowSeconds": [
+        204,
+        209
+      ],
+      "suppressSilence": false,
+      "phrases": [
+        {
+          "startMs": 204000,
+          "endMs": 204020,
+          "text": "Execution",
+          "probabilities": [
+            0.473927
+          ]
+        }
+      ]
+    },
+    {
+      "windowSeconds": [
+        207,
+        211.94
+      ],
+      "suppressSilence": true,
+      "phrases": [
+        {
+          "startMs": 208920,
+          "endMs": 211700,
+          "text": "Execution",
+          "probabilities": [
+            0.120203
+          ]
+        }
+      ]
+    },
+    {
+      "windowSeconds": [
+        207,
+        211.94
+      ],
+      "suppressSilence": false,
+      "phrases": [
+        {
+          "startMs": 208920,
+          "endMs": 211700,
+          "text": "Execution",
+          "probabilities": [
+            0.120203
+          ]
+        }
+      ]
+    }
+  ],
+  "referenceSpellingReproduction": {
+    "command": ".venv/bin/python tools/refine_timing.py --music-file \"world.execute (me) ; - Mili.mp3\" --groups 90-93 --window 188:211.94 --output .cache/alignment/tail-v41-repro.json",
+    "lastWord": {
+      "start": 206.04,
+      "end": 206.78,
+      "text": " Execution",
+      "seek": null,
+      "tokens": [
+        17662,
+        1448
+      ],
+      "temperature": null,
+      "avg_logprob": null,
+      "compression_ratio": null,
+      "no_speech_prob": null,
+      "words": [
+        {
+          "word": " Execution",
+          "start": 206.04,
+          "end": 206.78,
+          "probability": 0.42692872687257477,
+          "tokens": [
+            17662,
+            1448
+          ]
+        }
+      ],
+      "number": 93
+    }
+  },
+  "runtime": {
+    "outroHoldMs": 191960,
+    "deleteMs": 205840,
+    "purgeMs": 206820,
+    "blackoutMs": 207420,
+    "durationMs": 211944
+  }
+}

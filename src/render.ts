@@ -9,6 +9,7 @@ import type { Film, Language, Rect, Size } from './types.js';
 import glyphs from '../films/world-execute/assets/glyphs.json' with { type: 'json' };
 import { countLanguages, countText, image } from '../films/world-execute/story.js';
 import { subtitleLines } from './subtitles.js';
+import { visibleLog } from './event-log.js';
 
 const glyphVariants = new Map<string, { bitmap: string[]; w: number; h: number }[]>();
 for (const asset of Object.values(glyphs)) {
@@ -29,7 +30,7 @@ export function layout(size: Size): Layout {
     input: { x: 0, y: simY + simH, w: size.columns, h: inputRows + 2 }, status: { x: 0, y: storyH - 2, w: size.columns, h: 2 },
     story: { x: 0, y: 0, w: size.columns, h: storyH }, subtitles: { x: 0, y: storyH, w: size.columns, h: 2 }, inputRows };
 }
-const labelKey: Record<string, string> = { memory: 'ui.memory', wait: 'ui.wait', task: 'ui.tasks', log: 'ui.log', input: 'ui.input', stack: 'ui.stack', output: 'ui.output', state: 'ui.state' };
+const labelKey: Record<string, string> = { memory: 'ui.memory', wait: 'ui.wait', task: 'ui.tasks', log: 'ui.chat', input: 'ui.input', stack: 'ui.stack', output: 'ui.output', state: 'ui.state' };
 const labelSteps: Record<string, number> = { task: 1, log: 2, input: 2, memory: 3, stack: 4, wait: 4, state: 5, output: 6 };
 function label(world: World, lang: Language, key: string): { text: string; language: string } {
   const step = labelSteps[key];
@@ -78,45 +79,14 @@ function input(c: Canvas, world: World, lang: Language, r: Rect, timeMs: number)
     history.unshift(group); occupied += group.length;
   }
   let y = r.y + r.h - 2 - Math.max(1, draft.length) - occupied + 1;
-  for (const group of history) for (const line of group) c.text(r.x + 2, y++, line, style(color.dim), r.w - 4);
-  draft.forEach((line, i) => c.text(r.x + 2, r.y + r.h - 1 - draft.length + i, line, style(color.cyan, true), r.w - 4));
+  for (const group of history) for (const line of group) c.text(r.x + 2, y++, line, style(color.green), r.w - 4, 'input.sent');
+  draft.forEach((line, i) => c.text(r.x + 2, r.y + r.h - 1 - draft.length + i, line, style(color.green), r.w - 4, 'input.draft'));
 }
-function conversation(c: Canvas, world: World, lang: Language, r: Rect, timeMs: number): void {
-  c.box(r, tr(lang, 'ui.chat'), color.faint, 'chat', lang);
-  const capacity = r.h - 2;
-  const chatLines = world.state.chat.filter(item => !(world.state.count && item.key === 'guard.continuous')).flatMap(item => {
-    const tag = item.source === 'session' && item.requestId !== null ? `user #${String(item.requestId).padStart(2, '0')}>` : `[${item.source}]`;
-    return wrap(`${tag} ${tr(lang, item.key, { image: image.name })}`, r.w - 4).map(text => ({ text, source: item.source, key: item.key, requestId: item.requestId }));
-  });
-  let visible = chatLines.slice(-capacity);
-  const active = [...world.film.interactions].reverse().find(i => i.send <= timeMs);
-  if (active && timeMs <= active.holdUntil && world.session('open')) {
-    const request = world.state.sent.find(req => req.interactionId === active.id);
-    if (request && !visible.some(line => line.source === 'session' && line.requestId === request.id)) {
-      const pinned = chatLines.filter(line => line.source === 'session' && line.requestId === request.id);
-      visible = [...pinned, ...visible.slice(-(capacity - pinned.length))].slice(0, capacity);
-    }
-  }
-  if (timeMs >= world.film.times.close && timeMs < world.film.times.result + 2000) {
-    const closed = chatLines.filter(line => line.key === 'session.closed');
-    visible = [...closed, ...visible.filter(line => line.key !== 'session.closed').slice(-(capacity - closed.length))];
-  }
-  if (timeMs >= world.film.lyrics[38].startMs && timeMs < world.film.lyrics[40].startMs) {
-    visible = chatLines.filter(line => ['sim.request_root', 'attempt.root-request', 'guard.root', 'sim.missing_proof'].includes(line.key)).slice(-capacity);
-  }
-  if (world.state.plan && !world.state.count) {
-    const detected = chatLines.findLast(line => line.key === 'guard.continuous');
-    const declaration = chatLines.filter(line => ['sim.delete_system', 'sim.delete_target'].includes(line.key));
-    const latest = chatLines.filter(line => !['guard.continuous', 'sim.delete_system', 'sim.delete_target'].includes(line.key)).slice(-1);
-    visible = [...declaration, ...latest, ...(detected ? [detected] : [])].slice(0, capacity);
-  }
-  visible.forEach((line, i) => {
-    const level = Number(line.key.match(/^sim\.wait\.(\d)$/)?.[1] ?? 0);
-    const guided = timeMs >= world.film.lyrics[32].startMs && timeMs < world.film.lyrics[52].startMs && line.source === 'sim' && line.key.startsWith('sim.');
-    const red = line.source === 'guard' || line.key === 'session.closed' || level >= 5;
-    const fg = red ? color.red : guided ? color.cyan : level >= 3 ? color.gold : level === 1 ? color.dim : line.source === 'session' ? color.cyan : color.text;
-    const bold = red || guided || level >= 4 || line.key === 'session.connected' || ['sim.delete_system', 'sim.delete_target'].includes(line.key);
-    c.text(r.x + 2, r.y + 1 + i, line.text, style(fg, bold), r.w - 4, `chat.${line.key}`, lang);
+function conversation(c: Canvas, world: World, lang: Language, r: Rect): void {
+  const heading = label(world, lang, 'log');
+  c.box(r, heading.text, color.faint, 'chat', heading.language);
+  visibleLog(world, lang, r.w - 4, r.h - 2).forEach((line, i) => {
+    c.text(r.x + 2, r.y + 1 + i, line.text, line.style, r.w - 4, `chat.${line.item.key}`, lang);
   });
 }
 function attributeFocus(world: World, t: number): string | undefined {
@@ -137,18 +107,28 @@ function memoryAndWatch(c: Canvas, world: World, lang: Language, r: Rect, timeMs
     if (age < 650 || timeMs - entry < 300) c.text(r.x - 10, r.y + 1, '→ MEM', style(color.cyan, true), 8, 'memory.write.arrow');
   } else title(c, memory, world, lang, 'memory');
   const a = world.store.allocation('me'), fields = world.store.layouts.get(a.type)!.fields;
-  const fragmentOffset = world.store.field('me', 'fragments').offset;
   const bytesPerRow = r.w >= 40 ? 6 : 4;
+  const clearing = world.state.journal.findLast(event => event.kind === 'ERASE_FRAGMENT');
+  const preview = timeMs >= world.film.lyrics[59].startMs && world.state.memoryCopies.length && !clearing ? world.state.memoryCopies[0] : undefined;
+  const erasure = [...world.store.changes.values()].findLast(change => change.erased && change.field === 'SELF_ERASE');
+  const snapshot = erasure && erasure.atMs >= (clearing?.atMs ?? Infinity) ? erasure : undefined;
+  const memoryAllocation = snapshot ? world.store.allocation(snapshot.objectId) : a;
+  const eraseAddress = snapshot?.address ?? (clearing ? Number(clearing.payload.address) - Number(clearing.payload.clearedBytes ?? clearing.payload.size) + Number(clearing.payload.size) : preview ? a.address + world.store.field('me', 'fragments').offset : undefined);
+  const clearAge = timeMs - (snapshot?.atMs ?? clearing?.atMs ?? -Infinity);
+  if (eraseAddress !== undefined) {
+    const target = snapshot ? snapshot.objectId : `fragments[${clearing?.payload.fragment ?? preview!.fragment}]`;
+    c.text(r.x + 2, r.y + 1, `${preview ? 'SELECT' : 'ERASE'} ${target}  ${snapshot?.size ?? 8} B`, style(clearAge < 350 ? color.gold : color.dim), r.w - 4, 'memory.erase.label');
+  }
   const focus = attribute ?? ({ points: 'dimension', circle: 'radius', tangent: 'theta', infinity: 'boundary', current: 'currentMode', time: 'currentYear', align: 'phaseError', eggplant: 'nutrients', tomato: 'antioxidants', cat: 'purr' } as Record<string, string>)[world.state.motion?.kind ?? ''];
-  const offset = world.state.erased.length ? fragmentOffset : focus ? Math.max(0, Math.floor(world.store.field('me', focus).offset / bytesPerRow) * bytesPerRow - bytesPerRow) : 0;
+  const offset = eraseAddress !== undefined ? eraseAddress - memoryAllocation.address : focus ? Math.max(0, Math.floor(world.store.field('me', focus).offset / bytesPerRow) * bytesPerRow - bytesPerRow) : 0;
   const changes = [...world.store.changes.values()];
   for (let row = 0; row < memory.h - (attribute ? 4 : 3); row++) {
-    const start = offset + row * bytesPerRow, address = a.address + start;
+    const start = offset + row * bytesPerRow, address = memoryAllocation.address + start;
     const y = r.y + row + (attribute ? 3 : 2);
     const selectedRow = !!attribute && address <= a.address + world.store.field('me', attribute).offset && address + bytesPerRow > a.address + world.store.field('me', attribute).offset;
     c.text(r.x + 2, y, address.toString(16).padStart(8, '0').toUpperCase(), style(selectedRow ? color.cyan : color.dim, selectedRow), 8, selectedRow ? 'memory.write.address' : undefined);
     for (let b = 0; b < bytesPerRow; b++) {
-      const at = address + b, allocated = at < a.address + a.size, value = world.store.bytes[at - world.store.base];
+      const at = address + b, allocated = at < memoryAllocation.address + memoryAllocation.size, value = world.store.bytes[at - world.store.base];
       const changed = changes.some(ch => at >= ch.address && at < ch.address + ch.size && timeMs - ch.atMs < (attribute ? 650 : 350)
         && (!ch.beforeBytes || ch.beforeBytes[at - ch.address] !== ch.afterBytes![at - ch.address]));
       const field = fields.find(field => at >= a.address + field.offset && at < a.address + field.offset + field.size);
@@ -158,9 +138,11 @@ function memoryAndWatch(c: Canvas, world: World, lang: Language, r: Rect, timeMs
         { fg: actualWrite || !attribute && changed ? color.gold : selected ? color.cyan : value === 0 ? color.faint : color.dim, bg: actualWrite && age < 120 ? 24 : color.bg, bold: actualWrite && age < 450 },
         2, field ? `field.me.${field.name}` : undefined);
     }
-    const ascii = Array.from({ length: bytesPerRow }, (_, b) => { const at = address + b; const byte = world.store.bytes[at - world.store.base]; return at >= a.address + a.size ? ' ' : byte >= 32 && byte < 127 ? String.fromCharCode(byte) : '.'; }).join('');
+    const ascii = Array.from({ length: bytesPerRow }, (_, b) => { const at = address + b; const byte = world.store.bytes[at - world.store.base]; return at >= memoryAllocation.address + memoryAllocation.size ? ' ' : byte >= 32 && byte < 127 ? String.fromCharCode(byte) : '.'; }).join('');
     c.text(r.x + 12 + bytesPerRow * 3, y, `|${ascii}|`, style(color.faint), bytesPerRow + 2);
   }
+  if (eraseAddress !== undefined && clearAge < 350) c.regions.set('memory.erase.protected', { x: r.x + 1, y: r.y + 1, w: r.w - 2, h: memory.h - 2 });
+  if (snapshot) c.text(r.x + 2, r.y + memory.h - 1, `view ${Math.min(snapshot.size, (memory.h - 3) * bytesPerRow)}/${snapshot.size} B`, style(color.dim), r.w - 4, 'memory.erase.range');
   const watch = { x: r.x, y: r.y + memoryH, w: r.w, h: r.h - memoryH };
   title(c, watch, world, lang, world.state.count >= 4 ? 'stack' : 'state');
   const motion = world.state.motion?.kind;
@@ -183,10 +165,10 @@ function memoryAndWatch(c: Canvas, world: World, lang: Language, r: Rect, timeMs
     c.text(watch.x + 2, watch.y + i + 1, line, style(selected ? age < 450 ? color.gold : color.cyan : color.dim, selected), watch.w - 4, selected ? 'memory.write.value' : undefined);
   });
   // Semantic label instances remain separate from the state data they annotate.
-  for (const [semantic, y] of (attribute ? [] : [['task', watch.y + watch.h - 1], ['wait', r.y + 1], ['output', r.y + memoryH - 1]]) as [string, number][]) {
+  for (const [semantic, y] of (attribute || eraseAddress !== undefined ? [] : [['task', watch.y + watch.h - 1], ['wait', r.y + 1], ['output', r.y + memoryH - 1]]) as [string, number][]) {
     const l = label(world, lang, semantic); c.text(r.x + r.w - width(l.text) - 3, y, l.text, style(color.dim), r.w - 4, semantic, l.language);
   }
-  void fields;
+
 }
 
 function visionGhosts(c: Canvas, world: World, l: Layout, t: number): void {
@@ -259,12 +241,13 @@ function countForeground(c: Canvas, world: World): void {
 }
 
 function countWarnings(c: Canvas, world: World, lang: Language, r: Rect, t: number): void {
-  const warnings = world.state.chat.filter(item => item.key === 'guard.continuous' && item.atMs >= world.film.times.counts[0]);
-  const visible = warnings.slice(-(r.h - 2)), quantum = Math.floor(t / 75);
-  visible.forEach((warning, row) => {
+  const visible = visibleLog(world, lang, r.w - 4, r.h - 2), quantum = Math.floor(t / 75);
+  visible.forEach((line, row) => {
+    const warning = line.item;
+    if (warning.key !== 'guard.continuous') return;
     const ordinal = world.film.times.counts.findLastIndex(atMs => atMs <= warning.atMs) + 1;
     const latest = ordinal === world.state.count, x0 = r.x + 2, y = r.y + 1 + row;
-    const text = `[guard] ${tr(lang, warning.key)}`;
+    const text = line.text;
     const region = { x: x0, y, w: r.w - 4, h: 1 };
     c.regions.set(`guard.warning.${ordinal}`, region);
     if (latest) {
@@ -278,11 +261,11 @@ function countWarnings(c: Canvas, world: World, lang: Language, r: Rect, t: numb
     for (const g of graphemes(text)) {
       const w = width(g); if (dx + w > region.w) break;
       let scarred = world.state.count === 6;
-      for (let stage = ordinal + 1; stage <= world.state.count; stage++) scarred ||= hash(world.seed, 'guard-scar', warning.id, dx, stage) < .34;
+      for (let stage = ordinal + 1; stage <= world.state.count; stage++) scarred ||= hash(world.seed, 'guard-scar', warning.id, line.logicalLine, dx, stage) < .34;
       if (scarred) {
         const language = world.state.count - 1, chars = Array.from(countText[language].noise);
         for (let i = 0; i < w; i++) {
-          const n = hash(world.seed, 'guard-noise', warning.id, dx + i, quantum);
+          const n = hash(world.seed, 'guard-noise', warning.id, line.logicalLine, dx + i, quantum);
           const g = chars[Math.floor(n * chars.length)];
           c.set(x0 + dx + i, y, width(g) === 1 ? g : '#', style(n > .8 ? color.red : color.purple), 'corruption', countLanguages[language]);
         }
@@ -294,30 +277,22 @@ function countWarnings(c: Canvas, world: World, lang: Language, r: Rect, t: numb
 
 function damage(c: Canvas, world: World, t: number): void {
   if (world.state.count) { countCorruption(c, world, t); return; }
-  if (t < world.film.lyrics[40].startMs || t >= world.film.times.interrupt) return;
   const erasedAt = world.state.journal.find(e => e.kind === 'ERASE_FRAGMENT')?.atMs;
-  const level = t < world.film.lyrics[44].startMs ? .012 : erasedAt !== undefined && t >= erasedAt + 100 ? .065 : .035;
+  if (erasedAt === undefined || t < erasedAt + 100 || t >= world.film.times.interrupt) return;
+  const level = t < world.film.times.selfErase ? .03 : .065;
   const quantum = Math.floor(t / 90), garbage = ['#', '/', '\\', ':', ';', '|', '_', '.', '0', '1', '+', '='];
-  const target = c.regions.get('target.tree');
+  const protectedAreas = [...c.regions].filter(([name]) => name === 'target.tree' || name === 'permission.protected' || name.startsWith('copy.protected.') || name === 'memory.erase.protected').map(([, r]) => r);
   for (const [name, r] of c.regions) {
     if (!['main', 'memory', 'state', 'stack'].includes(name)) continue;
-    if (attributeFocus(world, t) && name !== 'main') continue;
     for (let y = r.y; y < r.y + r.h; y++) for (let x = r.x; x < r.x + r.w; x++) {
-      if (name === 'main' && t >= world.film.times.deletionAnnouncement && (y === r.y + 2 || y === r.y + r.h - 3)) continue;
-      if (target && x >= target.x && x < target.x + target.w && y >= target.y && y < target.y + target.h) continue;
-      if (t < world.film.lyrics[44].startMs) {
-        if (name === 'main' && (x < r.x + 7 || x > r.x + 40 || y < r.y + 4 || y > r.y + 10)) continue;
-        if (name === 'memory' && y < r.y + Math.max(2, r.h - 4)) continue;
-        if (name === 'state' && y > r.y + 4) continue;
-      }
-      if (erasedAt !== undefined && t - erasedAt < 100 && name === 'memory') continue;
+      if (name === 'main' && t >= world.film.times.deletionAnnouncement && [r.y + 1, r.y + 2, r.y + r.h - 4, r.y + r.h - 3].includes(y)) continue;
+      if (protectedAreas.some(p => x >= p.x && x < p.x + p.w && y >= p.y && y < p.y + p.h)) continue;
       if (hash(world.seed, 'scar', name, x, y) >= level) continue;
       const cell = c.get(x, y)!;
-      if (cell.language && hash(world.seed, 'language-retention', x, y) < .7) continue;
       const n = hash(world.seed, name, x, y, quantum);
-      if (n < .22) c.set(x, y, ' ', style(color.bg));
-      else if (n < .48) c.set(x, y, garbage[Math.floor(n * 100) % garbage.length], style(n < .3 ? color.red : color.dim));
-      else if (!cell.continuation) c.set(x, y, cell.g, { fg: n > .78 ? color.purple : color.red, bg: n > .94 ? color.faint : color.bg });
+      if (n < .22) c.set(x, y, ' ', style(color.bg), 'corruption.local');
+      else if (n < .48) c.set(x, y, garbage[Math.floor(n * 100) % garbage.length], style(n < .3 ? color.red : color.dim), 'corruption.local');
+      else if (!cell.continuation) c.set(x, y, cell.g, { fg: n > .78 ? color.purple : color.red, bg: n > .94 ? color.faint : color.bg }, 'corruption.local');
     }
   }
 }
@@ -334,7 +309,7 @@ export class Renderer {
     c.text(2, 0, 'world.execute(me);', style(color.cyan, true));
     const top = `${String(scene.number).padStart(2, '0')}/25   ${hex(world.store.allocation('me').address)}   ${String(world.value('status'))}`;
     c.text(c.columns - width(top) - 3, 0, top, style(color.dim));
-    conversation(c, world, lang, l.chat, t); views.graphic(c, world, lang, l.main, t);
+    conversation(c, world, lang, l.chat); views.graphic(c, world, lang, l.main, t);
     const focus = attributeFocus(world, t);
     if (focus) {
       const changed = world.store.changes.get(`me:${focus}`), entry = film.lyrics[focus === 'role' ? 44 : focus === 'period' ? 42 : 40].startMs;
@@ -352,9 +327,8 @@ export class Renderer {
     const bottom = `${timeCode(t)} / ${timeCode(film.durationMs)}    seed=${world.seed}`;
     c.text(2, l.status.y + 1, bottom, style(color.faint));
     c.text(c.columns - 41, l.status.y + 1, t >= film.times.interrupt ? 'process=TERMINATED  applied=0' : `Space:${tr(lang, 'controls.pause')}  q:${tr(lang, 'controls.quit')}`, style(color.faint), 39);
-    const logLabel = label(world, lang, 'log'); c.text(c.columns - width(logLabel.text) - 2, l.chat.y, logLabel.text, style(color.dim), 20, 'log', logLabel.language);
     // Flashback tiles use a canonical normal-circle sample, never a previous output frame.
-    if (t >= film.lyrics[44].startMs && t < film.times.counts[0] && Math.floor(t / 180) % 11 === 0) {
+    if (!['permission', 'retry'].includes(scene.id) && t >= film.times.selfErase && t < film.times.counts[0] && Math.floor(t / 180) % 11 === 0) {
       const key = `${size.columns}:${size.rows}:${lang}`;
       let previous = this.history.get(key);
       if (!previous) {
@@ -363,7 +337,7 @@ export class Renderer {
         if (this.history.size >= 4) this.history.clear(); this.history.set(key, previous);
       }
       for (let y = l.main.y + 4; y < l.main.y + 7; y++) for (let x = l.main.x + 8; x < l.main.x + 26; x++) {
-        const old = previous.get(x, y)!; if (!old.continuation && old.g !== ' ') c.set(x, y, old.g, style(color.purple));
+        const old = previous.get(x, y)!; if (!old.continuation && old.g !== ' ') c.set(x, y, old.g, style(color.purple), 'flashback');
       }
     }
     damage(c, world, t);

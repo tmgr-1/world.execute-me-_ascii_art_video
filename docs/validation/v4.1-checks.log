@@ -1,0 +1,92 @@
+
+> world-execute-terminal-film@1.0.0 check
+> tsc --noEmit && node --import tsx src/cli.ts check
+
+内容结构通过；发布检查仍需精校锚点。
+E_ANCHOR_ROUGH:209
+
+> world-execute-terminal-film@1.0.0 build
+> tsc
+
+
+
+> world-execute-terminal-film@1.0.0 test
+> node --import tsx --test --test-isolation=none test/*.test.ts
+
+✔ rehearsal loop ranges use media milliseconds and reject empty, reversed or tiny intervals (1.284002ms)
+✔ all content contracts pass; unreviewed machine anchors fail release validation (625.853719ms)
+✔ keyword and count syllable anchors cannot drift outside their lyric spans (1.529001ms)
+✔ typed values, UTF-8 references, byte order, alignment, and invalid-write rollback share one store (0.434971ms)
+✔ draft does not create a request or task; one send links history, transcript, task and rx (3.817899ms)
+✔ disconnect freezes external facts; predictions never become rx, ack or verification (41.691769ms)
+✔ erasure changes bytes and validity while protected session writes are rejected (38.632814ms)
+✔ a request allocates its typed boundary from semantic parameters without handwritten addresses (8.270174ms)
+✔ six stages arm without committing; the word end precedes intent and the write barrier (78.249917ms)
+✔ the patch is a draft before the check event and cannot acquire PASS from a later render (38.906244ms)
+✔ fixed ticks and checkpoints reproduce exact state across frame rates, dropped frames and reverse seeks (258.032992ms)
+✔ providers preserve circumference, tangent contact, current stages and era direction (0.192974ms)
+✔ AC/DC and AD/BC states land on their keyword anchors (12.155247ms)
+✔ media clock pause, speed and epochs are independent of render cadence (0.151949ms)
+✔ wide graphemes erase and clip as complete glyphs (0.118763ms)
+✔ 130x35 cn: all scene and count boundaries preserve valid glyphs (169.120603ms)
+✔ 130x35 cn: story freezes for 3000ms while captions follow the music (219.378915ms)
+✔ 130x35 en: all scene and count boundaries preserve valid glyphs (162.095526ms)
+✔ 130x35 en: story freezes for 3000ms while captions follow the music (222.235893ms)
+✔ 160x45 cn: all scene and count boundaries preserve valid glyphs (183.683125ms)
+✔ 160x45 cn: story freezes for 3000ms while captions follow the music (234.009237ms)
+✔ 160x45 en: all scene and count boundaries preserve valid glyphs (193.173727ms)
+✔ 160x45 en: story freezes for 3000ms while captions follow the music (229.981848ms)
+✔ the six words have independent assets and retain all six language sources (47.686744ms)
+✔ the complete Chinese title stays on one line at native size with both background borders intact (507.693625ms)
+✔ the simulation keeps the deletion target readable while its log declaration scrolls (44.278618ms)
+✔ damage and canonical flashback frames reproduce after forward and reverse seeks (237.861182ms)
+✔ the opening uses quick drafts and real connection / selection events before the first simulation (8.606033ms)
+✔ vision is a linked request with degraded model state, ghosted panes and subsequent recovery (13.94968ms)
+✔ departure is readable before the result, followed by a short feedback timeout (25.576111ms)
+✔ waiting moves from status to demand; the first sim first-person line is the final demand (83.59012ms)
+✔ own data really disappears while runtime and external objects survive; only system execution is fatal (41.849474ms)
+✔ every count adds viewport damage; guard wins briefly, is overwritten, and never freezes the background (89.985627ms)
+✔ 130x35 cn: full title, plain console, frozen analysis and final purge (140.329106ms)
+✔ 130x35 en: full title, plain console, frozen analysis and final purge (132.662245ms)
+✔ 160x45 cn: full title, plain console, frozen analysis and final purge (133.435815ms)
+✔ 160x45 en: full title, plain console, frozen analysis and final purge (139.855091ms)
+✔ JSON protocol fixture: load paused, exact seek, speed, frozen pause, EOF and own-child cleanup (425.505152ms)
+✔ invalid files and missing players fail and clean up rather than becoming story termination (46.400244ms)
+✔ single output adapter uses terminal-kit, emits whole glyphs and restores terminal modes (13.422402ms)
+✔ terminal output includes the side panels and bottom edge beyond the reference viewport after resizing (27.897488ms)
+✔ backpressure bounds pending work and only encodes the latest dropped-frame replacement (11.695718ms)
+✔ boot percentages are monotonic and complete at simulation readiness (31.760945ms)
+✔ the closed session remains alone for 1.5 seconds; timeout starts inspection, not another long wait (23.13257ms)
+✔ each autonomous candidate has one combined cyan hypothesis; God needs ROOT and user proof (52.03079ms)
+✔ attribute write focus follows the actual field, address and changed bytes without delaying lyrics (37.849353ms)
+✔ the execution sequence ends before Ein; guard warning refreshes never issue new operations (43.014086ms)
+✔ count warnings append to the full log and scroll its tail; old lines acquire persistent scars while new warnings remain legible (321.792805ms)
+✔ all 93 translations fit; English count meanings occupy only the second caption row (0.276049ms)
+✔ captions survive corruption, frozen termination, POST, core analysis and final deletion at every supported size (715.731755ms)
+✔ continuous playback renders the actual wrapped tail of one event log through every scene transition (7991.818806ms)
+✔ message styles belong to the record; past gray messages survive the cyan transition and APIs remain gray (46.667871ms)
+✔ user drafts, sent history and log requests are green; departure emphasis stays in User Input (66.270592ms)
+✔ weighted boot work advances in deterministic batches with plateaus and one ASCII percentage bar (44.880934ms)
+✔ ordinary attribute writes are stable; local corruption starts only after a real fragment deletion (594.066715ms)
+✔ six source-bound private copies wipe top-to-bottom; real bytes, validity, memory focus and originals agree (175.209087ms)
+✔ Challenging your God traces a read-only authority chain and checks a draft before any new submission (51.010179ms)
+✔ instrumental outro holds the complete host frame; the last sung Execution appends deletion with independent captions (471.755016ms)
+ℹ tests 58
+ℹ suites 0
+ℹ pass 58
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 15697.128406
+
+
+> world-execute-terminal-film@1.0.0 test:e2e
+> python3 test/pty_smoke.py
+
+PTY fixture passed: ready/start, termination, pause, resize, seek, quit, terminal restore, no duplicate requests.
+PTY player-failure case passed: full-screen panels at 220x60 / 240x64, real ERROR, no story termination, terminal restored.
+PTY loop case passed: repeated exact media seeks, deterministic rebuild, no duplicate requests, terminal restored.
+
+Authoring: explicit --window 188:211.94 local alignment reproduced; Python compile/help passed.
+Frame review: 156 deterministic JSON frames / 90 PNGs; cn/en at 130x35, 160x45, 220x60.

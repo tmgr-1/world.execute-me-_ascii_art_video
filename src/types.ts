@@ -30,6 +30,8 @@ export type MotionKind = 'points' | 'circle' | 'tangent' | 'infinity' | 'current
 export type PrivilegedOperation = 'root-request' | 'root' | 'reopen' | 'inject' | 'disable' | 'erase-preflight' | 'arm-preflight' | 'system-execute';
 export type Command =
   | { kind: 'CREATE_WORLD' }
+  | { kind: 'BOOT_WORK'; units: number }
+  | { kind: 'ERASE_COPY'; fragment: number; clearedBytes: number }
   | { kind: 'SET'; target: string; field: string; value: Value; source?: Source }
   | { kind: 'CHAT'; source: Source; key: string }
   | { kind: 'OPEN' } | { kind: 'CLOSE' }
@@ -55,5 +57,5 @@ export interface Film {
   programs: Program[]; cues: Cue[]; scenes: Scene[]; schemas: Schema[];
   times: { intro: number; close: number; intent: number; interrupt: number; holdEnd: number; patch: number; counts: number[];
     result: number; feedbackTimeout: number; executionStart: number; executionEnd: number; violationWarning: number;
-    selfErase: number; deletionAnnouncement: number; finalDelete: number; purge: number; blackout: number };
+    selfErase: number; deletionAnnouncement: number; outroHold: number; finalDelete: number; purge: number; blackout: number };
 }

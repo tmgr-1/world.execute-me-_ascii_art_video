@@ -1,0 +1,27 @@
+{
+  "environment": {
+    "os": "linux",
+    "arch": "x64",
+    "cpu": "Intel(R) Core(TM) i5-14600K",
+    "node": "v24.19.0",
+    "size": {
+      "columns": 160,
+      "rows": 45
+    },
+    "language": "cn"
+  },
+  "samples": 6423,
+  "meanMs": 1.7543828321656494,
+  "p95Ms": 2.7296809999998004,
+  "maxMs": 70.75801300000057,
+  "peakRssMiB": 133.109375,
+  "memory": {
+    "rss": 138473472,
+    "heapTotal": 36143104,
+    "heapUsed": 26951712,
+    "external": 17933679,
+    "arrayBuffers": 15490687
+  },
+  "scope": "Deterministic model and frame composition; excludes terminal transport, mpv and audible synchronization.",
+  "anchors": "machine estimates, unreviewed"
+}

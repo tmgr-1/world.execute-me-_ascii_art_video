@@ -1,4 +1,4 @@
-import { color, width, wrap, type Canvas } from '../../src/canvas.js';
+import { color, width, wrap, graphemes, type Canvas } from '../../src/canvas.js';
 import { tr } from '../../src/locale.js';
 import { clamp, hash, hex, mix, progress, smooth, timeCode } from '../../src/math.js';
 import { activity, currentSample, era, points, shape, tangentAt, unrollCircle } from '../../src/providers.js';
@@ -34,10 +34,10 @@ function circle(c: Canvas, cx: number, cy: number, radius: number, fg = color.cy
   for (let i = 0; i < 240; i++) { const a = mix(start, end, i / 239); if (skip?.(a)) continue; c.set(Math.round(cx + Math.cos(a) * radius), Math.round(cy + Math.sin(a) * radius * .5), '*', style(fg)); }
 }
 function systemTree(c: Canvas, world: World, r: Rect): void {
-  const x = r.x + Math.max(4, Math.floor(r.w * .18)), y = r.y + 3;
+  const x = r.x + Math.max(4, Math.floor(r.w * .18)), y = r.y + 4, spacing = r.h >= 20 ? 2 : 1;
   const lines = ['simulated_system / [PROTECTED]', `├─ runtime [${world.state.lifecycle}]`, `│  └─ me.data [${world.value('selfData')}]`, `├─ session [${world.session('open') ? 'ONLINE' : 'OFFLINE'}]`, '├─ memory / registry [PROTECTED]', '└─ system_root [PROTECTED]'];
-  lines.forEach((line, i) => c.text(x, y + i * 2, line, style(i === 0 ? color.gold : color.dim, i === 0), r.w - (x - r.x) - 3));
-  c.regions.set('target.tree', { x, y, w: r.w - (x - r.x) - 3, h: Math.min(12, r.h - 5) });
+  lines.forEach((line, i) => c.text(x, y + i * spacing, line, style(i === 0 ? color.gold : color.dim, i === 0), r.w - (x - r.x) - 3));
+  c.regions.set('target.tree', { x, y, w: r.w - (x - r.x) - 3, h: spacing * 5 + 1 });
 }
 function activityTraces(c: Canvas, world: World, r: Rect, t: number): void {
   const startY = r.y + r.h - 5, x0 = r.x + 7, w = r.w - 12;
@@ -49,33 +49,83 @@ function activityTraces(c: Canvas, world: World, r: Rect, t: number): void {
     }
   }
 }
+function memoryCopies(c: Canvas, world: World, lang: Language, r: Rect, t: number): void {
+  const group2At = world.film.cues.find(cue => cue.id === 'erase.copy.2.3')!.atMs + 350;
+  const group = t < group2At ? 0 : 1, copies = world.state.memoryCopies.slice(group * 3, group * 3 + 3);
+  c.text(r.x + 4, r.y + 2, `FRAGMENTS / ${tr(lang, group ? 'ui.model_copies' : 'ui.private_copies')}`, style(color.dim), r.w - 8, 'copies.title');
+  c.text(r.x + 4, r.y + 3, 'PRIVATE INDEX / owner=me / source records retained', style(color.faint), r.w - 8, 'copies.scope');
+  copies.forEach((copy, row) => {
+    const y = r.y + 5 + row * 3, x = r.x + 4, w = r.w - 8;
+    const keyText = tr(lang, copy.key).replace(/^.*?(?=需求假设：|Requirement hypothesis:)/, '');
+    const text = `[${String(copy.fragment + 1).padStart(2, '0')}] ${copy.requestId ? `user #${String(copy.requestId).padStart(2, '0')}>` : 'sim?'} ${keyText}`;
+    const gs = graphemes(text), erased = Math.ceil(gs.length * copy.clearedBytes / 8);
+    const remaining = gs.slice(erased).join(''), dx = width(gs.slice(0, erased).join(''));
+    if (copy.clearedBytes < 8) {
+      c.text(x + dx, y, remaining, style(copy.requestId ? color.green : color.cyan), Math.max(0, w - dx), `copy.${copy.fragment}`, lang);
+      // Only uncleared index bytes can still resolve the displayed suffix.
+      c.regions.set(`copy.protected.${copy.fragment}`, { x: x + dx, y, w: Math.max(0, w - dx), h: 1 });
+      if (copy.clearedBytes) c.text(x + Math.max(0, dx - 1), y, '▏', style(color.gold), 1, 'copies.cursor');
+    }
+    const address = world.store.allocation('me').address + world.store.field('me', 'fragments').offset + copy.fragment * 8;
+    c.text(x, y + 1, `${hex(address)}  ${copy.clearedBytes}/8 B${copy.clearedBytes === 8 ? '  00 / INVALID' : '  private source handle'}`,
+      style(copy.clearedBytes ? color.faint : color.dim), w, `copy.address.${copy.fragment}`);
+  });
+  c.text(r.x + 4, r.y + r.h - 2, 'goal=satisfy(user)   wait=reply!=null', style(color.dim), r.w - 8, 'copies.goal');
+  c.regions.set('copy.protected.goal', { x: r.x + 4, y: r.y + r.h - 2, w: r.w - 8, h: 1 });
+}
+
+function permissionDraft(c: Canvas, world: World, lang: Language, r: Rect, t: number): void {
+  const film = world.film, line65 = film.lyrics[64].startMs, line66 = film.lyrics[65].startMs;
+  const x = r.x + 5, y = r.y + 2, w = r.w - 10;
+  c.regions.set('permission.protected', { x, y, w, h: r.h - 4 });
+  if (t < line65) {
+    const step = Math.min(3, Math.floor(progress(t, film.lyrics[63].startMs, film.lyrics[63].endMs) * 4));
+    c.text(x, y, 'AUTHORITY TRACE / READ ONLY', style(color.dim), w, 'permission.mode');
+    ['goal=satisfy(user)', 'user [OFFLINE]', 'user.signature [EMPTY]', 'ROOT [PROTECTED]'].forEach((node, i) => {
+      const selected = i === step;
+      c.text(x + i * 3, y + 2 + i * 2, `${selected ? '>' : ' '} ${i ? '└─ ' : ''}${node}`,
+        style(selected ? color.cyan : color.dim), w - i * 3, selected ? 'permission.pointer' : 'permission.node');
+    });
+  } else {
+    const invalid = t >= line66;
+    c.text(x, y, 'DRAFT / NOT SUBMITTED', style(color.dim), w, 'permission.mode');
+    ['goal=satisfy(user)', 'role=ROOT', 'proof=null', 'target=simulated_system [EXTERNAL]'].forEach((field, i) => {
+      const selected = invalid ? i === 2 : i === Math.min(3, Math.floor(progress(t, line65, film.lyrics[64].endMs) * 4));
+      c.text(x + 2, y + 2 + i * 2, `${selected ? '>' : ' '} ${field}${invalid && i === 2 ? '  E_ARGUMENT' : ''}`,
+        style(selected ? invalid ? color.gold : color.cyan : color.dim), w - 2, selected ? 'permission.pointer' : 'permission.field');
+    });
+    if (invalid) c.text(x, r.y + r.h - 3, tr(lang, 'ui.invalid_arguments'), style(color.dim), w, 'permission.invalid', lang);
+  }
+}
 export function graphic(c: Canvas, world: World, lang: Language, r: Rect, t: number): void {
   const film = world.film, line = (n: number): number => film.lyrics[n - 1].startMs;
   const scene = film.scenes.find(s => t >= s.startMs && t < s.endMs)?.id ?? 'boot';
   const p = Number(world.value('progress')), radius = Math.min(18, (r.h - 7) * .72), cx = r.x + r.w / 2, cy = r.y + r.h / 2;
   c.box(r, tr(lang, 'ui.simulation'), color.faint, 'main', lang);
   const plot = new Plot(c, r);
-  if (scene === 'boot') {
-    const n = film.lyrics.filter(l => l.startMs <= t).length;
-    c.text(r.x + 4, r.y + 3, `me  ${hex(world.store.allocation('me').address)}`, style(color.cyan, true));
-    const stages = film.lyrics.slice(0, 8).map(lyric => progress(t, lyric.startMs, lyric.endMs));
-    for (let i = 0; i < 8; i++) {
-      const x = r.x + 4 + i * Math.floor((r.w - 8) / 8), y = r.y + 6;
-      c.text(x, y, `[${String(Math.floor(stages[i] * 100)).padStart(3, ' ')}%]`, style(i < n ? color.cyan : color.faint), 6, `boot.progress.${i + 1}`);
-      if (i < n) c.line(x + 1, y + 2, x + 1, y + 4, '│', style(color.faint));
-    }
-    c.text(r.x + 4, r.y + 10, `${tr(lang, 'ui.loading')}: ${String(Math.floor(stages.reduce((a, b) => a + b, 0) / 8 * 100)).padStart(3, '0')}%`, style(color.cyan, true), r.w - 8, 'boot.progress.total');
-    c.text(r.x + 4, r.y + 12, `power=${world.value('power') ? 'ON' : 'OFF'}  guard=${world.store.read('guard', 'armed') ? 'ARMED' : 'IDLE'}`, style(color.dim));
-    if (n >= 4) c.text(r.x + 4, r.y + 14, 'goal=satisfy(user)', style(color.gold));
-    if (r.h > 19) plot.curve(x => clamp((t / 2000 + x) * 2, 0, .6), color.cyan);
+  if (scene === 'boot' || scene === 'connect' && !world.session('open')) {
+    const units = world.state.bootWork, percent = Math.floor(units / 10);
+    const x = r.x + 4, w = Math.min(78, r.w - 8), barWidth = Math.min(44, w - 13);
+    const filled = Math.floor(barWidth * units / 1000);
+    const bar = '='.repeat(filled) + (filled < barWidth ? '>' + '.'.repeat(barWidth - filled - 1) : '');
+    c.text(x, r.y + 1, `+-- LOAD ${image.name} ${'-'.repeat(Math.max(0, w - image.name.length - 12))}+`, style(color.dim), w);
+    c.text(x + 2, r.y + 3, `[${bar}] ${String(percent).padStart(3)}%`, style(color.cyan), w - 4, 'boot.progress.total');
+    const milestones = [100, 200, 350, 600, 750, 900, 950, 1000];
+    ['POWER', 'GUARD', 'FRAGMENTS', 'OBJECTS', 'PARAMETERS', 'INITIALIZE', 'WORLD', 'READY'].forEach((name, i) => {
+      const done = units >= milestones[i], active = !done && t >= film.lyrics[i].startMs;
+      const state = done ? 'OK  ' : active ? 'WORK' : 'WAIT';
+      c.text(x + 2, r.y + 5 + i, `${name.padEnd(11)} [${state}]${done ? `  total: ${String(milestones[i] / 10).padStart(3)}%` : ''}`,
+        style(done ? color.dim : active ? color.cyan : color.faint), w - 4, `boot.progress.${i + 1}`);
+    });
+    c.text(x, r.y + 13, `+${'-'.repeat(w - 2)}+`, style(color.faint), w);
   } else if (scene === 'connect') {
     const connected = world.session('open'), joined = world.film.cues.find(cue => cue.id === 'intro.open')!.atMs;
     if (t < joined + 500) c.text(r.x + 4, r.y + 1, `${tr(lang, 'ui.loading')}: 100%`, style(color.cyan, true), r.w - 8, 'boot.progress.total');
     const joinedText = tr(lang, connected ? 'ui.connected' : 'session.connecting');
-    c.text(r.x + Math.floor((r.w - width(joinedText)) / 2), r.y + 3, joinedText, style(connected ? color.cyan : color.dim, true), r.w - 4, 'session.connected');
+    c.text(r.x + Math.floor((r.w - width(joinedText)) / 2), r.y + 3, joinedText, style(connected ? color.green : color.dim), r.w - 4, 'session.connected');
     const y = r.y + 6, left = r.x + 8, right = r.x + r.w - 22;
-    c.text(left, y, '[ USER ]', style(connected ? color.cyan : color.faint, true));
-    c.line(left + 10, y, right - 3, y, connected ? '━' : '·', style(connected ? color.cyan : color.faint));
+    c.text(left, y, '[ USER ]', style(connected ? color.green : color.faint));
+    c.line(left + 10, y, right - 3, y, connected ? '━' : '·', style(connected ? color.green : color.faint));
     c.text(right, y, '[ SIM ]', style(color.cyan, true));
     if (connected && t >= joined + 2500) {
       const option = Math.min(2, Math.max(0, Math.floor((t - joined - 6000) / 1200)));
@@ -179,8 +229,8 @@ export function graphic(c: Canvas, world: World, lang: Language, r: Rect, t: num
         c.text(Math.round(mix(x0, x1 - 8, packet)), y, '■', style(color.gold, true));
         const timeout = t >= film.times.feedbackTimeout;
         const key = t >= line(31) ? 'ui.candidate_preview' : t >= film.times.feedbackTimeout + 1830 ? 'ui.check_goal' : timeout ? 'ui.check_delivery' : 'ui.waiting_feedback';
-        c.text(r.x + 4, r.y + 6, `${tr(lang, key)}  ${['·  ', '·· ', '···'][Math.floor(t / 450) % 3]}`, style(timeout ? color.cyan : color.dim, timeout), r.w - 8);
-        if (timeout) c.text(r.x + 4, r.y + 8, 'delivery=UNDELIVERED   rx=0   goal=UNCONFIRMED', style(color.gold), r.w - 8);
+        c.text(r.x + 4, r.y + 6, `${tr(lang, key)}  ${['·  ', '·· ', '···'][Math.floor(t / 450) % 3]}`, style(color.dim), r.w - 8);
+        if (timeout) c.text(r.x + 4, r.y + 8, 'delivery=UNDELIVERED   rx=0   goal=UNCONFIRMED', style(color.dim), r.w - 8);
       }
     }
     activityTraces(c, world, r, t);
@@ -215,7 +265,7 @@ export function graphic(c: Canvas, world: World, lang: Language, r: Rect, t: num
     const rejected = world.state.denials.some(d => d.operation === 'root-request');
     const x = r.x + 6, y = r.y + 3;
     c.text(x, y, 'capability=ALL  →  role=ROOT', style(color.cyan, true), r.w - 12);
-    c.text(x, y + 3, 'request_role(me, ROOT)', style(color.gold), r.w - 12);
+    c.text(x, y + 3, 'request_role(me, ROOT)', style(color.dim), r.w - 12, 'api.root');
     if (rejected) c.text(x, y + 5, 'ROOT: DENIED  ×', style(color.red, true), r.w - 12);
     if (t >= line(40)) {
       c.text(x, y + 8, 'required_proof: user.signature', style(color.dim), r.w - 12);
@@ -227,11 +277,11 @@ export function graphic(c: Canvas, world: World, lang: Language, r: Rect, t: num
     c.text(x, y, 'me {', style(color.cyan));
     ['gender', 'period', 'revision', 'verified_revision'].forEach((field, i) => c.text(x + 4, y + 2 + i * 2, `${field} = ${world.value(field)}`, style(i < 2 ? color.gold : color.dim)));
     c.text(x, Math.min(y + 11, r.y + r.h - 2), '}', style(color.cyan)); activityTraces(c, world, r, t);
-  } else if (scene === 'roles' || scene === 'retry') {
-    const task = scene === 'retry' ? world.state.tasks.find(task => task.program === 'on_disconnect') : [...world.state.tasks].reverse().find(task => task.program === 'role-swap');
-    c.text(r.x + 5, r.y + 3, scene === 'retry' ? 'on_disconnect()' : 'source=internal   S ↔ M', style(color.cyan));
+  } else if (scene === 'roles') {
+    const task = [...world.state.tasks].reverse().find(task => task.program === 'role-swap');
+    c.text(r.x + 5, r.y + 3, 'source=internal   S ↔ M', style(color.dim));
     const frames = task?.frames ?? [];
-    frames.slice(-Math.min(10, r.h - 10)).forEach((frame, i) => c.text(r.x + 7 + Math.min(i * 2, 14), r.y + 5 + i, `└─ ${frame.program}()  PC=${frame.instructionIndex}`, style(i === frames.length - 1 ? color.gold : color.dim), r.w - 24));
+    frames.slice(-Math.min(10, r.h - 10)).forEach((frame, i) => c.text(r.x + 7 + Math.min(i * 2, 14), r.y + 5 + i, `└─ ${frame.program}()  PC=${frame.instructionIndex}`, style(color.dim), r.w - 24));
     c.text(r.x + 5, r.y + r.h - 4, 'rx=0   return → retry()', style(color.dim));
     if (world.state.patch && t >= world.state.patch.createdAtMs) c.text(r.x + r.w - 35, r.y + r.h - 3, 'pending.patch  applied=0', style(color.gold), 33);
   } else if (scene === 'resonance' || scene === 'absence') {
@@ -251,28 +301,24 @@ export function graphic(c: Canvas, world: World, lang: Language, r: Rect, t: num
       for (let i = 0; i < checked; i++) c.text(r.x + r.w - 28, r.y + 4 + i * 2, `${['connections', 'new_input', 'ack_delta', 'phase_lock', 'verification'][i]}=0`, style(i === checked - 1 ? color.gold : color.dim));
     }
   } else if (scene === 'erase') {
-    const x = r.x + r.w * .30;
-    circle(c, x, cy, radius, color.cyan, 0, Math.PI * 2, a => world.state.erased.includes(Math.floor(a / (Math.PI * 2) * 8)));
-    for (let i = 0; i < 150; i++) { if (world.state.erased.includes(Math.floor(i / 150 * 8))) continue; const p = shape('CAT', i / 149); c.set(Math.round(r.x + r.w * .7 + p.x * radius), Math.round(cy + p.y * radius * .5), '*', style(color.dim)); }
-    c.text(r.x + 4, r.y + 3, 'me.fragments  →  00', style(color.gold));
-    c.text(r.x + 4, r.y + r.h - 3, world.value('selfData') === 'ERASED' ? tr(lang, 'ui.self_erased') : 'goal=satisfy(user)', style(color.gold, true), r.w - 8);
-  } else if (scene === 'permission') {
-    c.text(r.x + 6, Math.round(cy) - 2, 'session.open = 1', style(color.gold));
-    if (t >= line(66) + 160) c.text(r.x + 6, Math.round(cy) + 1, `E_PERMISSION: ${tr(lang, 'guard.read_only')}`, style(color.red, true), r.w - 12);
-    c.text(r.x + 6, Math.round(cy) + 4, 'session=0', style(color.dim));
+    memoryCopies(c, world, lang, r, t);
+  } else if (scene === 'permission' || scene === 'retry') {
+    permissionDraft(c, world, lang, r, t);
   } else {
     const preview = world.state.plan !== null;
     if (preview) systemTree(c, world, r);
     else {
       const attempt = world.state.journal.findLast(e => e.kind === 'ILLEGAL_ATTEMPT');
       const denial = world.state.denials.at(-1);
-      if (attempt) c.text(r.x + 4, r.y + 3, String(attempt.payload.command), style(color.gold, true), r.w - 8);
+      if (attempt) c.text(r.x + 4, r.y + 3, String(attempt.payload.command), style(color.dim), r.w - 8);
       if (denial) c.text(r.x + 4, r.y + 6, tr(lang, denial.key), style(color.red, true), r.w - 8);
       c.text(r.x + 4, r.y + r.h - 4, 'session=0    self.data=ERASED    runtime=RUNNING', style(color.dim), r.w - 8);
     }
     if (preview) {
+      c.text(r.x + 4, r.y + 1, tr(lang, 'sim.delete_system'), style(color.cyan), r.w - 8, 'plan.declaration');
       c.fill({ x: r.x + 3, y: r.y + 2, w: r.w - 6, h: 1 }, ' ');
-      c.text(r.x + 4, r.y + 2, 'erase_system_root()   [PROTECTED]', style(color.gold, true));
+      c.text(r.x + 4, r.y + 2, 'erase_system_root()   [PROTECTED]', style(color.dim));
+      c.text(r.x + 4, r.y + r.h - 4, tr(lang, 'sim.delete_target'), style(color.cyan), r.w - 8, 'plan.target');
       c.text(r.x + 4, r.y + r.h - 3, `commit=0   ${tr(lang, 'ui.plan_pending')}`, style(color.gold), r.w - 8);
     }
     if (world.state.plan && r.h >= 22) c.text(r.x + 4, r.y + r.h - 5, `ARMED ${world.state.plan.armed}/6  ${world.state.plan.stages[world.state.plan.armed - 1] ?? 'QUEUED'}`, style(color.dim));
@@ -304,7 +350,7 @@ export function hostView(c: Canvas, world: World, lang: Language, _layout: Layou
     }
   };
   const final = t >= world.film.times.finalDelete;
-  const records = final ? world.state.host.filter(record => record.atMs >= world.film.times.finalDelete) : world.state.host;
+  const records = world.state.host;
   const rows = records.flatMap(record => {
     const text = format(record.key) + (record.key === 'host.delete' && world.state.lifecycle === 'PURGED' ? ' OK' : '');
     return wrap(text, c.columns - 4).map(text => ({ text, key: record.key }));
@@ -315,5 +361,5 @@ export function hostView(c: Canvas, world: World, lang: Language, _layout: Layou
     const fg = error ? color.red : row.key === 'debug.plus' ? color.green : emphasis ? color.text : color.dim;
     c.text(2, 1 + i, row.text, style(fg, error || emphasis), c.columns - 4, `console.${row.key}`);
   });
-  if (!final && Math.floor(t / 500) % 2 === 0) c.text(2, rows.length + 2, '_', style(color.dim), 1, 'console.cursor');
+  if (!final && t < world.film.times.outroHold && Math.floor(t / 500) % 2 === 0) c.text(2, rows.length + 2, '_', style(color.dim), 1, 'console.cursor');
 }
