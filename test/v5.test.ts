@@ -141,13 +141,20 @@ test('lyric-bound inspection finds the missing confirmation, keeps the return pa
 
 test('opening and closing the debugger preserve the original console and final deletion timeline', () => {
   const r = new Renderer(new Director(film));
-  assert.equal(film.times.debugOpen, 170850); assert.equal(film.times.debugClose, 201840);
+  assert.equal(film.times.debugOpen, 170850); assert.equal(film.times.debugClose, 200840);
+  const closed = film.cues.find(c => c.command.kind === 'HOST' && c.command.key === 'host.debug_closed')!;
+  assert.equal(closed.atMs, 201640);
+  assert.equal(film.times.consoleReset, 202940);
+  assert.equal(film.times.consoleReset - closed.atMs, 1300);
+  assert.ok(r.frame(film.times.debugClose - 1, small, 'cn').regions.has('debugger'));
   for (const t of [film.times.debugOpen - 1, film.times.debugClose, film.times.debugClose + 800]) {
     const frame = r.frame(t, small, 'cn'); assert.ok(frame.regions.has('system.console') && !frame.regions.has('debugger'));
     assert.ok(frame.plain().includes('ROM') && frame.plain().includes('RAM'));
     assert.ok(!/[┌┐└┘│─]/.test(frame.plain()));
   }
   assert.ok(r.frame(film.times.debugClose, small, 'cn').plain().includes(tr('cn', 'host.close_debug', { image: image.name })));
+  assert.ok(r.frame(closed.atMs, small, 'cn').plain().includes('DEBUG SESSION CLOSED'));
+  assert.ok(r.frame(film.times.consoleReset - 1, small, 'cn').plain().includes('DEBUG SESSION CLOSED'));
   assert.ok(r.frame(film.times.consoleReset, small, 'cn').cells.every(c => c.g === ' '));
   assert.equal(film.times.finalDelete, 204290); assert.equal(film.times.purge, 206020);
   assert.ok(r.frame(film.times.purge, small, 'cn').plain().includes('PROGRAM DELETED'));
@@ -155,7 +162,7 @@ test('opening and closing the debugger preserve the original console and final d
 
 test('deletion audit views and debugger selections reproduce after reverse seeks and skipped frames', () => {
   const r = new Renderer(new Director(film));
-  for (const t of [120239, 120340, 122540, 125240, 170850, 178500, 181200, 183600, 185700, 191300, 201840]) {
+  for (const t of [120239, 120340, 122540, 125240, 170850, 178500, 181200, 183600, 185700, 191300, film.times.debugClose]) {
     const expected = new Renderer(new Director(film)).frame(t, small, 'cn').hash();
     r.frame(1000, small, 'cn'); r.frame(t + 300, small, 'cn');
     assert.equal(r.frame(t, small, 'cn').hash(), expected);

@@ -1,4 +1,4 @@
-V5.0 implementation validation — 2026-10-17
+V5.0 initial implementation validation — 2026-10-17
 Baseline: accb02e
 
 
@@ -188,3 +188,30 @@ Benchmark en (250ms step, 160x45, 64 MiB Node old-generation heap limit):
 }
 
 Limits: 209 anchors retain their existing rough status. PTY checks use the explicit fake-mpv protocol fixture. Benchmarks measure model/frame composition, excluding terminal transport, mpv and audible synchronization; real-device sound/video latency was not remeasured. Music and the original root lyric file remain excluded from Git.
+
+V5.0 timing follow-up — 2026-10-17
+Baseline: d36d4ab
+The following timings supersede the original boundary record above.
+
+Debugger exit: 201840 -> 200840ms.
+Close confirmation: 202640 -> 201640ms.
+Recovery console visible: 1100 -> 2100ms; close confirmation readable for 1300ms before clear.
+Unchanged: console clear 202940ms; deletion announcement 204290ms; final lyric 205840ms; purge 206020ms.
+
+$ npm run check
+> world-execute-terminal-film@1.0.0 check
+> tsc --noEmit && node --import tsx src/cli.ts check
+
+内容结构通过；发布检查仍需精校锚点。
+E_ANCHOR_ROUGH:209
+
+$ npm test
+✔ opening and closing the debugger preserve the original console and final deletion timeline (69.798829ms)
+ℹ tests 82
+ℹ suites 0
+ℹ pass 82
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 23303.632488

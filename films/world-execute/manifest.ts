@@ -20,8 +20,8 @@ export function makeFilm(overrides?: Anchor[], options: { easterEgg?: boolean } 
   const debugOpen = holdEnd + 2700 + 5 * 520;
   const deletionAnnouncement = Math.min(start(70), counts[0] - 3300);
   const executionStart = end(66) + 1500, executionEnd = end(72), violationWarning = start(72) + 120;
-  const outroHold = end(92), finalExecution = start(93), debugClose = finalExecution - 4000;
-  const consoleReset = debugClose + 1100, finalDelete = consoleReset + 1350, purge = finalExecution + 180;
+  const outroHold = end(92), finalExecution = start(93), debugClose = finalExecution - 5000;
+  const consoleReset = finalExecution - 2900, finalDelete = consoleReset + 1350, purge = finalExecution + 180;
   const easterEgg = purge + 8000, easterEggEnabled = options.easterEgg === true;
   const presentationEndMs = easterEggEnabled ? Math.max(timing.durationMs, easterEgg + 2000) : timing.durationMs;
   const densities = [.01, .02, .04, .08, .12];
